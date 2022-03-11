@@ -6,17 +6,19 @@ part 'extensions.dart';
 
 part 'pot_body.dart';
 
-/// The signature of a callback that creates and returns an object of type T.
+/// The signature of a callback that creates and returns an object
+/// of type [T].
 typedef PotObjectFactory<T> = T Function();
 
-/// The signature of a callback that receives an object of type T to be
-/// disposed of.
+/// The signature of a callback that receives an object of type [T]
+/// to be disposed of.
 typedef PotDisposer<T> = void Function(T);
 
 typedef _Resetter = void Function();
 typedef _ScopedResetters = List<List<_Resetter>>;
 
-/// A class that instantiate and keeps an object until it is discarded.
+/// A class that instantiates and keeps an object of type [T] until
+/// it is discarded.
 ///
 /// {@template pot.class}
 /// This class is for keeping an object instance instead of assigning
@@ -88,8 +90,8 @@ typedef _ScopedResetters = List<List<_Resetter>>;
 /// {@endtemplate}
 @sealed
 class Pot<T> extends _PotBody<T> {
-  /// Creates an object that instantiate and keeps an object until
-  /// it is discarded.
+  /// Creates a Pot that instantiates and keeps an object of type [T]
+  /// until it is discarded.
   ///
   /// {@macro pot.class}
   Pot(PotObjectFactory<T> factory, {PotDisposer<T>? disposer})
@@ -138,8 +140,10 @@ class Pot<T> extends _PotBody<T> {
   /// in pots created by this method, and not in pots created by
   /// the default constructor.
   ///
-  /// For details on how this method is used and what occurs in the
-  /// process of replacement, see the document of [ReplaceablePot.replace].
+  /// {@macro pot.replaceablePot}
+  ///
+  /// For details on replacement of the factory, see the document
+  /// of [ReplaceablePot.replace].
   static ReplaceablePot<T> replaceable<T>(
     PotObjectFactory<T> factory, {
     PotDisposer<T>? disposer,

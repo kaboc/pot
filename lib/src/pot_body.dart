@@ -28,7 +28,7 @@ class _PotBody<T> {
   /// a pot is associated with a certain scope as expected.
   int? get scope => _scope;
 
-  /// Returns the object created by the factory.
+  /// Returns the object of type [T] created by the factory.
   ///
   /// If an object has not been created yet, this triggers the factory,
   /// which was set in the constructor, to create one.
@@ -99,7 +99,7 @@ class _PotBody<T> {
   /// See [get] for details.
   T call() => get;
 
-  /// Calls the factory to create an object.
+  /// Calls the factory to create an object of type [T].
   ///
   /// If this is called, the factory, which was set in the constructor,
   /// is executed to create an object.
@@ -136,8 +136,8 @@ class _PotBody<T> {
     _isDisposed = true;
   }
 
-  /// Discards the object that was created by the factory and has been
-  /// held in the pot.
+  /// Discards the object of type [T] that was created by the factory
+  /// and has been held in the pot.
   ///
   /// This method triggers the disposer, which was set in the constructor
   /// of [Pot], if the object exists.
@@ -190,7 +190,8 @@ class _PotBody<T> {
     Pot._scopedResetters.removeFromScope(reset);
   }
 
-  /// Replaces the object factory with a new one for testing purposes.
+  /// Replaces the factory, which creates objects of type [T], with a new
+  /// one for testing purposes.
   ///
   /// [ReplaceablePot.replace] is also a method for replacing the factory,
   /// and in fact, it works exactly the same way, but it is not available
@@ -223,9 +224,20 @@ class _PotBody<T> {
   }
 }
 
-/// A variant of [Pot] with a method for replacing the factory.
+/// A variant of [Pot] with the [replace] method for replacing the
+/// factory, which creates objects of type [T], with a new one.
 ///
 /// This pot is created through [Pot.replaceable].
+///
+/// {@template pot.replaceablePot}
+/// ```dart
+/// // This pot does not have the replace() method.
+/// final pot = Pot(() => Counter());
+///
+/// // This pot has the replace() method.
+/// final replaceablePot = Pot.replaceable(() => Counter());
+/// ```
+/// {@endtemplate}
 ///
 /// [replaceForTesting] is available on this type of Pot regardless
 /// of the flag status of [Pot.forTesting].
@@ -235,9 +247,10 @@ class ReplaceablePot<T> extends _PotBody<T> {
   ReplaceablePot(PotObjectFactory<T> factory, {PotDisposer<T>? disposer})
       : super(factory, disposer: disposer);
 
-  /// Replaces the object factory with new one.
+  /// Replaces the factory, which creates objects of type [T], with
+  /// a new one.
   ///
-  /// This method discards the object of type [T] before replacing the
+  /// This method discards the existing object before replacing the
   /// factory, and unsets the object from the scope it was bound to.
   /// A new object is not created until it is first needed.
   ///
@@ -283,7 +296,7 @@ class ReplaceablePot<T> extends _PotBody<T> {
   ///   // A new scope 1 is added.
   ///   Pot.pushScope();
   ///
-  ///   // The factory is replaced with new one, so
+  ///   // The factory is replaced with a new one, so
   ///   // the existing object is discarded.
   ///   counterPot.replace(() => Counter(0));
   ///
