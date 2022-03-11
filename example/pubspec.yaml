@@ -1,0 +1,12 @@
+name: pot_example
+description: An example of Pot.
+
+environment:
+  sdk: ">=2.16.0 <3.0.0"
+
+dependencies:
+  pot:
+    path: ../
+
+dev_dependencies:
+  lints: ^1.0.1
