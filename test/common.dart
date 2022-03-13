@@ -25,18 +25,21 @@ void prepare() {
 
 @immutable
 class Foo {
-  Foo(this.value) {
+  Foo(this.value)
+      : uid = Object().hashCode ^ DateTime.now().millisecondsSinceEpoch {
     isInitialized = true;
   }
 
+  final int uid;
   final int value;
 
   @override
   bool operator ==(Object other) =>
-      identical(other, this) || other is Foo && value == other.value;
+      identical(other, this) ||
+      other is Foo && uid == other.uid && value == other.value;
 
   @override
-  int get hashCode => value.hashCode;
+  int get hashCode => Object.hashAll([uid, value]);
 
   void dispose() {
     isDisposed = true;

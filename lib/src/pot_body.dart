@@ -15,7 +15,7 @@ class _PotBody<T> {
   bool _isDisposed = false;
 
   @visibleForTesting
-  bool $expect(T? object) => _object == object;
+  bool $expect(bool Function(T?) test) => test(_object);
 
   /// The index number of the scope that the object of this pot has
   /// been bound to.

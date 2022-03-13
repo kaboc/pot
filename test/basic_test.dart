@@ -12,40 +12,51 @@ void main() {
   group('get / call() / create()', () {
     test('Object is not created right away', () {
       final pot = Pot(() => Foo(1));
-      expect(pot.$expect(null), isTrue);
+      expect(pot.$expect((o) => o == null), isTrue);
       expect(isInitialized, isFalse);
     });
 
     test('`get` creates and returns object', () {
       final pot = Pot(() => Foo(1));
-      expect(pot.$expect(null), isTrue);
+      expect(pot.$expect((o) => o == null), isTrue);
       expect(isInitialized, isFalse);
 
       final foo = pot.get;
       expect(isInitialized, isTrue);
-      expect(pot.$expect(Foo(1)), isTrue);
+      expect(pot.$expect((o) => o!.value == 1), isTrue);
       expect(foo.value, 1);
     });
 
-    test('call() creates and returns object', () {
+    test('`get` returns same object', () {
       final pot = Pot(() => Foo(1));
-      expect(pot.$expect(null), isTrue);
+      final hashCode1 = pot.get.hashCode;
+      final hashCode2 = pot.get.hashCode;
+      expect(hashCode2, equals(hashCode1));
+    });
+
+    test('call() works the same as `get`', () {
+      final pot = Pot(() => Foo(1));
+      expect(pot.$expect((o) => o == null), isTrue);
       expect(isInitialized, isFalse);
 
       final foo = pot();
       expect(isInitialized, isTrue);
-      expect(pot.$expect(Foo(1)), isTrue);
+      expect(pot.$expect((o) => o!.value == 1), isTrue);
       expect(foo.value, 1);
+
+      final hashCode1 = foo.hashCode;
+      final hashCode2 = pot().hashCode;
+      expect(hashCode2, equals(hashCode1));
     });
 
     test('create() creates object', () {
       final pot = Pot(() => Foo(1));
-      expect(pot.$expect(null), isTrue);
+      expect(pot.$expect((o) => o == null), isTrue);
       expect(isInitialized, isFalse);
 
       pot.create();
       expect(isInitialized, isTrue);
-      expect(pot.$expect(Foo(1)), isTrue);
+      expect(pot.$expect((o) => o!.value == 1), isTrue);
     });
   });
 
@@ -53,19 +64,29 @@ void main() {
     test('reset() resets object  to null', () {
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
       pot.create();
-      expect(pot.$expect(Foo(1)), isTrue);
+      expect(pot.$expect((o) => o!.value == 1), isTrue);
 
       pot.reset();
-      expect(pot.$expect(null), isTrue);
+      expect(pot.$expect((o) => o == null), isTrue);
+    });
+
+    test('Object after reset is different from previous one', () {
+      final pot = Pot<Foo>(() => Foo(1));
+      final hashCode1 = pot().hashCode;
+
+      pot.reset();
+      final hashCode2 = pot().hashCode;
+
+      expect(hashCode2, isNot(equals(hashCode1)));
     });
 
     test('reset() resets object to null even if disposer() is not set', () {
       final pot = Pot<Foo>(() => Foo(1));
       pot.create();
-      expect(pot.$expect(Foo(1)), isTrue);
+      expect(pot.$expect((o) => o!.value == 1), isTrue);
 
       pot.reset();
-      expect(pot.$expect(null), isTrue);
+      expect(pot.$expect((o) => o == null), isTrue);
     });
 
     test('reset() triggers disposer', () {
@@ -79,7 +100,7 @@ void main() {
 
     test('reset() does not trigger Disposer if object is null', () {
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
-      expect(pot.$expect(null), isTrue);
+      expect(pot.$expect((o) => o == null), isTrue);
       expect(isDisposed, isFalse);
 
       pot.reset();
@@ -89,13 +110,13 @@ void main() {
     test('Object is created again when it is needed after reset', () {
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
       pot.create();
-      expect(pot.$expect(Foo(1)), isTrue);
+      expect(pot.$expect((o) => o!.value == 1), isTrue);
 
       pot.reset();
-      expect(pot.$expect(null), isTrue);
+      expect(pot.$expect((o) => o == null), isTrue);
 
       final foo = pot.get;
-      expect(pot.$expect(Foo(1)), isTrue);
+      expect(pot.$expect((o) => o!.value == 1), isTrue);
       expect(foo.value, equals(1));
     });
   });
@@ -113,7 +134,7 @@ void main() {
 
     test('replace() replaces factory regardless of existence of object', () {
       final pot = Pot.replaceable<Foo>(() => Foo(1));
-      expect(pot.$expect(null), isTrue);
+      expect(pot.$expect((o) => o == null), isTrue);
 
       pot.replace(() => Foo(2));
       final foo = pot.get;
@@ -124,18 +145,18 @@ void main() {
       final pot =
           Pot.replaceable<Foo>(() => Foo(1), disposer: (f) => f.dispose());
       pot.create();
-      expect(pot.$expect(Foo(1)), isTrue);
+      expect(pot.$expect((o) => o!.value == 1), isTrue);
       expect(isDisposed, isFalse);
 
       pot.replace(() => Foo(2));
-      expect(pot.$expect(null), isTrue);
+      expect(pot.$expect((o) => o == null), isTrue);
       expect(isDisposed, isTrue);
     });
 
     test('replace() does not trigger disposer if object is null', () {
       final pot =
           Pot.replaceable<Foo>(() => Foo(1), disposer: (f) => f.dispose());
-      expect(pot.$expect(null), isTrue);
+      expect(pot.$expect((o) => o == null), isTrue);
 
       pot.replace(() => Foo(2));
       expect(isDisposed, isFalse);
@@ -146,7 +167,7 @@ void main() {
           Pot.replaceable<Foo>(() => Foo(1), disposer: (f) => f.dispose());
 
       pot.replace(() => Foo(2));
-      expect(pot.$expect(null), isTrue);
+      expect(pot.$expect((o) => o == null), isTrue);
 
       final foo = pot.get;
       expect(foo.value, equals(2));
@@ -196,7 +217,7 @@ void main() {
       () {
         Pot.forTesting = true;
         final pot = Pot<Foo>(() => Foo(1));
-        expect(pot.$expect(null), isTrue);
+        expect(pot.$expect((o) => o == null), isTrue);
 
         pot.replaceForTesting(() => Foo(2));
         final foo = pot.get;
@@ -208,18 +229,18 @@ void main() {
       Pot.forTesting = true;
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
       pot.create();
-      expect(pot.$expect(Foo(1)), isTrue);
+      expect(pot.$expect((o) => o!.value == 1), isTrue);
       expect(isDisposed, isFalse);
 
       pot.replaceForTesting(() => Foo(2));
-      expect(pot.$expect(null), isTrue);
+      expect(pot.$expect((o) => o == null), isTrue);
       expect(isDisposed, isTrue);
     });
 
     test('replaceForTesting() does not trigger disposer if object is null', () {
       Pot.forTesting = true;
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
-      expect(pot.$expect(null), isTrue);
+      expect(pot.$expect((o) => o == null), isTrue);
 
       pot.replaceForTesting(() => Foo(2));
       expect(isDisposed, isFalse);
@@ -230,7 +251,7 @@ void main() {
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
 
       pot.replaceForTesting(() => Foo(2));
-      expect(pot.$expect(null), isTrue);
+      expect(pot.$expect((o) => o == null), isTrue);
 
       final foo = pot.get;
       expect(foo.value, equals(2));

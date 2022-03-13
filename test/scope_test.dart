@@ -146,15 +146,15 @@ void main() {
         final pot4 = Pot<Foo>(() => Foo(4), disposer: disposer);
         pot3.create();
         pot4.create();
-        expect(pot3.$expect(Foo(3)), isTrue);
-        expect(pot4.$expect(Foo(4)), isTrue);
+        expect(pot3.$expect((o) => o!.value == 3), isTrue);
+        expect(pot4.$expect((o) => o!.value == 4), isTrue);
         expect(Pot.$scopedResetters[0], hasLength(2));
         expect(Pot.$scopedResetters[1], hasLength(2));
         expect(values, equals(<int>[]));
 
         Pot.resetAllInScope();
-        expect(pot3.$expect(null), isTrue);
-        expect(pot4.$expect(null), isTrue);
+        expect(pot3.$expect((o) => o == null), isTrue);
+        expect(pot4.$expect((o) => o == null), isTrue);
         expect(Pot.$scopedResetters[0], hasLength(2));
         expect(Pot.$scopedResetters[1], isEmpty);
         expect(values, equals(<int>[4, 3]));
@@ -221,15 +221,15 @@ void main() {
       final pot4 = Pot<Foo>(() => Foo(4), disposer: disposer);
       pot3.create();
       pot4.create();
-      expect(pot3.$expect(Foo(3)), isTrue);
-      expect(pot4.$expect(Foo(4)), isTrue);
+      expect(pot3.$expect((o) => o!.value == 3), isTrue);
+      expect(pot4.$expect((o) => o!.value == 4), isTrue);
       expect(Pot.$scopedResetters[0], hasLength(2));
       expect(Pot.$scopedResetters[1], hasLength(2));
       expect(values, equals(<int>[]));
 
       Pot.resetAll();
-      expect(pot3.$expect(null), isTrue);
-      expect(pot4.$expect(null), isTrue);
+      expect(pot3.$expect((o) => o == null), isTrue);
+      expect(pot4.$expect((o) => o == null), isTrue);
       expect(Pot.$scopedResetters[0], isEmpty);
       expect(Pot.$scopedResetters[1], isEmpty);
       expect(values, equals(<int>[4, 3, 2, 1]));
@@ -297,16 +297,16 @@ void main() {
         final pot4 = Pot<Foo>(() => Foo(4), disposer: disposer);
         pot3.create();
         pot4.create();
-        expect(pot3.$expect(Foo(3)), isTrue);
-        expect(pot4.$expect(Foo(4)), isTrue);
+        expect(pot3.$expect((o) => o!.value == 3), isTrue);
+        expect(pot4.$expect((o) => o!.value == 4), isTrue);
         expect(Pot.$scopedResetters, hasLength(2));
         expect(Pot.$scopedResetters[0], hasLength(2));
         expect(Pot.$scopedResetters[1], hasLength(2));
         expect(values, equals(<int>[]));
 
         Pot.popScope();
-        expect(pot3.$expect(null), isTrue);
-        expect(pot4.$expect(null), isTrue);
+        expect(pot3.$expect((o) => o == null), isTrue);
+        expect(pot4.$expect((o) => o == null), isTrue);
         expect(Pot.$scopedResetters, hasLength(1));
         expect(Pot.$scopedResetters[0], hasLength(2));
         expect(values, equals(<int>[4, 3]));
@@ -372,13 +372,13 @@ void main() {
       );
       expect(Pot.currentScope, equals(0));
       pot.create();
-      expect(pot.$expect(Foo(201)), isTrue);
+      expect(pot.$expect((o) => o!.value == 201), isTrue);
       expect(valueOfDisposedObject, equals(-1));
 
       Pot.pushScope();
       pot.replace(() => Foo(202));
       expect(Pot.currentScope, equals(1));
-      expect(pot.$expect(null), isTrue);
+      expect(pot.$expect((o) => o == null), isTrue);
       expect(valueOfDisposedObject, equals(201));
     });
 
@@ -442,13 +442,13 @@ void main() {
       );
       expect(Pot.currentScope, equals(0));
       pot.create();
-      expect(pot.$expect(Foo(201)), isTrue);
+      expect(pot.$expect((o) => o!.value == 201), isTrue);
       expect(valueOfDisposedObject, equals(-1));
 
       Pot.pushScope();
       pot.replaceForTesting(() => Foo(202));
       expect(Pot.currentScope, equals(1));
-      expect(pot.$expect(null), isTrue);
+      expect(pot.$expect((o) => o == null), isTrue);
       expect(valueOfDisposedObject, equals(201));
     });
 
