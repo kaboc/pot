@@ -9,32 +9,14 @@ import 'common.dart';
 void main() {
   setUp(prepare);
 
-  group('get / call() / create()', () {
+  group('call() / create()', () {
     test('Object is not created right away', () {
       final pot = Pot(() => Foo(1));
       expect(pot.$expect((o) => o == null), isTrue);
       expect(isInitialized, isFalse);
     });
 
-    test('`get` creates and returns object', () {
-      final pot = Pot(() => Foo(1));
-      expect(pot.$expect((o) => o == null), isTrue);
-      expect(isInitialized, isFalse);
-
-      final foo = pot.get;
-      expect(isInitialized, isTrue);
-      expect(pot.$expect((o) => o!.value == 1), isTrue);
-      expect(foo.value, 1);
-    });
-
-    test('`get` returns same object', () {
-      final pot = Pot(() => Foo(1));
-      final hashCode1 = pot.get.hashCode;
-      final hashCode2 = pot.get.hashCode;
-      expect(hashCode2, equals(hashCode1));
-    });
-
-    test('call() works the same as `get`', () {
+    test('call() creates and returns object', () {
       final pot = Pot(() => Foo(1));
       expect(pot.$expect((o) => o == null), isTrue);
       expect(isInitialized, isFalse);
@@ -43,8 +25,11 @@ void main() {
       expect(isInitialized, isTrue);
       expect(pot.$expect((o) => o!.value == 1), isTrue);
       expect(foo.value, 1);
+    });
 
-      final hashCode1 = foo.hashCode;
+    test('call() returns same object', () {
+      final pot = Pot(() => Foo(1));
+      final hashCode1 = pot().hashCode;
       final hashCode2 = pot().hashCode;
       expect(hashCode2, equals(hashCode1));
     });
@@ -115,7 +100,7 @@ void main() {
       pot.reset();
       expect(pot.$expect((o) => o == null), isTrue);
 
-      final foo = pot.get;
+      final foo = pot();
       expect(pot.$expect((o) => o!.value == 1), isTrue);
       expect(foo.value, equals(1));
     });
@@ -124,11 +109,11 @@ void main() {
   group('replace()', () {
     test('replace() replaces factory', () {
       final pot = Pot.replaceable<Foo>(() => Foo(1));
-      var foo = pot.get;
+      var foo = pot();
       expect(foo.value, equals(1));
 
       pot.replace(() => Foo(2));
-      foo = pot.get;
+      foo = pot();
       expect(foo.value, equals(2));
     });
 
@@ -137,7 +122,7 @@ void main() {
       expect(pot.$expect((o) => o == null), isTrue);
 
       pot.replace(() => Foo(2));
-      final foo = pot.get;
+      final foo = pot();
       expect(foo.value, equals(2));
     });
 
@@ -169,7 +154,7 @@ void main() {
       pot.replace(() => Foo(2));
       expect(pot.$expect((o) => o == null), isTrue);
 
-      final foo = pot.get;
+      final foo = pot();
       expect(foo.value, equals(2));
     });
   });
@@ -189,11 +174,11 @@ void main() {
         expect(Pot.forTesting, isFalse);
 
         final pot = Pot.replaceable<Foo>(() => Foo(1));
-        var foo = pot.get;
+        var foo = pot();
         expect(foo.value, equals(1));
 
         pot.replaceForTesting(() => Foo(2));
-        foo = pot.get;
+        foo = pot();
         expect(foo.value, equals(2));
       },
     );
@@ -203,11 +188,11 @@ void main() {
       () {
         Pot.forTesting = true;
         final pot = Pot<Foo>(() => Foo(1));
-        var foo = pot.get;
+        var foo = pot();
         expect(foo.value, equals(1));
 
         pot.replaceForTesting(() => Foo(2));
-        foo = pot.get;
+        foo = pot();
         expect(foo.value, equals(2));
       },
     );
@@ -220,7 +205,7 @@ void main() {
         expect(pot.$expect((o) => o == null), isTrue);
 
         pot.replaceForTesting(() => Foo(2));
-        final foo = pot.get;
+        final foo = pot();
         expect(foo.value, equals(2));
       },
     );
@@ -253,7 +238,7 @@ void main() {
       pot.replaceForTesting(() => Foo(2));
       expect(pot.$expect((o) => o == null), isTrue);
 
-      final foo = pot.get;
+      final foo = pot();
       expect(foo.value, equals(2));
     });
   });
@@ -262,12 +247,6 @@ void main() {
     test('Calling dispose() does not throw', () {
       final pot1 = Pot<Foo>(() => Foo(1));
       expect(pot1.dispose, isNot(throwsA(anything)));
-    });
-
-    test('Thrown if `get` is accessed after pot is disposed', () {
-      final pot1 = Pot<Foo>(() => Foo(1));
-      pot1.dispose();
-      expect(() => pot1.get, throwsA(isA<StateError>()));
     });
 
     test('Thrown if call() is called after pot is disposed', () {

@@ -40,21 +40,14 @@ special reason not to.
 
 ### Getting the object
 
-You can use either [get][get] or [call()][call]:
+Call the [call()][call] method.
 
-```dart
-void someMethod() {
-  final counter = counterPot.get;
-}
-```
+`call()` is a special function of Dart that allows a class instance to be called like
+a function, so you can omit the method name like above.
 
 ```dart
 void someMethod() {
   final counter = counterPot();
-
-  // Or
-  // final counter = counterPot.call();
-}
 ```
 
 ### Creating an object
@@ -303,7 +296,6 @@ be the most preferable place for it.
 
 [Pot]: https://pub.dev/documentation/pot/latest/pot/Pot-class.html
 [Pot-constructor]: https://pub.dev/documentation/pot/latest/pot/Pot/Pot.html
-[get]: https://pub.dev/documentation/pot/latest/pot/Pot/get.html
 [call]: https://pub.dev/documentation/pot/latest/pot/Pot/call.html
 [create]: https://pub.dev/documentation/pot/latest/pot/Pot/create.html
 [reset]: https://pub.dev/documentation/pot/latest/pot/Pot/reset.html

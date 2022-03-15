@@ -38,7 +38,7 @@ class _PotBody<T> {
   /// final counterPot = Pot<Counter>(() => Counter(0));
   ///
   /// // The factory is triggered when the object is first accessed.
-  /// final counter = counterPot.get;
+  /// final counter = counterPot();
   /// ```
   ///
   /// It also applies to the first access after a reset.
@@ -47,13 +47,13 @@ class _PotBody<T> {
   /// final counterPot = Pot<Counter>(() => Counter(0));
   ///
   /// // An object is created.
-  /// var counter = counterPot.get;
+  /// var counter = counterPot();
   ///
   /// // The object is discarded.
   /// counterPot.reset();
   ///
   /// // A new object is created again.
-  /// counter = counterPot.get;
+  /// counter = counterPot();
   /// ```
   ///
   /// The object exists while the scope where it was created exists,
@@ -68,14 +68,14 @@ class _PotBody<T> {
   ///   Pot.pushScope();
   ///
   ///   // An object is created and set in the current scope 1.
-  ///   final counter = counterPot.get;
+  ///   final counter = counterPot();
   ///
   ///   // The object is discarded.
   ///   // The scope 1 is removed and the `currentScope` turns 0.
   ///   Pot.popScope();
   /// }
   /// ```
-  T get get {
+  T call() {
     if (_isDisposed) throwStateError();
 
     if (_object == null) {
@@ -88,16 +88,6 @@ class _PotBody<T> {
     }
     return _object!;
   }
-
-  /// A syntactic sugar for [get].
-  ///
-  /// ```dart
-  /// final counterPot = Pot<Counter>(() => Counter(0));
-  /// final counter = counterPot();
-  /// ```
-  ///
-  /// See [get] for details.
-  T call() => get;
 
   /// Calls the factory to create an object of type [T].
   ///
@@ -116,13 +106,13 @@ class _PotBody<T> {
   /// }
   /// ```
   ///
-  /// [create] is almost the same as [get] and [call], only with the
-  /// difference that this does not return the object while they do,
-  /// so those can also be used for the same purpose instead.
+  /// [create] is almost the same as [call], only with the difference
+  /// that this does not return the object while `call()` does, so
+  /// `call()` can also be used for the same purpose instead.
   ///
   /// Note that calling this method has no effect if the object has
   /// already been created.
-  void create() => get;
+  void create() => call();
 
   /// Discards resources in the pot.
   ///
