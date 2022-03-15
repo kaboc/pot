@@ -12,6 +12,7 @@ class _PotBody<T> {
 
   T? _object;
   int? _scope;
+  int? _prevScope;
   bool _isDisposed = false;
 
   @visibleForTesting
@@ -75,16 +76,19 @@ class _PotBody<T> {
   ///   Pot.popScope();
   /// }
   /// ```
-  T call() {
+  T call({bool suppressWarning = false}) {
     if (_isDisposed) throwStateError();
 
     if (_object == null) {
+      _debugWarning(suppressWarning);
+
       Pot._scopedResetters
         ..removeFromScope(reset, excludeCurrentScope: true)
         ..addToScope(reset);
 
       _object = _factory();
       _scope = Pot._currentScope;
+      _prevScope = _scope;
     }
     return _object!;
   }
@@ -112,7 +116,8 @@ class _PotBody<T> {
   ///
   /// Note that calling this method has no effect if the object has
   /// already been created.
-  void create() => call();
+  void create({bool suppressWarning = false}) =>
+      call(suppressWarning: suppressWarning);
 
   /// Discards resources in the pot.
   ///

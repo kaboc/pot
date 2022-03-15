@@ -8,6 +8,8 @@ late bool isInitialized;
 late bool isDisposed;
 late int valueOfDisposedObject;
 
+Object? warning;
+
 void _popAllScopes() {
   for (var i = Pot.currentScope; i >= 0; i--) {
     Pot.popScope();
@@ -17,10 +19,12 @@ void _popAllScopes() {
 void prepare() {
   _popAllScopes();
   Pot.forTesting = false;
+  Pot.$warningPrinter = (w) => warning = w;
 
   isInitialized = false;
   isDisposed = false;
   valueOfDisposedObject = -1;
+  warning = null;
 }
 
 @immutable

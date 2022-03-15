@@ -362,6 +362,27 @@ void main() {
       Pot.popScope();
       expect(pot.scope, isNull);
     });
+
+    test('Warned if new object is created in older scope than before', () {
+      Pot.pushScope();
+      final pot = Pot<Foo>(() => Foo(1));
+      pot.create();
+      expect(warning, isNull);
+
+      Pot.popScope();
+      pot.create();
+      expect(warning, isNotNull);
+    });
+
+    test('Warning is suppressed if suppressWarning is true', () {
+      Pot.pushScope();
+      final pot = Pot<Foo>(() => Foo(1));
+      pot.create();
+
+      Pot.popScope();
+      pot.create(suppressWarning: true);
+      expect(warning, isNull);
+    });
   });
 
   group('Scope - replace()', () {

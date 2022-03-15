@@ -107,6 +107,9 @@ class Pot<T> extends _PotBody<T> {
         for (final resetter in _scopedResetters) List.unmodifiable(resetter),
       ]);
 
+  @visibleForTesting
+  static void Function(Object?) $warningPrinter = print;
+
   /// The flag that shows whether [replaceForTesting] is enabled.
   ///
   /// Defaults to `false`, which means disabled.
