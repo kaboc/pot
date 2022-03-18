@@ -181,8 +181,8 @@ class _PotBody<T> {
       _disposer?.call(object);
       _object = null;
       _scope = null;
+      Pot._scopedResetters.removeFromScope(reset);
     }
-    Pot._scopedResetters.removeFromScope(reset);
   }
 
   /// Replaces the factory set in the constructor with a new one, and/or
