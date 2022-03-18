@@ -126,7 +126,7 @@ void main() {
       expect(foo.value, equals(2));
     });
 
-    test('replace() resets object and triggers disposer', () {
+    test('replace() triggers disposer and creates new object', () {
       final pot =
           Pot.replaceable<Foo>(() => Foo(1), disposer: (f) => f.dispose());
       pot.create();
@@ -134,8 +134,21 @@ void main() {
       expect(isDisposed, isFalse);
 
       pot.replace(() => Foo(2));
-      expect(pot.$expect((o) => o == null), isTrue);
+      expect(pot.$expect((o) => o?.value == 2), isTrue);
       expect(isDisposed, isTrue);
+    });
+
+    test('Disposer triggered by replace() is given old object', () {
+      var value = 0;
+
+      final pot = Pot.replaceable<Foo>(
+        () => Foo(1),
+        disposer: (f) => value = f.value,
+      );
+      pot.create();
+
+      pot.replace(() => Foo(2));
+      expect(value, equals(1));
     });
 
     test('replace() does not trigger disposer if object is null', () {
@@ -147,7 +160,7 @@ void main() {
       expect(isDisposed, isFalse);
     });
 
-    test('replace() does not call new factory right away', () {
+    test('replace() does not call new factory if object is null', () {
       final pot =
           Pot.replaceable<Foo>(() => Foo(1), disposer: (f) => f.dispose());
 
@@ -210,7 +223,7 @@ void main() {
       },
     );
 
-    test('replaceForTesting() resets object and triggers disposer', () {
+    test('replaceForTesting() triggers disposer and creates new object', () {
       Pot.forTesting = true;
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
       pot.create();
@@ -218,8 +231,22 @@ void main() {
       expect(isDisposed, isFalse);
 
       pot.replaceForTesting(() => Foo(2));
-      expect(pot.$expect((o) => o == null), isTrue);
+      expect(pot.$expect((o) => o?.value == 2), isTrue);
       expect(isDisposed, isTrue);
+    });
+
+    test('Disposer triggered by replaceForTesting() is given old object', () {
+      var value = 0;
+
+      Pot.forTesting = true;
+      final pot = Pot<Foo>(
+        () => Foo(1),
+        disposer: (f) => value = f.value,
+      );
+      pot.create();
+
+      pot.replaceForTesting(() => Foo(2));
+      expect(value, equals(1));
     });
 
     test('replaceForTesting() does not trigger disposer if object is null', () {
@@ -231,7 +258,7 @@ void main() {
       expect(isDisposed, isFalse);
     });
 
-    test('replaceForTesting() does not call new factory right away', () {
+    test('replaceForTesting() does not call new factory if object is null', () {
       Pot.forTesting = true;
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
 

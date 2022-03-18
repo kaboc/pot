@@ -100,9 +100,10 @@ later sections of this document.
 
 ## Advanced usage
 
-### Replacing the object factory
+### Replacing factory and object
 
-It is possible to replace the factory if the pot was created by [Pot.replaceable][replaceable].
+It is possible to replace the object factory, which was set in the constructor of [Pot][Pot],
+and the object held in a pot, if the pot was created by [Pot.replaceable][replaceable].
 Otherwise, the [replace()][replace] method is not available.
 
 ```dart
@@ -117,8 +118,10 @@ Future<User> signIn() async {
 }
 ```
 
-Note that the existing object is discarded before the factory is replaced, and in the same
-way as when [reset()][reset] is manually used, it triggers the disposer too.
+Note that the [replace()][replace] method discards an existing object, triggering the
+disposer, but only if an object has already been created. It behaves differently depending
+on whether the object exists. See the document of [replace()][replace] for details on the
+behaviour.
 
 ### Replacing in tests
 

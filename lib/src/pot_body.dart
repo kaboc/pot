@@ -185,11 +185,11 @@ class _PotBody<T> {
     Pot._scopedResetters.removeFromScope(reset);
   }
 
-  /// Replaces the factory, which creates objects of type [T], with a new
-  /// one for testing purposes.
+  /// Replaces the factory set in the constructor with a new one, and/or
+  /// creates a new object using the new factory, for testing purposes.
   ///
-  /// [ReplaceablePot.replace] is also a method for replacing the factory,
-  /// and in fact, it works exactly the same way, but it is not available
+  /// [ReplaceablePot.replace] is another method for replacements, and
+  /// in fact, it works exactly the same way, but it is not available
   /// to pots created by the default constructor of [Pot].
   /// It is because it should be safer to not have access to a feature
   /// that is not needed usually.
@@ -214,13 +214,18 @@ class _PotBody<T> {
   void _replace(PotObjectFactory<T> factory) {
     if (_isDisposed) throwStateError();
 
-    reset();
     _factory = factory;
+
+    final object = _object;
+    if (object != null) {
+      _disposer?.call(object);
+      _object = factory();
+    }
   }
 }
 
-/// A variant of [Pot] with the [replace] method for replacing the
-/// factory, which creates objects of type [T], with a new one.
+/// A variant of [Pot] with the [replace] method for replacing its
+/// factory and the object of type [T] created by the factory.
 ///
 /// This pot is created through [Pot.replaceable].
 ///
@@ -242,70 +247,55 @@ class ReplaceablePot<T> extends _PotBody<T> {
   ReplaceablePot(PotObjectFactory<T> factory, {PotDisposer<T>? disposer})
       : super(factory, disposer: disposer);
 
-  /// Replaces the factory, which creates objects of type [T], with
-  /// a new one.
+  /// Replaces the factory set in the constructor with a new one, and/or
+  /// creates a new object using the new factory.
   ///
-  /// This method discards the existing object before replacing the
-  /// factory, and unsets the object from the scope it was bound to.
-  /// A new object is not created until it is first needed.
+  /// This behaves differently depending on the existence of the object.
   ///
-  /// It is useful if the object is going to be used only in a
-  /// particular scope and therefore you want to set the object in it.
-  /// The object is reset when the scope is removed by [Pot.popScope].
+  /// If no object has been created:
+  /// * Only the factory is replaced.
+  /// * A new object is not created.
+  /// * The disposer is not triggered.
   ///
   /// ```dart
-  /// final counterPot = Pot<Counter>(() => Counter(0));
+  /// final pot = Pot.replaceable(() => User(id: 100));
   ///
   /// void main() {
-  ///   // A new scope is added, and `currentScope` turns 1.
-  ///   Pot.pushScope();
+  ///   // The factory is replaced.
+  ///   // The pot has no User object yet.
+  ///   pot.replace(() => User(id: 200);
   ///
-  ///   // The factory is replaced here, but the object does not
-  ///   // belong to any scope yet because a Counter object has
-  ///   // not been created.
-  ///   counterPot.replace(() => Counter(0));
+  ///   // The object is created.
+  ///   final user = pot();
   ///
-  ///   // A new object is created by the new factory, and
-  ///   // the object gets bound to the current scope 1.
-  ///   counterPot.create();
-  ///
-  ///   // The scope 1 is removed, the object is discarded, and
-  ///   // `currentScope` becomes 0.
-  ///   // The object is not bound to any scope now.
-  ///   Pot.popScope();
-  ///
-  ///   // A new object is created again because it is accessed.
-  ///   // The new object is set in the current scope 0.
-  ///   final counter = counterPot.get;
+  ///   print(user.id); // 200
   /// }
   /// ```
   ///
+  /// If the pot has an object:
+  /// * Both the factory and the object are replaced.
+  /// * The disposer of the old object is triggered.
+  ///
   /// ```dart
-  /// final counterPot = Pot<Counter>(() => Counter(0));
+  /// final pot = Pot.replaceable<User>(
+  ///   () => User(id: 100),
+  ///   disposer: (user) => user.dispose(),
+  /// );
   ///
   /// void main() {
-  ///   // A Counter object is created and the pot is set
-  ///   // in the current scope 0.
-  ///   counterPot.create();
+  ///   // The object is created.
+  ///   pot.create();
   ///
-  ///   // A new scope 1 is added.
-  ///   Pot.pushScope();
-  ///
-  ///   // The factory is replaced with a new one, so
-  ///   // the existing object is discarded.
-  ///   counterPot.replace(() => Counter(0));
-  ///
-  ///   // A new object is created by the new factory, and
-  ///   // the object gets bound to the current scope 1.
-  ///   counterPot.create();
+  ///   // The factory is replaced.
+  ///   // The existing object is discarded and the disposer is triggered.
+  ///   // A new object is created by the new factory.
+  ///   pot.replace(() => User(id: 200);
   /// }
   /// ```
   ///
-  /// Note that the `disposer` set in the constructor of [Pot] is not
-  /// called if an object has not been created when this method is used.
-  ///
-  /// Replacing the factory is also convenient in tests. If it is
-  /// necessary only in tests and not for some functionality of the
-  /// application, [replaceForTesting] is more suitable.
+  /// If replacements are only necessary for testing, it is safer to make
+  /// [ReplaceablePot.replace] unavailable by using a non-replaceable pot.
+  /// You can use [replaceForTesting] on a non-replaceable pot instead if
+  /// [Pot.forTesting] is set to `true`.
   void replace(PotObjectFactory<T> factory) => _replace(factory);
 }

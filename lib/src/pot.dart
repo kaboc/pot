@@ -49,7 +49,8 @@ typedef _ScopedResetters = List<List<_Resetter>>;
 /// final counter = Counter();
 /// ```
 ///
-/// It allows a subtype to be used, making the object testable.
+/// It is possible to replace the factory and/or the object with
+/// [ReplaceablePot.replace].
 ///
 /// ```dart
 /// final counterPot = Pot.replaceable<Counter>(() => Counter());
@@ -135,13 +136,7 @@ class Pot<T> extends _PotBody<T> {
   static int get currentScope => _currentScope;
 
   /// Creates a pot of type [ReplaceablePot] that has the ability
-  /// to replace its factory.
-  ///
-  /// Replacing the factory resets the object created by the old
-  /// factory. It should be done only when it is really necessary.
-  /// In order to prevent unwanted replacement, it is only allowed
-  /// in pots created by this method, and not in pots created by
-  /// the default constructor.
+  /// to replace its factory and the object held in the pot.
   ///
   /// {@macro pot.replaceablePot}
   ///
