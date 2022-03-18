@@ -1,11 +1,13 @@
 [![Pub Version](https://img.shields.io/pub/v/pot)](https://pub.dev/packages/pot)
 [![Dart CI](https://github.com/kaboc/pot/workflows/Dart%20CI/badge.svg)](https://github.com/kaboc/pot/actions)
+[![codecov](https://codecov.io/gh/kaboc/pot/branch/main/graph/badge.svg?token=YZMCN6WZKM)](https://codecov.io/gh/kaboc/pot)
 
 An easy and safe DI (Dependency Injection) solution for Dart with support for scoping.
 
 ## Introduction
 
-A [Pot][Pot] is a container that creates and keeps an object of a certain type.
+A [Pot][Pot] is a sort of service locator, but a single pot is for a single type.
+An object of a certain type is created in a pot as needed and kept until it is discarded.
 
 - Easy
     - Straightforward because it is specialised in DI, without other features.
@@ -25,9 +27,8 @@ The focus will be more on enhancing stability and robustness.
 
 ## Usage
 
-Create a pot with the factory that instantiates an object.
-
-A single pot is for a single type, which is different from most of other DI containers.
+Create a pot with a function that instantiates an object. The function is going to be called
+"factory" in this document.
 
 ```dart
 final counterPot = Pot(() => Counter(0));
@@ -43,7 +44,7 @@ special reason not to.
 Call the [call()][call] method.
 
 `call()` is a special function of Dart that allows a class instance to be called like
-a function, so you can omit the method name like above.
+a function, so you can omit the method name like below.
 
 ```dart
 void someMethod() {
@@ -54,8 +55,7 @@ void someMethod() {
 
 An object is created by the factory when it is first accessed like above.
 
-If you need to instantiate an object immediately without obtaining it, use [create()][create]
-explicitly.
+Use [create()][create] if you want to instantiate an object without obtaining it.
 
 ```dart
 void someMethod() {
@@ -66,14 +66,13 @@ void someMethod() {
 ### Discarding the object
 
 You can discard the object with several methods like [reset()][reset]. The resources are saved
-if objects are properly discarded when they are no longer necessary.
+if objects are properly discarded when they become unnecessary.
 
 Even if an object is discarded, the pot itself is not discarded. A new object is created when
-it is needed again, so no worry that the object may have already been discarded and not be
-accessible.
+it is needed again, so no worry that the object may be no longer accessible.
 
-If a callback function is passed to the `disposer` of the [Pot constructor][Pot-constructor],
-it is called when the object in the pot is discarded. Use it for doing a clean-up related to
+If a callback function is passed to the `disposer` of the [constructor][Pot-constructor] of Pot,
+it is triggered when the object in the pot is discarded. Use it for doing a clean-up related to
 the object.
 
 ```dart
@@ -102,9 +101,9 @@ later sections of this document.
 
 ### Replacing factory and object
 
-It is possible to replace the object factory, which was set in the constructor of [Pot][Pot],
-and the object held in a pot, if the pot was created by [Pot.replaceable][replaceable].
-Otherwise, the [replace()][replace] method is not available.
+Pot created by [Pot.replaceable][replaceable] have the [replace()][replace] method.
+It replaces the object factory, which was set in the constructor of [Pot][Pot], and
+the object held in a pot. Otherwise, the [replace()][replace] method is not available.
 
 ```dart
 final userPot = Pot.replaceable(() => User.none());
@@ -113,7 +112,7 @@ final userPot = Pot.replaceable(() => User.none());
 ```dart
 Future<User> signIn() async {
   final userId = await Auth.signIn(...);
-  userPot.replace(() => User(userId));
+  userPot.replace(() => User(id: userId));
   return userPot();
 }
 ```
@@ -123,13 +122,11 @@ disposer, but only if an object has already been created. It behaves differently
 on whether the object exists. See the document of [replace()][replace] for details on the
 behaviour.
 
-### Replacing in tests
+### Replacements for testing
 
-If replacement of the factory is only necessary for testing, avoid using [Pot.replaceable][replaceable].
-It is safer to disable it if unnecessary.
-
-Instead, enable replacement by setting [Pot.forTesting][forTesting] to `true` and use
-[replaceForTesting()][replaceForTesting].
+If replacements are only necessary in tests, avoid using [Pot.replaceable][replaceable]
+for safety. Instead, enable the use of [replaceForTesting()][replaceForTesting] by setting
+[Pot.forTesting][forTesting] to `true`.
 
 ```dart
 final counterPot = Pot(() => Counter(0));
@@ -155,7 +152,7 @@ number of the current scope, and removing one decrements it.
 For example, if a scope is added when the current index number is 0, the number turns 1.
 If an object is created then, it gets bound to the current scope 1. It means the object
 exists while the current scope is 1 or newer, so it is discarded and the disposer is
-triggered when the scope 1 is removed. The current index number is back to 0.
+triggered when the scope 1 is removed. The current index number goes back to 0.
 
 ```dart
 final counterPot = Pot<Counter>(
@@ -173,7 +170,7 @@ void main() {
   Pot.pushScope();
   print(Pot.currentIndex); // 1
 
-  // The counter object is created here, and it is bound to scope 1.
+  // The counter object is created here, and it gets bound to scope 1.
   final counter = counterPot();
 
   // The scope 2 is removed and the counter object is discarded.
@@ -188,17 +185,21 @@ calling [Pot.popScope()][popScope].
 
 ### Combining replace() with scoping
 
-An object is not created unless it is used even if its pot is declared globally first.
-So in the case where the object is used only from some point onwards, you can declare
-the pot with a dummy factory initially, and replace it with the actual one at that point,
-in addition to adding a scope there.
+If an object is used only from some point onwards, you can make use of
+[Pot.popScope()][popScope] and [replace()][replace].
+
+Declare a pot with a dummy factory initially, and replace the factory with the actual one
+after adding a scope. It allows the factory to be given a new value, and enables the object
+to be discarded by removal of the scope.
 
 <details>
 <summary>Example code (Click to open)</summary>
 
+An example of an app using Flutter:
+
 ```dart
 final todoDetailsPot = Pot<TodoDetails>(
-  // A dummy factory for the moment.
+  // 1. A dummy factory for the moment.
   () => TodoDetails(),
   disposer: (details) => details.dispose(),
 );
@@ -219,34 +220,26 @@ class _TodoDetailsPageState extends State<TodoDetailsPage> {
   void initState() {
     super.initState();
 
-    // A new scope is added, and the dummy factory is replaced with the actual one.
+    // 2. A new scope is added, and the dummy factory is replaced with the actual one.
     Pot.pushScope();
     todoDetailsPot.replace(() => TodoDetails(widget.todoId));
   }
 
   @override
   void dispose() {
-    // The TodoDetails object is discarded when the page is disposed of.
+    // 4. The TodoDetails object is discarded when the page is disposed of.
     Pot.popScope();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // The TodoDetails object specified by the todo ID is obtained.
-    // It gets bound to the current scope when it is first accessed here.
+    // 3. The TodoDetails object is created and gets bound to the current scope.
     final details = todoDetailsPot();
     ...
   }
 }
 ```
-
-Above is an example of an app using Flutter.
-
-- The TodoDetails object is only necessary in the TodoDetailsPage.
-    - It is better to be created in the page, and discarded when the user leaves there.
-- The object must be created with the todo ID.
-    - The dummy factory is replaced with the actual one that uses the todo ID.
 </details>
 
 ### Resetting objects without removing a scope
@@ -261,13 +254,16 @@ to make the app behave as if it restarted.
 The behaviour of a reset of each object is the same as [reset()][reset], therefore the disposer
 is triggered in the same way.
 
-## Caution
+## Caveats
 
-All pots should usually be declared globally, but it is possible to declare and use a pot
-locally, as long as its object is properly discarded. Its partial data is stored globally
-even if the pot is assigned to a local variable, and it is not automatically discarded
-even when the variable is no longer in use. It therefore must be discarded manually with
-[reset()][reset] or other methods that have the same effect.
+### DON'T declare a pot locally
+
+All pots should usually be declared globally. It is possible to declare pots locally as long as
+their resources are properly discarded, but it is almost meaningless to use it like the code below.
+There isn't much difference from having the MyService object directly as a property of MyClass.
+
+<details>
+<summary>Example code (Click to open)</summary>
 
 ```dart
 void main() {
@@ -293,9 +289,12 @@ class MyClass {
   }
 }
 ```
+</details>
 
-In Flutter, the [dispose()][dispose] method of the State class or a method called from there would
-be the most preferable place for it.
+This brings the danger that its partial data remains until the end of the program because
+the data related to scoping is stored globally even if the pot is assigned to a local variable,
+and it is not automatically discarded when the variable goes out of use. It therefore must be
+discarded manually with [reset()][reset] or other methods that have the same effect.
 
 [Pot]: https://pub.dev/documentation/pot/latest/pot/Pot-class.html
 [Pot-constructor]: https://pub.dev/documentation/pot/latest/pot/Pot/Pot.html
@@ -309,4 +308,3 @@ be the most preferable place for it.
 [replaceable]: https://pub.dev/documentation/pot/latest/pot/Pot/replaceable.html
 [forTesting]: https://pub.dev/documentation/pot/latest/pot/Pot/forTesting.html
 [replaceForTesting]: https://pub.dev/documentation/pot/latest/pot/Pot/replaceForTesting.html
-[dispose]: https://pub.dev/documentation/pot/latest/pot/Pot/dispose.html

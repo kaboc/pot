@@ -32,9 +32,9 @@ class App {
 
   void toEditor() {
     Pot.pushScope();
-
-    // The TodoEditor object is bound to the new scope.
     todoEditorPot.replace(() => TodoEditor());
+
+    // The TodoEditor object is created and gets bound to the scope.
     final editor = todoEditorPot();
     editor.enter();
 

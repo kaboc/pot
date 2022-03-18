@@ -36,7 +36,7 @@ class _PotBody<T> {
   ///
   /// ```dart
   /// // The factory is not executed immediately when a pot is created.
-  /// final counterPot = Pot<Counter>(() => Counter(0));
+  /// final counterPot = Pot(() => Counter(0));
   ///
   /// // The factory is triggered when the object is first accessed.
   /// final counter = counterPot();
@@ -45,7 +45,7 @@ class _PotBody<T> {
   /// It also applies to the first access after a reset.
   ///
   /// ```dart
-  /// final counterPot = Pot<Counter>(() => Counter(0));
+  /// final counterPot = Pot(() => Counter(0));
   ///
   /// // An object is created.
   /// var counter = counterPot();
@@ -61,7 +61,7 @@ class _PotBody<T> {
   /// so it is discarded when the scope is removed.
   ///
   /// ```dart
-  /// final counterPot = Pot<Counter>(() => Counter(0));
+  /// final counterPot = Pot(() => Counter(0));
   ///
   /// void main() {
   ///   // A new scope is added, and the `currentScope` turns 1.
@@ -102,7 +102,7 @@ class _PotBody<T> {
   /// the creation immediately.
   ///
   /// ```dart
-  /// final counterPot = Pot<Counter>(() => Counter(0));
+  /// final counterPot = Pot(() => Counter(0));
   ///
   /// void main() {
   ///   counterPot.create();
@@ -135,7 +135,7 @@ class _PotBody<T> {
   /// and has been held in the pot.
   ///
   /// This method triggers the disposer, which was set in the constructor
-  /// of [Pot], if the object exists.
+  /// of [Pot], if an object exists.
   ///
   /// This does not discard the pot itself, so a new object is created
   /// again when it is need. Use this when the object is not used any more
@@ -166,7 +166,7 @@ class _PotBody<T> {
   /// not been created.
   ///
   /// ```dart
-  /// final counterPot = Pot<Counter>(() => Counter(0));
+  /// final counterPot = Pot(() => Counter(0));
   ///
   /// void main() {
   ///   // The disposer is not triggered because there is no object yet.
@@ -198,11 +198,25 @@ class _PotBody<T> {
   /// [replaceForTesting] comes in handy. Set [Pot.forTesting] to
   /// `true` to use the method, but only when it is really necessary.
   ///
+  /// {@template pot.replaceForTesting.example}
+  /// ```dart
+  /// final counterPot = Pot(() => Counter(0));
+  ///
+  /// void main() {
+  ///   Pot.forTesting = true;
+  ///
+  ///   test('Counter test', () {
+  ///     counterPot.replaceForTesting(() => Counter(100));
+  ///   });
+  /// }
+  /// ```
+  /// {@endtemplate}
+  ///
   /// Note that pots created by [Pot.replaceable] can use this method
   /// regardless of whether or not [Pot.forTesting] is enabled.
   ///
   /// For details on how this method is used and what occurs in the
-  /// process of replacement, see the document of [ReplaceablePot.replace].
+  /// process of a replacement, see the document of [ReplaceablePot.replace].
   void replaceForTesting(PotObjectFactory<T> factory) {
     if (!Pot.forTesting && this is! ReplaceablePot) {
       throw PotReplaceError();

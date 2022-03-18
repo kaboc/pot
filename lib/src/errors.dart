@@ -4,9 +4,10 @@ import 'pot.dart';
 /// is not enabled.
 class PotReplaceError extends Error {
   @override
-  String toString() => 'PotReplaceError: '
-      '`replaceForTesting()` cannot be used for this pot.\n'
-      'If replacement of the factory is necessary for testing, set `true` '
-      'to `Pot.forTesting`. If it is for functionality of the application, '
+  String toString() =>
+      'PotReplaceError: `replaceForTesting()` is not available with '
+      'the current setting.\n'
+      'If a replacement is necessary for testing, set `Pot.forTesting` '
+      'to `true`. Or if it is for functionality of the application, '
       'use the `Pot.replaceable` constructor instead.';
 }

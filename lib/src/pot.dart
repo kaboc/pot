@@ -21,12 +21,14 @@ typedef _ScopedResetters = List<List<_Resetter>>;
 /// it is discarded.
 ///
 /// {@template pot.class}
-/// This class is for keeping an object instance instead of assigning
-/// it direct to a global variable.
+/// A [Pot] is a holder that keeps an object instance.
 ///
-/// When an object is first needed, it is created by the `factory` provided
-/// to the constructor, and the `disposer` is triggered when the object
-/// is discarded by methods such as [reset] and [ReplaceablePot.replace].
+/// The `factory` provided to the constructor instantiates an object.
+/// It always works in a lazy manner; it does not create an object
+/// until it is first needed.
+///
+/// The `disposer` is triggered when the object is discarded by
+/// methods such as [reset] and [ReplaceablePot.replace].
 ///
 /// ```dart
 /// final counterPot = Pot<Counter>(
@@ -35,6 +37,10 @@ typedef _ScopedResetters = List<List<_Resetter>>;
 /// );
 ///
 /// void main() {
+///   // The factory has not been called yet at this point.
+///   ...
+///
+///   // The factory creates a Counter object.
 ///   final counter = counterPot();
 ///   ...
 ///
@@ -53,20 +59,29 @@ typedef _ScopedResetters = List<List<_Resetter>>;
 /// [ReplaceablePot.replace].
 ///
 /// ```dart
-/// final counterPot = Pot.replaceable<Counter>(() => Counter());
-/// counterPot.replace(() => MockCounter());
+/// final counterPot = Pot.replaceable<User>(() => User.none());
+///
+/// void main() {
+///   counterPot.replace(() => User(id: 100));
+/// }
 /// ```
 ///
-/// or if the pot is not one created by [Pot.replaceable]:
+/// or with [replaceForTesting] if the pot is not the one created by
+/// [Pot.replaceable]:
 ///
 /// ```dart
-/// Pot.forTesting = true;
-/// final counterPot = Pot<Counter>(() => Counter());
-/// counterPot.replaceForTesting(() => MockCounter());
+/// final counterPot = Pot(() => Counter());
+///
+/// void main() {
+///   Pot.forTesting = true;
+///
+///   test('Some test', () {
+///     counterPot.replaceForTesting(() => MockCounter());
+///   });
+/// }
 /// ```
 ///
-/// It also enables the object to be discarded when it is no longer
-/// necessary.
+/// It is easy to discard the object when it becomes no longer necessary.
 ///
 /// ```dart
 /// final counter = counterPot();
@@ -114,6 +129,12 @@ class Pot<T> extends _PotBody<T> {
   /// The flag that shows whether [replaceForTesting] is enabled.
   ///
   /// Defaults to `false`, which means disabled.
+  /// If this is set to `true`, [replaceForTesting] becomes available
+  /// on pots created by the default constructor of [Pot].
+  ///
+  /// {@macro pot.replaceForTesting.example}
+  ///
+  /// See [replaceForTesting] for more details.
   static bool forTesting = false;
 
   /// The index number of the current scope.
@@ -140,8 +161,10 @@ class Pot<T> extends _PotBody<T> {
   ///
   /// {@macro pot.replaceablePot}
   ///
-  /// For details on replacement of the factory, see the document
-  /// of [ReplaceablePot.replace].
+  /// Replacements are only available in this type of pots and not
+  /// in pots created by the default constructor of [Pot].
+  ///
+  /// See [ReplaceablePot.replace] for more details.
   static ReplaceablePot<T> replaceable<T>(
     PotObjectFactory<T> factory, {
     PotDisposer<T>? disposer,
@@ -163,7 +186,7 @@ class Pot<T> extends _PotBody<T> {
   /// {@endtemplate}
   ///
   /// ```dart
-  /// final counterPot = Pot<Counter>(() => Counter(0));
+  /// final counterPot = Pot(() => Counter(0));
   ///
   /// void main() {
   ///   // A new scope is added, and the `currentScope` turns 1.
@@ -189,8 +212,8 @@ class Pot<T> extends _PotBody<T> {
   /// each of them, and decrements the index number of the current scope.
   ///
   /// ```dart
-  /// final counterPot1 = Pot<Counter>(() => Counter(0));
-  /// final counterPot2 = Pot<Counter>(() => Counter(0));
+  /// final counterPot1 = Pot(() => Counter(0));
+  /// final counterPot2 = Pot(() => Counter(0));
   ///
   /// void main() {
   ///   // A new scope is added, and the `currentScope` turns 1.
