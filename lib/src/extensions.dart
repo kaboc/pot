@@ -19,7 +19,7 @@ extension<T> on _PotBody<T> {
         final prevScope = _prevScope;
         if (prevScope != null && Pot._currentScope < prevScope) {
           Pot.$warningPrinter(
-            'A new object was created in an older scope than where the '
+            'A new $T object was created in an older scope than where the '
             'previous object was bound to. It is likely a misuse.\n'
             'If it is not, or if you want to simply suppress this warning, '
             'pass in `suppressWarning: true` to `call()` or `create()`.',
