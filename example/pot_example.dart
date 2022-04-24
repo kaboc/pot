@@ -3,7 +3,10 @@ import 'dart:io';
 import 'package:pot/pot.dart';
 
 final todoListPot = Pot(() => TodoList());
-final todoEditorPot = Pot.replaceable(() => TodoEditor());
+
+// This pot throws if used without the factory being replaced.
+final todoEditorPot =
+    Pot.replaceable<TodoEditor>(() => throw UnimplementedError());
 
 void main() {
   todoListPot.create();

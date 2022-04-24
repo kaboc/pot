@@ -10,7 +10,7 @@ A [Pot][Pot] is a sort of service locator, but a single pot is for a single type
 An object of a certain type is created in a pot as needed and kept until it is discarded.
 
 - Easy
-    - Straightforward because it is specialised in DI, without other features.
+    - Straightforward because it is specialised for DI, without other features.
     - Simple API that you can be sure with confidence how to use.
     - A pot as a global variable is easy to handle, and can take help from IDEs.
 - Safe
@@ -47,8 +47,10 @@ Call the [call()][call] method.
 a function, so you can omit the method name like below.
 
 ```dart
-void someMethod() {
+void main() {
   final counter = counterPot();
+  ...
+}
 ```
 
 ### Creating an object
@@ -58,8 +60,9 @@ An object is created by the factory when it is first accessed like above.
 Use [create()][create] if you want to instantiate an object without obtaining it.
 
 ```dart
-void someMethod() {
+void main() {
   counterPot.create();
+  ...
 }
 ```
 
@@ -200,7 +203,7 @@ An example of an app using Flutter:
 ```dart
 final todoDetailsPot = Pot<TodoDetails>(
   // 1. A dummy factory for the moment.
-  () => TodoDetails(),
+  () => throw UnimplementedError(),
   disposer: (details) => details.dispose(),
 );
 ```
