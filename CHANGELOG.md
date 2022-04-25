@@ -1,6 +1,11 @@
+## 0.3.0
+
+- Make ReplaceablePot a subtype of Pot.
+- Minor changes in tests.
+
 ## 0.2.1
 
-- Include type name in assert message.
+- Include type name in assertion error message.
 - Improve documentation.
 - Update dev dependency.
 
