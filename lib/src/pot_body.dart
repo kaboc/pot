@@ -256,7 +256,7 @@ class _PotBody<T> {
 /// [replaceForTesting] is available on this type of Pot regardless
 /// of the flag status of [Pot.forTesting].
 @sealed
-class ReplaceablePot<T> extends _PotBody<T> {
+class ReplaceablePot<T> extends Pot<T> {
   @internal
   ReplaceablePot(PotObjectFactory<T> factory, {PotDisposer<T>? disposer})
       : super(factory, disposer: disposer);

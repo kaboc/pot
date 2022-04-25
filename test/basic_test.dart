@@ -9,6 +9,13 @@ import 'utils.dart';
 void main() {
   setUp(prepare);
 
+  group('Inheritance', () {
+    test('ReplaceablePot is a subtype of Pot', () {
+      final replaceablePot = Pot.replaceable<void>(() {});
+      expect(replaceablePot, isA<Pot>());
+    });
+  });
+
   group('call() / create()', () {
     test('Object is not created right away', () {
       final pot = Pot(() => Foo(1));
