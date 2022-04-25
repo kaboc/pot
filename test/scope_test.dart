@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 import 'package:pot/pot.dart';
 
-import 'common.dart';
+import 'utils.dart';
 
 void main() {
   setUp(prepare);

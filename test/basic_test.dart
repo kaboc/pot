@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 import 'package:pot/pot.dart';
 
-import 'common.dart';
+import 'utils.dart';
 
 void main() {
   setUp(prepare);
@@ -291,25 +291,25 @@ void main() {
       expect(pot1.call, throwsA(isA<StateError>()));
     });
 
-    test('Thrown if create() is called after pot is dispose', () {
+    test('Thrown if create() is called after pot is disposed', () {
       final pot1 = Pot<Foo>(() => Foo(1));
       pot1.dispose();
       expect(pot1.create, throwsA(isA<StateError>()));
     });
 
-    test('Thrown if reset() is called after pot is dispose', () {
+    test('Thrown if reset() is called after pot is disposed', () {
       final pot1 = Pot<Foo>(() => Foo(1));
       pot1.dispose();
       expect(pot1.reset, throwsA(isA<StateError>()));
     });
 
-    test('Thrown if replace() is called after pot is dispose', () {
+    test('Thrown if replace() is called after pot is disposed', () {
       final pot1 = Pot.replaceable<Foo>(() => Foo(1));
       pot1.dispose();
       expect(() => pot1.replace(() => Foo(2)), throwsA(isA<StateError>()));
     });
 
-    test('Thrown if replace() is called after pot is dispose', () {
+    test('Thrown if replace() is called after pot is disposed', () {
       Pot.forTesting = true;
       final pot1 = Pot<Foo>(() => Foo(1));
       pot1.dispose();
