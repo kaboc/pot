@@ -18,6 +18,9 @@ class _PotBody<T> {
   @visibleForTesting
   bool $expect(bool Function(T?) test) => test(_object);
 
+  /// Whether an object has been created by the factory and still exists.
+  bool get hasObject => _object != null;
+
   /// The index number of the scope that the object of this pot has
   /// been bound to.
   ///

@@ -153,8 +153,8 @@ void main() {
         expect(values, equals(<int>[]));
 
         Pot.resetAllInScope();
-        expect(pot3.$expect((o) => o == null), isTrue);
-        expect(pot4.$expect((o) => o == null), isTrue);
+        expect(pot3.hasObject, isFalse);
+        expect(pot4.hasObject, isFalse);
         expect(Pot.$scopedResetters[0], hasLength(2));
         expect(Pot.$scopedResetters[1], isEmpty);
         expect(values, equals(<int>[4, 3]));
@@ -228,8 +228,8 @@ void main() {
       expect(values, equals(<int>[]));
 
       Pot.resetAll();
-      expect(pot3.$expect((o) => o == null), isTrue);
-      expect(pot4.$expect((o) => o == null), isTrue);
+      expect(pot3.hasObject, isFalse);
+      expect(pot4.hasObject, isFalse);
       expect(Pot.$scopedResetters[0], isEmpty);
       expect(Pot.$scopedResetters[1], isEmpty);
       expect(values, equals(<int>[4, 3, 2, 1]));
@@ -305,8 +305,8 @@ void main() {
         expect(values, equals(<int>[]));
 
         Pot.popScope();
-        expect(pot3.$expect((o) => o == null), isTrue);
-        expect(pot4.$expect((o) => o == null), isTrue);
+        expect(pot3.hasObject, isFalse);
+        expect(pot4.hasObject, isFalse);
         expect(Pot.$scopedResetters, hasLength(1));
         expect(Pot.$scopedResetters[0], hasLength(2));
         expect(values, equals(<int>[4, 3]));
@@ -417,7 +417,7 @@ void main() {
       Pot.pushScope();
       pot.replace(() => Foo(202));
       expect(Pot.currentScope, equals(1));
-      expect(pot.$expect((o) => o == null), isTrue);
+      expect(pot.hasObject, isFalse);
       expect(Pot.$scopedResetters[0], isEmpty);
       expect(Pot.$scopedResetters[1], isEmpty);
     });
@@ -484,7 +484,7 @@ void main() {
         Pot.pushScope();
         pot.replaceForTesting(() => Foo(202));
         expect(Pot.currentScope, equals(1));
-        expect(pot.$expect((o) => o == null), isTrue);
+        expect(pot.hasObject, isFalse);
         expect(Pot.$scopedResetters[0], isEmpty);
         expect(Pot.$scopedResetters[1], isEmpty);
       },

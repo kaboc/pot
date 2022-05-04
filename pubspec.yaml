@@ -1,6 +1,6 @@
 name: pot
 description: An easy and safe DI (Dependency Injection) solution for Dart with support for scoping.
-version: 0.3.0
+version: 0.3.1
 homepage: https://github.com/kaboc/pot
 
 environment:

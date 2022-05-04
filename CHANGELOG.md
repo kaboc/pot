@@ -1,3 +1,7 @@
+## 0.3.1
+
+- Add `hasObject` that shows whether an object has been created.
+
 ## 0.3.0
 
 - Make ReplaceablePot a subtype of Pot.
