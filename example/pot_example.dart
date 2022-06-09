@@ -4,9 +4,10 @@ import 'package:pot/pot.dart';
 
 final todoListPot = Pot(() => TodoList());
 
-// This pot throws if used without the factory being replaced.
-final todoEditorPot =
-    Pot.replaceable<TodoEditor>(() => throw UnimplementedError());
+final todoEditorPot = Pot(
+  () => TodoEditor(),
+  disposer: (editor) => editor.dispose(),
+);
 
 void main() {
   todoListPot.create();
@@ -35,11 +36,10 @@ class App {
 
   void toEditor() {
     Pot.pushScope();
-    todoEditorPot.replace(() => TodoEditor());
 
     // The TodoEditor object is created and gets bound to the scope.
     final editor = todoEditorPot();
-    editor.enter();
+    editor.run();
 
     // The scope is removed, and the object is discarded accordingly.
     Pot.popScope();
@@ -69,16 +69,23 @@ class TodoList {
 }
 
 class TodoEditor {
-  void enter() {
+  TodoEditor() {
+    print('TodoEditor#$hashCode was created.\n');
+  }
+
+  void dispose() {
+    print('TodoEditor#$hashCode was discarded.\n');
+  }
+
+  void run() {
     stdout.write('Enter a todo: ');
     final input = stdin.readLineSync(encoding: utf8)?.trim() ?? '';
 
     if (input.isEmpty) {
       stdout.writeln('Todo must not be empty.\n');
-      enter();
+      run();
       return;
     }
-    stdout.writeln();
 
     final list = todoListPot();
     list.add(input);

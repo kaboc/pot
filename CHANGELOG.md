@@ -1,3 +1,7 @@
+## 0.3.2
+
+- Improve example.
+
 ## 0.3.1
 
 - Add `hasObject` that shows whether an object has been created.
