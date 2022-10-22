@@ -130,7 +130,7 @@ class Pot<T> extends _PotBody<T> {
   ///
   /// Defaults to `false`, which means disabled.
   /// If this is set to `true`, [replaceForTesting] becomes available
-  /// on pots created by the default constructor of [Pot].
+  /// also on non-replaceable pots.
   ///
   /// {@macro pot.replaceForTesting.example}
   ///
@@ -157,12 +157,11 @@ class Pot<T> extends _PotBody<T> {
   static int get currentScope => _currentScope;
 
   /// Creates a pot of type [ReplaceablePot] that has the ability
-  /// to replace its factory and the object held in the pot.
+  /// to replace its factory with another one of type [T].
   ///
   /// {@macro pot.replaceablePot}
   ///
-  /// Replacements are only available in this type of pots and not
-  /// in pots created by the default constructor of [Pot].
+  /// Replacements are only available for this type of pots.
   ///
   /// See [ReplaceablePot.replace] for more details.
   static ReplaceablePot<T> replaceable<T>(

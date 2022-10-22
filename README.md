@@ -22,19 +22,18 @@ An object of a certain type is created in a pot as needed and kept until it is d
 
 ### Policy
 
-This package is not going to adopt new features easily so that it'll be kept simple.
+This package will not adopt new features easily so that it'll be kept simple to use.
 The focus will be more on enhancing stability and robustness.
 
 ## Usage
 
-Create a pot with a function that instantiates an object. The function is going to be called
-"factory" in this document.
+Create a pot with a so-called Singleton factory that instantiates an object.
 
 ```dart
 final counterPot = Pot(() => Counter(0));
 ```
 
-Now you can use the pot wherever it is if the file containing the above declaration is imported.
+Now you can use the pot whatever file importing the above declaration.
 
 Note that the created pot should be assigned to a global variable unless there is some
 special reason not to.
@@ -42,6 +41,9 @@ special reason not to.
 ### Getting the object
 
 Call the [call()][call] method.
+
+An object is created on the fly by the factory. If no object has been created yet, one is
+created when it is first accessed, and the same object is returned from next time onwards.
 
 `call()` is a special function of Dart that allows a class instance to be called like
 a function, so you can omit the method name like below.
@@ -55,9 +57,10 @@ void main() {
 
 ### Creating an object
 
-An object is created by the factory when it is first accessed like above.
-
 Use [create()][create] if you want to instantiate an object without obtaining it.
+
+This is practically the same as [call()][call], except whether the created object is
+returned or not.
 
 ```dart
 void main() {
@@ -104,7 +107,7 @@ later sections of this document.
 
 ### Replacing factory and object
 
-Pot created by [Pot.replaceable][replaceable] have the [replace()][replace] method.
+Pots created by [Pot.replaceable()][replaceable] have the [replace()][replace] method.
 It replaces the object factory, which was set in the constructor of [Pot][Pot], and
 the object held in a pot. Otherwise, the [replace()][replace] method is not available.
 
@@ -201,44 +204,44 @@ to be discarded by removal of the scope.
 An example of an app using Flutter:
 
 ```dart
-final todoDetailsPot = Pot<TodoDetails>(
+final todoPot = Pot<Todo>(
   // 1. A dummy factory for the moment.
   () => throw UnimplementedError(),
-  disposer: (details) => details.dispose(),
+  disposer: (todo) => todo.dispose(),
 );
 ```
 
 ```dart
-class TodoDetailsPage extends StatefulWidget {
-  const TodoDetailsPage({required this.todoId});
+class TodoPage extends StatefulWidget {
+  const TodoPage({required this.todoId});
 
   final String todoId;
 
   @override
-  _TodoDetailsPageState createState() => _TodoDetailsPageState();
+  State<TodoPage> createState() => _TodoPageState();
 }
 
-class _TodoDetailsPageState extends State<TodoDetailsPage> {
+class _TodoPageState extends State<TodoPage> {
   @override
   void initState() {
     super.initState();
 
     // 2. A new scope is added, and the dummy factory is replaced with the actual one.
     Pot.pushScope();
-    todoDetailsPot.replace(() => TodoDetails(widget.todoId));
+    todoPot.replace(() => Todo(widget.todoId));
   }
 
   @override
   void dispose() {
-    // 4. The TodoDetails object is discarded when the page is disposed of.
+    // 4. The Todo object is discarded when the page is navigated away from.
     Pot.popScope();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // 3. The TodoDetails object is created and gets bound to the current scope.
-    final details = todoDetailsPot();
+    // 3. The Todo object is created and gets bound to the current scope.
+    final todo = todoPot();
     ...
   }
 }

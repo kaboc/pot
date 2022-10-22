@@ -9,5 +9,5 @@ class PotReplaceError extends Error {
       'the current setting.\n'
       'If a replacement is necessary for testing, set `Pot.forTesting` '
       'to `true`. Or if it is for functionality of the application, '
-      'use the `Pot.replaceable` constructor instead.';
+      'use the `Pot.replaceable()` instead.';
 }

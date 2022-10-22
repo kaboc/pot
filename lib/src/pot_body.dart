@@ -264,7 +264,7 @@ class ReplaceablePot<T> extends Pot<T> {
   ReplaceablePot(PotObjectFactory<T> factory, {PotDisposer<T>? disposer})
       : super(factory, disposer: disposer);
 
-  /// Replaces the factory set in the constructor with a new one, and/or
+  /// Replaces the factory in a replaceable pot with a new one, and/or
   /// creates a new object using the new factory.
   ///
   /// This behaves differently depending on the existence of the object.
@@ -280,7 +280,7 @@ class ReplaceablePot<T> extends Pot<T> {
   /// void main() {
   ///   // The factory is replaced.
   ///   // The pot has no User object yet.
-  ///   pot.replace(() => User(id: 200);
+  ///   pot.replace(() => User(id: 200));
   ///
   ///   // The object is created.
   ///   final user = pot();
@@ -305,8 +305,8 @@ class ReplaceablePot<T> extends Pot<T> {
   ///
   ///   // The factory is replaced.
   ///   // The existing object is discarded and the disposer is triggered.
-  ///   // A new object is created by the new factory.
-  ///   pot.replace(() => User(id: 200);
+  ///   // A new object is immediately created by the new factory.
+  ///   pot.replace(() => User(id: 200));
   /// }
   /// ```
   ///
