@@ -110,8 +110,7 @@ class Pot<T> extends _PotBody<T> {
   /// until it is discarded.
   ///
   /// {@macro pot.class}
-  Pot(PotObjectFactory<T> factory, {PotDisposer<T>? disposer})
-      : super(factory, disposer: disposer);
+  Pot(super.factory, {super.disposer});
 
   static int _currentScope = 0;
   static final _ScopedResetters _scopedResetters = [[]];
@@ -250,7 +249,9 @@ class Pot<T> extends _PotBody<T> {
   /// although every pot in the scope is reset and its disposer is called.
   static void popScope() {
     _scopedResetters.clearScope(_currentScope);
-    if (_currentScope > 0) _currentScope--;
+    if (_currentScope > 0) {
+      _currentScope--;
+    }
   }
 
   /// Resets all pots in the current scope.

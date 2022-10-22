@@ -80,7 +80,9 @@ class _PotBody<T> {
   /// }
   /// ```
   T call({bool suppressWarning = false}) {
-    if (_isDisposed) throwStateError();
+    if (_isDisposed) {
+      throwStateError();
+    }
 
     if (_object == null) {
       _debugWarning(suppressWarning);
@@ -177,7 +179,9 @@ class _PotBody<T> {
   /// }
   /// ```
   void reset() {
-    if (_isDisposed) throwStateError();
+    if (_isDisposed) {
+      throwStateError();
+    }
 
     final object = _object;
     if (object != null) {
@@ -229,7 +233,9 @@ class _PotBody<T> {
   }
 
   void _replace(PotObjectFactory<T> factory) {
-    if (_isDisposed) throwStateError();
+    if (_isDisposed) {
+      throwStateError();
+    }
 
     _factory = factory;
 
@@ -261,8 +267,7 @@ class _PotBody<T> {
 @sealed
 class ReplaceablePot<T> extends Pot<T> {
   @internal
-  ReplaceablePot(PotObjectFactory<T> factory, {PotDisposer<T>? disposer})
-      : super(factory, disposer: disposer);
+  ReplaceablePot(super.factory, {super.disposer});
 
   /// Replaces the factory in a replaceable pot with a new one, and/or
   /// creates a new object using the new factory.

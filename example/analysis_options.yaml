@@ -1,5 +1,6 @@
-include: package:lints/recommended.yaml
+include: ../analysis_options.yaml
 
 linter:
   rules:
+    cascade_invocations: false
     unnecessary_lambdas: false

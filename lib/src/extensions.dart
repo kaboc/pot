@@ -11,7 +11,9 @@ extension<T> on _PotBody<T> {
   }
 
   void _debugWarning(bool suppressWarning) {
-    if (suppressWarning) return;
+    if (suppressWarning) {
+      return;
+    }
 
     // ignore: prefer_asserts_with_message
     assert(
