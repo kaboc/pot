@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'pot.dart';
 
 /// Error thrown if `replaceForTesting` is used when [Pot.forTesting]

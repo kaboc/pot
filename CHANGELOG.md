@@ -1,3 +1,9 @@
+## 0.4.0
+
+- Add `pending()` and `PotNotReadyException`.
+- Raise minimum Dart version to 2.17.
+- Improve documentation.
+
 ## 0.3.2
 
 - Improve example.
