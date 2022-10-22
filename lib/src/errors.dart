@@ -11,3 +11,11 @@ class PotReplaceError extends Error {
       'to `true`. Or if it is for functionality of the application, '
       'use the `Pot.replaceable()` instead.';
 }
+
+/// Exception thrown if a pot with no factory is used.
+class PotNotReadyException implements Exception {
+  @override
+  String toString() =>
+      'PotNotReadyException: The pot is not ready for use. Set a valid '
+      'factory with `Pot.replace()`.';
+}

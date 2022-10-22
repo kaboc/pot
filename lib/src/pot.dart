@@ -171,6 +171,22 @@ class Pot<T> extends _PotBody<T> {
     return ReplaceablePot<T>(factory, disposer: disposer);
   }
 
+  /// Creates a pot of type [ReplaceablePot] where its factory of
+  /// type [T] is yet to be set.
+  ///
+  /// This is an alternative to [Pot.replaceable] for convenience,
+  /// useful if the object is unnecessary or the factory is unavailable
+  /// until some point.
+  ///
+  /// A factory must be set with [ReplaceablePot.replace] before
+  /// the pot is used. Otherwise the [PotNotReadyException] is thrown.
+  static ReplaceablePot<T> pending<T>({PotDisposer<T>? disposer}) {
+    return replaceable(
+      () => throw PotNotReadyException(),
+      disposer: disposer,
+    );
+  }
+
   /// Adds a new scope to the stack of scopes.
   ///
   /// {@template pot.scope}

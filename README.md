@@ -15,7 +15,8 @@ An object of a certain type is created in a pot as needed and kept until it is d
     - A pot as a global variable is easy to handle, and can take help from IDEs.
 - Safe
     - Not dependent on types. 
-        - No runtime error. The object always exists when it is accessed.
+        - No runtime error basically. The object always exists when it is accessed
+          as long as the pot has a valid factory.
     - Not dependent on strings either.
         - Features to access an object or a scope by name were excluded on purpose.
         - More of other similar design decisions for safety.
@@ -128,6 +129,24 @@ disposer, but only if an object has already been created. It behaves differently
 on whether the object exists. See the document of [replace()][replace] for details on the
 behaviour.
 
+### Creating a pot with no factory
+
+[Pot.pending()][pending] is an alternative to [Pot.replaceable()][replaceable], useful
+if the object is unnecessary or the factory is unavailable until some point.
+
+Note that a [PotNotReadyException][PotNotReadyException] occurs if the pot is used before
+a valid factory is set.
+
+```dart
+final userPot = Pot.pending<User>();
+// final user = userPot(); // PotNotReadyException
+
+...
+
+userPot.replace(() => User(id: userId));
+final user = userPot();
+```
+
 ### Replacements for testing
 
 If replacements are only necessary in tests, avoid using [Pot.replaceable][replaceable]
@@ -194,9 +213,9 @@ calling [Pot.popScope()][popScope].
 If an object is used only from some point onwards, you can make use of
 [Pot.popScope()][popScope] and [replace()][replace].
 
-Declare a pot with a dummy factory initially, and replace the factory with the actual one
-after adding a scope. It allows the factory to be given a new value, and enables the object
-to be discarded by removal of the scope.
+Declare a pot with [Pot.pending()][pending] initially, and replace the factory with
+the actual one after adding a scope. It allows a factory to be set only at a specific
+scope, and enables the object to be discarded by removal of the scope.
 
 <details>
 <summary>Example code (Click to open)</summary>
@@ -204,11 +223,8 @@ to be discarded by removal of the scope.
 An example of an app using Flutter:
 
 ```dart
-final todoPot = Pot<Todo>(
-  // 1. A dummy factory for the moment.
-  () => throw UnimplementedError(),
-  disposer: (todo) => todo.dispose(),
-);
+// 1. A dummy factory for the moment, which only throws an exception if called.
+final todoPot = Pot.pending<Todo>();
 ```
 
 ```dart
@@ -312,5 +328,7 @@ discarded manually with [reset()][reset] or other methods that have the same eff
 [resetAllInScope]: https://pub.dev/documentation/pot/latest/pot/Pot/resetAllInScope.html
 [resetAll]: https://pub.dev/documentation/pot/latest/pot/Pot/resetAll.html
 [replaceable]: https://pub.dev/documentation/pot/latest/pot/Pot/replaceable.html
+[pending]: https://pub.dev/documentation/pot/latest/pot/Pot/pending.html
+[PotNotReadyException]: https://pub.dev/documentation/pot/latest/pot/PotNotReadyException-class.html
 [forTesting]: https://pub.dev/documentation/pot/latest/pot/Pot/forTesting.html
 [replaceForTesting]: https://pub.dev/documentation/pot/latest/pot/Pot/replaceForTesting.html
