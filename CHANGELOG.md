@@ -1,3 +1,8 @@
+## 0.4.1
+
+- Downgrade `meta` and `test` to resolve issue in Dart 2.17 / Flutter 3.0.
+- Update analysis_options.yaml.
+
 ## 0.4.0
 
 - Add `pending()` and `PotNotReadyException`.
