@@ -12,7 +12,7 @@ void main() {
   group('Inheritance', () {
     test('ReplaceablePot is a subtype of Pot', () {
       final replaceablePot = Pot.replaceable<void>(() {});
-      expect(replaceablePot, isA<Pot>());
+      expect(replaceablePot, isA<Pot<void>>());
     });
   });
 
