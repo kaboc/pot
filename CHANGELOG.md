@@ -1,3 +1,11 @@
+## 0.4.2
+
+- Add `keepScopes` to `resetAll()`.
+    - No change in the default behavior.
+    - If `false` is passed, not only objects but also scopes are reset.
+- Fix a warning and add a missing rule to analysis_options.yaml.
+- Improve documentation.
+
 ## 0.4.1
 
 - Downgrade `meta` and `test` to resolve issue in Dart 2.17 / Flutter 3.0.

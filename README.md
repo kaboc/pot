@@ -26,6 +26,11 @@ An object of a certain type is created in a pot as needed and kept until it is d
 This package will not adopt new features easily so that it'll be kept simple to use.
 The focus will be more on enhancing stability and robustness.
 
+## Examples
+
+- [Todo](https://github.com/kaboc/pot/tree/main/example) - Dart
+- [pub.dev explorer](https://github.com/kaboc/pubdev-explorer) - Flutter
+
 ## Usage
 
 Create a pot with a so-called Singleton factory that instantiates an object.
@@ -189,16 +194,16 @@ final counterPot = Pot<Counter>(
 ```dart
 void main() {
   print(Pot.currentIndex); // 0
-  // At this point, the counter object is not bound to the scope 0
+  // At this point, the Counter object is not bound to the scope 0
   // because the object has not been created yet.
 
   Pot.pushScope();
   print(Pot.currentIndex); // 1
 
-  // The counter object is created here, and it gets bound to scope 1.
+  // The Counter object is created here, and it gets bound to scope 1.
   final counter = counterPot();
 
-  // The scope 2 is removed and the counter object is discarded.
+  // The scope 2 is removed and the object is discarded.
   // In addition, the disposer is triggered.
   Pot.popScope();
   print(Pot.currentIndex); // 0
@@ -217,54 +222,28 @@ Declare a pot with [Pot.pending()][pending] initially, and replace the factory w
 the actual one after adding a scope. It allows a factory to be set only at a specific
 scope, and enables the object to be discarded by removal of the scope.
 
-<details>
-<summary>Example code (Click to open)</summary>
-
-An example of an app using Flutter:
-
 ```dart
-// 1. A dummy factory for the moment, which only throws an exception if called.
-final todoPot = Pot.pending<Todo>();
+// A dummy factory for the moment, which only throws an exception if called.
+final userPot = Pot.pending<User>();
+
+...
+
+// A new scope is added, and the dummy factory is replaced with the actual one.
+Pot.pushScope();
+todoPot.replace(() => User(id, name));
+
+// The User object is created and gets bound to the current scope.
+final user = userPot();
+
+...
+
+// The scope is removed and the object is discarded.
+// It is better to replace the factory so that it throws if called unexpectedly after this. 
+Pot.popScope();
+userPot.replace(() => throw PotNotReadyException());
 ```
 
-```dart
-class TodoPage extends StatefulWidget {
-  const TodoPage({required this.todoId});
-
-  final String todoId;
-
-  @override
-  State<TodoPage> createState() => _TodoPageState();
-}
-
-class _TodoPageState extends State<TodoPage> {
-  @override
-  void initState() {
-    super.initState();
-
-    // 2. A new scope is added, and the dummy factory is replaced with the actual one.
-    Pot.pushScope();
-    todoPot.replace(() => Todo(widget.todoId));
-  }
-
-  @override
-  void dispose() {
-    // 4. The Todo object is discarded when the page is navigated away from.
-    Pot.popScope();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // 3. The Todo object is created and gets bound to the current scope.
-    final todo = todoPot();
-    ...
-  }
-}
-```
-</details>
-
-### Resetting objects without removing a scope
+### Resetting objects in the current scope
 
 [Pot.resetAllInScope()][resetAllInScope] discards all the objects bound to the current scope,
 but the scope is not removed.
@@ -287,7 +266,7 @@ the app behave as if it has restarted.
 
 All pots should usually be declared globally. It is possible to declare pots locally as long as
 their resources are properly discarded, but it is almost meaningless to use it like the code below.
-There isn't much difference from having the MyService object directly as a property of MyClass.
+It isn't much different from having the MyService object directly as a property of MyClass.
 
 <details>
 <summary>Example code (Click to open)</summary>
