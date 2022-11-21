@@ -267,14 +267,19 @@ class _TodoPageState extends State<TodoPage> {
 ### Resetting objects without removing a scope
 
 [Pot.resetAllInScope()][resetAllInScope] discards all the objects bound to the current scope,
-but the scope is not removed. This method is likely to be only necessary in rare cases.
+but the scope is not removed.
 
-Similarly, [Pot.resetAll()][resetAll] discards all the objects that are bound to any scope.
-This is useful to reset all objects for testing. It may also be used for clearing the state
-to make the app behave as if it restarted.
+The behaviour of a reset of each object is the same as [reset()][reset]; the disposer is
+triggered in the same way.
 
-The behaviour of a reset of each object is the same as [reset()][reset], therefore the disposer
-is triggered in the same way.
+### Resetting objects in all scopes
+
+[Pot.resetAll()][resetAll] discards all the objects that are bound to any scope. This is
+useful to reset all for testing.
+
+By default, this method does not remove scopes themselves. If you want both objects and scopes
+to be reset, call it with `keepScopes: false`. It may be used for clearing the state to make
+the app behave as if it has restarted.
 
 ## Caveats
 

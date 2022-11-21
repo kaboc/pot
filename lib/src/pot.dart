@@ -248,10 +248,7 @@ class Pot<T> extends _PotBody<T> {
   /// If this is used in the root scope, the index number remains `0`
   /// although every pot in the scope is reset and its disposer is called.
   static void popScope() {
-    _scopedResetters.clearScope(_currentScope);
-    if (_currentScope > 0) {
-      _currentScope--;
-    }
+    _scopedResetters.clearScope(_currentScope, keepScope: false);
   }
 
   /// Resets all pots in the current scope.
@@ -269,16 +266,18 @@ class Pot<T> extends _PotBody<T> {
 
   /// Resets all pots of all scopes.
   ///
-  /// This discards all the objects bound to any scopes, and
-  /// triggers the disposer of each pot.
+  /// This discards all the objects bound to any scopes, and triggers
+  /// the disposer of each pot.
   ///
-  /// Calling this does not affect the scopes themselves. The index
-  /// number of the current scope stays the same.
+  /// If `keepScopes` is `false` or not specified, calling this method
+  /// does not affect the scopes themselves; the index number of the
+  /// current scope stays the same. Otherwise, the index is reset to 0.
   ///
   /// See [reset] for details on a reset of an object.
-  static void resetAll() {
-    for (var i = _currentScope; i >= 0; i--) {
-      _scopedResetters.clearScope(i, keepScope: true);
+  static void resetAll({bool keepScopes = true}) {
+    final count = _currentScope;
+    for (var i = count; i >= 0; i--) {
+      _scopedResetters.clearScope(i, keepScope: keepScopes);
     }
   }
 }

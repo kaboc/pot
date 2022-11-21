@@ -279,6 +279,28 @@ void main() {
       Pot.resetAll();
       expect(pot.scope, isNull);
     });
+
+    test('resetAll(keepScopes: false) removes objects and scopes except 0', () {
+      expect(Pot.currentScope, equals(0));
+      expect(Pot.$scopedResetters, equals(<List<Resetter>>[[]]));
+
+      final pot1 = Pot<Foo>(() => Foo(1));
+      final pot2 = Pot<Foo>(() => Foo(2));
+      pot1.create();
+      pot2.create();
+      Pot.pushScope();
+      final pot3 = Pot<Foo>(() => Foo(3));
+      final pot4 = Pot<Foo>(() => Foo(4));
+      pot3.create();
+      pot4.create();
+      expect(Pot.currentScope, equals(1));
+      expect(Pot.$scopedResetters, hasLength(2));
+
+      Pot.resetAll(keepScopes: false);
+      expect(Pot.currentScope, equals(0));
+      expect(Pot.$scopedResetters, equals(<List<Resetter>>[[]]));
+      expect(pot1.scope, isNull);
+    });
   });
 
   group('Scope - popScope()', () {

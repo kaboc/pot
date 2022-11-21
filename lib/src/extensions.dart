@@ -39,7 +39,7 @@ extension on _ScopedResetters {
     add([]);
   }
 
-  void clearScope(int index, {bool keepScope = false}) {
+  void clearScope(int index, {required bool keepScope}) {
     for (var i = this[index].length - 1; i >= 0; i--) {
       this[index][i]();
     }
@@ -48,6 +48,7 @@ extension on _ScopedResetters {
       this[index].clear();
     } else {
       removeAt(index);
+      Pot._currentScope--;
     }
   }
 
