@@ -39,7 +39,7 @@ Create a pot with a so-called Singleton factory that instantiates an object.
 final counterPot = Pot(() => Counter(0));
 ```
 
-Now you can use the pot whatever file importing the above declaration.
+Now you can use the pot in whatever file importing the above declaration.
 
 Note that the created pot should be assigned to a global variable unless there is some
 special reason not to.
@@ -185,28 +185,24 @@ exists while the current scope is 1 or newer, so it is discarded and the dispose
 triggered when the scope 1 is removed. The current index number goes back to 0.
 
 ```dart
-final counterPot = Pot<Counter>(
-  () => Counter(),
-  disposer: (counter) => counter.dispose(),
-);
+final counterPot = Pot<Counter>(() => Counter());
 ```
 
 ```dart
 void main() {
-  print(Pot.currentIndex); // 0
-  // At this point, the Counter object is not bound to the scope 0
-  // because the object has not been created yet.
+  print(Pot.currentScope);     // 0
 
   Pot.pushScope();
-  print(Pot.currentIndex); // 1
+  print(Pot.currentScope);     // 1
 
   // The Counter object is created here, and it gets bound to scope 1.
   final counter = counterPot();
+  print(counterPot.hasObject); // true
 
-  // The scope 2 is removed and the object is discarded.
-  // In addition, the disposer is triggered.
+  // The scope 1 is removed, causing the object to be discarded.
   Pot.popScope();
-  print(Pot.currentIndex); // 0
+  print(Pot.currentScope);     // 0
+  print(counterPot.hasObject); // false
 }
 ```
 
