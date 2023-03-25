@@ -31,6 +31,13 @@ The focus will be more on enhancing stability and robustness.
 - [Todo](https://github.com/kaboc/pot/tree/main/example) - Dart
 - [pub.dev explorer](https://github.com/kaboc/pubdev-explorer) - Flutter
 
+## Related package
+
+- [pottery][Pottery]
+    - A package that helps you use pots in Flutter by allowing to limit the scope
+      of pots in the widget tree.
+    - Whether to use this is up to you. It is just an additional utility.
+
 ## Usage
 
 Create a pot with a so-called Singleton factory that instantiates an object.
@@ -298,7 +305,17 @@ the data related to scoping is stored globally even if the pot is assigned to a 
 and it is not automatically discarded when the variable goes out of use. It therefore must be
 discarded manually with [reset()][reset] or other methods that have the same effect.
 
+### Scoping in Flutter
+
+The scoping feature of this package is not very suitable for Flutter apps because this is not
+a package specific to Flutter but for Dart in general, and so is the scoping feature.
+
+It is recommended to use [Pottery] instead. It is just a utility that contains the pot package,
+limiting the scope of pots in the widget tree by making use of the widget lifecycle, which
+is more natural in Flutter and less error-prone.
+
 [Pot]: https://pub.dev/documentation/pot/latest/pot/Pot-class.html
+[Pottery]: https://pub.dev/packages/pottery
 [Pot-constructor]: https://pub.dev/documentation/pot/latest/pot/Pot/Pot.html
 [call]: https://pub.dev/documentation/pot/latest/pot/Pot/call.html
 [create]: https://pub.dev/documentation/pot/latest/pot/Pot/create.html
