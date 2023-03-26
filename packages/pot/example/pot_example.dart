@@ -4,7 +4,7 @@ import 'package:pot/pot.dart';
 
 final todoListPot = Pot(() => TodoList());
 
-final todoEditorPot = Pot(
+final todoEditorPot = Pot<TodoEditor>(
   () => TodoEditor(),
   disposer: (editor) => editor.dispose(),
 );

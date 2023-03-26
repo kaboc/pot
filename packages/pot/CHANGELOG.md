@@ -1,3 +1,8 @@
+## 0.4.2+1
+
+- Change the project structure.
+- Add an introduction of Pottery to README.
+
 ## 0.4.2
 
 - Add `keepScopes` to `resetAll()`.

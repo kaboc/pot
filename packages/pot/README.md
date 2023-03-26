@@ -1,12 +1,12 @@
 [![Pub Version](https://img.shields.io/pub/v/pot)](https://pub.dev/packages/pot)
-[![Dart CI](https://github.com/kaboc/pot/workflows/Dart%20CI/badge.svg)](https://github.com/kaboc/pot/actions)
+[![pot CI](https://github.com/kaboc/pot/actions/workflows/pot.yml/badge.svg)](https://github.com/kaboc/pot/actions/workflows/pot.yml)
 [![codecov](https://codecov.io/gh/kaboc/pot/branch/main/graph/badge.svg?token=YZMCN6WZKM)](https://codecov.io/gh/kaboc/pot)
 
 An easy and safe DI (Dependency Injection) solution for Dart with support for scoping.
 
 ## Introduction
 
-A [Pot][Pot] is a sort of service locator, but a single pot is for a single type.
+A [Pot] is a sort of service locator, but a single pot is for a single type.
 An object of a certain type is created in a pot as needed and kept until it is discarded.
 
 - Easy
@@ -14,7 +14,7 @@ An object of a certain type is created in a pot as needed and kept until it is d
     - Simple API that you can be sure with confidence how to use.
     - A pot as a global variable is easy to handle, and can take help from IDEs.
 - Safe
-    - Not dependent on types. 
+    - Not dependent on types.
         - No runtime error basically. The object always exists when it is accessed
           as long as the pot has a valid factory.
     - Not dependent on strings either.
@@ -33,7 +33,7 @@ The focus will be more on enhancing stability and robustness.
 
 ## Related package
 
-- [pottery][Pottery]
+- [Pottery]
     - A package that helps you use pots in Flutter by allowing to limit the scope
       of pots in the widget tree.
     - Whether to use this is up to you. It is just an additional utility.
@@ -121,7 +121,7 @@ later sections of this document.
 ### Replacing factory and object
 
 Pots created by [Pot.replaceable()][replaceable] have the [replace()][replace] method.
-It replaces the object factory, which was set in the constructor of [Pot][Pot], and
+It replaces the object factory, which was set in the constructor of [Pot], and
 the object held in a pot. Otherwise, the [replace()][replace] method is not available.
 
 ```dart
@@ -146,8 +146,8 @@ behaviour.
 [Pot.pending()][pending] is an alternative to [Pot.replaceable()][replaceable], useful
 if the object is unnecessary or the factory is unavailable until some point.
 
-Note that a [PotNotReadyException][PotNotReadyException] occurs if the pot is used before
-a valid factory is set.
+Note that a [PotNotReadyException] occurs if the pot is used before a valid factory is
+set with [replace()][replace].
 
 ```dart
 final userPot = Pot.pending<User>();

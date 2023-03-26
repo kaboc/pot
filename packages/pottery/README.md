@@ -1,3 +1,7 @@
+[![Pub Version](https://img.shields.io/pub/v/pottery)](https://pub.dev/packages/pottery)
+[![pottery CI](https://github.com/kaboc/pot/actions/workflows/pottery.yml/badge.svg)](https://github.com/kaboc/pot/actions/workflows/pottery.yml)
+[![codecov](https://codecov.io/gh/kaboc/pot/branch/main/graph/badge.svg?token=YZMCN6WZKM)](https://codecov.io/gh/kaboc/pot)
+
 **Pottery** is a widget that limits the scope where particular [Pot]s are available
 in the widget tree.
 
@@ -8,8 +12,8 @@ in the widget tree.
 The scoping feature of [Pot] is not very suitable for Flutter apps because Pot is
 not a package specific to Flutter but for Dart in general and so is the scoping feature.
 
-Pottery makes use of the widget lifecycle to manage the lifecycle of pots. It is
-more natural and less error-prone.
+Pottery makes use of the widget lifecycle to limit the scope of pots. It is more
+natural and less error-prone.
 
 ### How beneficial is it to use this?
 
@@ -43,7 +47,7 @@ Use `Pottery` and specify a factory right before you need to use the pot.
 ```dart
 Widget build(BuildContext context) {
   // counterNotifierPot does not have a factory yet.
-  // Calling `counterNotifierPot()` here throws an PotNotReadyException.
+  // Calling `counterNotifierPot()` here throws a PotNotReadyException.
 
   ...
 
@@ -87,15 +91,18 @@ all pots passed to the `pots` argument and replaces their factories to throw an
 The `pots` argument is not type-safe.
 
 ```dart
+final counterNotifierPot = Pot.pending<CounterNotifier>();
+```
+
+```dart
 pots: {
   counterNotifierPot: TodoNotifier.new,
 }
 ```
 
-The factory of counterNotifierPot must be a function that returns CounterNotifier,
-so it is wrong to use the constructor of TodoNotifier as its factory. However,
-it does not appear as an error in the static analysis. Be careful not to specify
-a wrong factory, otherwise its error occurs only at runtime.
+In this example, the factory of counterNotifierPot must be a function that returns
+CounterNotifier. However, the static analysis does not tell you it is wrong to specify
+a factory that creates TodoNotifier. The error only occurs at runtime.
 
 ## Tips
 
