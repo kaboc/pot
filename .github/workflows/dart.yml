@@ -1,19 +1,27 @@
-name: Dart CI
+name: pot CI
 
 on:
-  push:
-    branches: [main]
+#  push:
+#    branches: [main]
+#    paths:
+#      - "packages/pot/**"
+#      - ".github/workflows/pot.yaml"
   pull_request:
     branches: [main]
+    paths:
+      - "packages/pot/**"
+      - ".github/workflows/pot.yaml"
   workflow_dispatch:
 
 jobs:
-  dart-ci:
+  pot-ci:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: packages/pot
     steps:
-      - uses: actions/checkout@v2
-      - uses: dart-lang/setup-dart@v1.3
+      - uses: actions/checkout@v3
+      - uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
       - name: Install dependencies
@@ -25,8 +33,6 @@ jobs:
       - name: Run tests
         run: |
           dart pub global activate coverage
-          dart pub global run coverage:test_with_coverage
+          dart run coverage:test_with_coverage
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
-        with:
-          file: coverage/lcov.info
+        uses: codecov/codecov-action@v3
