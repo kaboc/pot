@@ -1,0 +1,34 @@
+name: pottery CI
+
+on:
+#  push:
+#    branches: [main]
+#    paths:
+#      - "packages/pottery/**"
+#      - ".github/workflows/pottery.yaml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "packages/pottery/**"
+      - ".github/workflows/pottery.yaml"
+  workflow_dispatch:
+
+jobs:
+  pottery-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/pottery
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Check format
+        run: flutter format -n .
+      - name: Analyze
+        run: flutter analyze --no-pub
+      - name: Run tests
+        run: flutter test

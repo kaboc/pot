@@ -1,0 +1,20 @@
+name: pottery
+description: A widget to limit the scope where particular Pots are available in the widget tree.
+version: 0.0.1
+repository: https://github.com/kaboc/pottery
+
+environment:
+  sdk: '>=2.19.2 <3.0.0'
+  flutter: '>=3.7.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  pot: ^0.4.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.1

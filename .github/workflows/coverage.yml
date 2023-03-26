@@ -1,0 +1,30 @@
+name: Coverage
+
+on:
+  workflow_dispatch:
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Run tests for pot
+        run: |
+          dart pub get
+          dart pub global activate coverage
+          dart run coverage:test_with_coverage
+        working-directory: packages/pot
+
+      - name: Run tests for pottery
+        run: |
+          flutter pub get
+          flutter test --coverage
+        working-directory: packages/pottery
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
