@@ -48,7 +48,6 @@ linter:
 #    directives_ordering: true
     do_not_use_environment: true
     eol_at_end_of_file: true
-    invariant_booleans: true
     join_return_with_assignment: true
     leading_newlines_in_multiline_strings: true
     lines_longer_than_80_chars: true
