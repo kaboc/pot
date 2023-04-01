@@ -2,10 +2,10 @@
 [![pottery CI](https://github.com/kaboc/pot/actions/workflows/pottery.yml/badge.svg)](https://github.com/kaboc/pot/actions/workflows/pottery.yml)
 [![codecov](https://codecov.io/gh/kaboc/pot/branch/main/graph/badge.svg?token=YZMCN6WZKM)](https://codecov.io/gh/kaboc/pot)
 
-**Pottery** is a widget that limits the scope where particular [Pot]s are available
-in the widget tree.
+## Overview
 
-## Motivations
+**Pottery** is a widget that limits the scope where particular [Pot]s are available
+in the widget tree. Using it makes it clearer from which point onwards pots are used.
 
 ### Why is this better than scoping by Pot itself?
 
@@ -13,7 +13,7 @@ The scoping feature of [Pot] is not very suitable for Flutter apps because Pot i
 not a package specific to Flutter but for Dart in general and so is the scoping feature.
 
 Pottery makes use of the widget lifecycle to limit the scope of pots. It is more
-natural and less error-prone.
+natural in Flutter and less error-prone.
 
 ### How beneficial is it to use this?
 
@@ -86,9 +86,9 @@ all pots passed to the `pots` argument and replaces their factories to throw an
 
 ## Caveats
 
-### Make sure not to specify a factory that returns a wrong type.
+### Make sure to specify a factory that returns a correct type.
 
-The `pots` argument is not type-safe.
+The `pots` argument is not type-safe as it uses a generic Map.
 
 ```dart
 final counterNotifierPot = Pot.pending<CounterNotifier>();
@@ -104,34 +104,58 @@ In this example, the factory of counterNotifierPot must be a function that retur
 CounterNotifier. However, the static analysis does not tell you it is wrong to specify
 a factory that creates TodoNotifier. The error only occurs at runtime.
 
-## Tips
-
-### Using Pottery with Grab
+## Usage with Grab
 
 The author created Pot and Pottery mainly for using them in combination with [Grab].
-This combination is even more similar to the usage of the provider package and will
-be good as an alternative.
+You can use Pottery + Grab as an alternative to package:provider.
 
-However, the extension methods of Grab requires the `BuildContext` of the widget
-in which they are used, not the `BuildContext` passed to the `builder` function
-of Pottery.
+There is however an important thing to remember. The extension methods of Grab require
+the `BuildContext` of the widget in which they are used, not the one passed to the
+`builder` function of Pottery.
 
 ```dart
-Pottery(
-  pots: { ... },
-  builder: (context) {
-    // Wrong!!
-    final count = context.grab<int>(counterNotifierPot());
-  },
+class MyWidget extends StatelessWidget with Grab {
+  const MyWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    return Pottery(
+      pots: { ... },
+      builder: (context) {
+        // It is not possible to use the BuildContext passed to
+        // this callback to call grab extension methods on.
+        final count = context.grab<int>(counterNotifierPot());
+      },
+    )
+  }
+}
+```
+
+Tt is actually possible to get around it by using the outer BuildContext instead.
+
+```dart
+Widget build(BuildContext context) {
+  return Pottery(
+    pots: { ... },
+    builder: (innerContext) {
+      // Grab works if you use the `context` passed to
+      // the build method instead of `innerContext`.
+      final count = context.grab<int>(counterNotifierPot());
+    },
+  );
 )
 ```
 
-It is necessary to use Pottery before the build method where pots are used is called.
+However, using grab methods this way is discouraged as it is confusing and can
+easily lead to a bug. If you are using [grab_lints](https://github.com/kaboc/grab-lints),
+it will warn you about it.
 
-#### Option 1
+Make sure to use Pottery a little earlier to get pots ready before they are used
+in a build method. Here are two options for it.
 
-Using Pottery in the builder function of PageRoute before navigating to the
-page that requires pots.
+### Option 1
+
+Using Pottery in the builder function of PageRoute before navigation.
 
 ```dart
 ElevatedButton(
@@ -143,17 +167,18 @@ ElevatedButton(
       ),
     ),
   ),
-  child: ...,
+  child: const Text('To CounterPage'),
 )
 ```
 
-#### Option 2
+### Option 2
 
 Using Pottery in the builder function of PageRoute in a route method.
 
-This is more recommended because Pottery is used in the class of the actual page
-where pots are used, which makes more sense and helps you grasp the scope of pots
-when you get back to the code after a long while.
+This is essentially the same as Option 1, but more recommended because Pottery
+is used in the class of the actual page where pots are used. It makes more sense
+and helps you easily grasp the scope of pots when you get back to the code after
+a long while.
 
 ```dart
 class CounterPage extends StatelessWidget {
@@ -172,6 +197,13 @@ class CounterPage extends StatelessWidget {
     final count = context.grab<int>(counterNotifierPot());
   }
 }
+```
+
+```dart
+ElevatedButton(
+  onPressed: () => Navigator.of(context).push(CounterPage.route()),
+  child: const Text('To CounterPage'),
+)
 ```
 
 <!-- Links -->
