@@ -60,7 +60,7 @@ class CounterPage extends StatelessWidget with Grab {
   @override
   Widget build(BuildContext context) {
     final notifier = counterNotifierPot();
-    final count = context.grab<int>(notifier);
+    final count = notifier.grab(context);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Counter')),
