@@ -131,7 +131,7 @@ class MyWidget extends StatelessWidget with Grab {
 }
 ```
 
-Tt is actually possible to get around it by using the outer BuildContext instead.
+It is actually possible to get around it by using the outer BuildContext instead.
 
 ```dart
 Widget build(BuildContext context) {

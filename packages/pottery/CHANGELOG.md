@@ -1,3 +1,7 @@
+## 0.0.1+3
+
+- Update README and example.
+
 ## 0.0.1+2
 
 - Improve README.
