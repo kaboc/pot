@@ -122,9 +122,9 @@ class MyWidget extends StatelessWidget with Grab {
     return Pottery(
       pots: { ... },
       builder: (context) {
-        // It is not possible to use the BuildContext passed to
-        // this callback to call grab extension methods on.
-        final count = context.grab<int>(counterNotifierPot());
+        // The BuildContext passed to this callback
+        // cannot be used for grab extension methods.
+        final count = counterNotifierPot().grab(context);
       },
     )
   }
@@ -140,7 +140,7 @@ Widget build(BuildContext context) {
     builder: (innerContext) {
       // Grab works if you use the `context` passed to
       // the build method instead of `innerContext`.
-      final count = context.grab<int>(counterNotifierPot());
+      final count = counterNotifierPot().grab(context);
     },
   );
 )
@@ -194,7 +194,7 @@ class CounterPage extends StatelessWidget {
   }
 
   Widget build(BuildContext context) {
-    final count = context.grab<int>(counterNotifierPot());
+    final count = counterNotifierPot().grab(context);
   }
 }
 ```
