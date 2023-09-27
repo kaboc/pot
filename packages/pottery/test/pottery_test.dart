@@ -24,14 +24,16 @@ void main() {
   testWidgets(
     'Pots become available by Pottery and unavailable again by removal',
     (tester) async {
-      fooPot = Pot.pending<Foo>();
-      barPot = Pot.pending<Bar>();
+      var fooDisposed = false;
+      var barDisposed = false;
+      fooPot = Pot.pending<Foo>(disposer: (_) => fooDisposed = true);
+      barPot = Pot.pending<Bar>(disposer: (_) => barDisposed = true);
 
       expect(fooPot?.create, throwsA(isA<PotNotReadyException>()));
       expect(barPot?.create, throwsA(isA<PotNotReadyException>()));
 
       await tester.pumpWidget(
-        TestWidget(
+        TestPottery(
           pots: {
             fooPot!: Foo.new,
             barPot!: Bar.new,
@@ -48,6 +50,8 @@ void main() {
       await tester.tap(buttonFinder);
       await tester.pump();
 
+      expect(fooDisposed, isTrue);
+      expect(barDisposed, isTrue);
       expect(fooPot!.create, throwsA(isA<PotNotReadyException>()));
       expect(barPot!.create, throwsA(isA<PotNotReadyException>()));
       expect(fooPot!.hasObject, isFalse);
@@ -63,7 +67,7 @@ void main() {
       barPot = Pot.pending<Bar>();
 
       await tester.pumpWidget(
-        TestWidget(
+        TestPottery(
           pots: {
             fooPot!: Foo.new,
             barPot!: Bar.new,
@@ -93,7 +97,7 @@ void main() {
       barPot = Pot.pending<Bar>(disposer: (_) => fooPot!.call());
 
       await tester.pumpWidget(
-        TestWidget(
+        TestPottery(
           pots: {
             fooPot!: Foo.new,
             barPot!: Bar.new,

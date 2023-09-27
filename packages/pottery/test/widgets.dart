@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 
 import 'package:pottery/pottery.dart';
 
-class TestWidget extends StatefulWidget {
-  const TestWidget({required this.pots});
+class TestPottery extends StatefulWidget {
+  const TestPottery({required this.pots});
 
   final PotReplacements pots;
 
   @override
-  State<TestWidget> createState() => _TestWidgetState();
+  State<TestPottery> createState() => _TestPotteryState();
 }
 
-class _TestWidgetState extends State<TestWidget> {
+class _TestPotteryState extends State<TestPottery> {
   bool _pressed = false;
 
   @override
