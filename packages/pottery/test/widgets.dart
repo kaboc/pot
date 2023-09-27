@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:pottery/pottery.dart';
 
 class TestPottery extends StatefulWidget {
-  const TestPottery({required this.pots});
+  const TestPottery({required this.pots, this.builder});
 
   final PotReplacements pots;
+  final WidgetBuilder? builder;
 
   @override
   State<TestPottery> createState() => _TestPotteryState();
@@ -25,7 +26,7 @@ class _TestPotteryState extends State<TestPottery> {
           if (!_pressed)
             Pottery(
               pots: widget.pots,
-              builder: (_) => const SizedBox.shrink(),
+              builder: widget.builder ?? (_) => const SizedBox.shrink(),
             ),
           RemovePotteryButton(
             onPressed: () => setState(() => _pressed = true),

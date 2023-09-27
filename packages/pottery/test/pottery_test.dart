@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:pottery/pottery.dart';
@@ -8,11 +9,13 @@ ReplaceablePot<Foo>? fooPot;
 ReplaceablePot<Bar>? barPot;
 
 class Foo {
-  const Foo();
+  const Foo([this.value]);
+  final int? value;
 }
 
 class Bar {
-  const Bar();
+  const Bar([this.value]);
+  final int? value;
 }
 
 void main() {
@@ -56,6 +59,28 @@ void main() {
       expect(barPot!.create, throwsA(isA<PotNotReadyException>()));
       expect(fooPot!.hasObject, isFalse);
       expect(barPot!.hasObject, isFalse);
+    },
+  );
+
+  testWidgets(
+    'Pots are immediately available in the builder function',
+    (tester) async {
+      fooPot = Pot.replaceable(() => const Foo(10));
+      expect(fooPot?.call(), const Foo(10));
+
+      Foo? foo;
+      await tester.pumpWidget(
+        TestPottery(
+          pots: {
+            fooPot!: () => const Foo(20),
+          },
+          builder: (_) {
+            foo ??= fooPot?.call();
+            return const SizedBox.shrink();
+          },
+        ),
+      );
+      expect(foo, const Foo(20));
     },
   );
 
