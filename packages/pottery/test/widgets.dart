@@ -7,7 +7,7 @@ import 'package:pottery/pottery.dart';
 class TestWidget extends StatefulWidget {
   const TestWidget({required this.pots});
 
-  final PotsMap pots;
+  final PotReplacements pots;
 
   @override
   State<TestWidget> createState() => _TestWidgetState();

@@ -3,7 +3,8 @@ import 'package:flutter/widgets.dart';
 import 'package:pot/pot.dart';
 
 /// The signature of a map consisting of replaceable pots and factories.
-typedef PotsMap = Map<ReplaceablePot<Object?>, PotObjectFactory<Object?>>;
+typedef PotReplacements
+    = Map<ReplaceablePot<Object?>, PotObjectFactory<Object?>>;
 
 /// A widget that limits the scope where particular [Pot]s are
 /// available in the widget tree.
@@ -58,7 +59,7 @@ class Pottery extends StatefulWidget {
   /// Note that there is no warning even if you specify a factory
   /// that creates a wrong type of object. Make sure to specify a
   /// correct factory to avoid an error being thrown at runtime.
-  final PotsMap pots;
+  final PotReplacements pots;
 
   /// Called to obtain the child widget.
   final WidgetBuilder builder;
