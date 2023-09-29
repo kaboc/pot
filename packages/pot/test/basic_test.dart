@@ -17,7 +17,7 @@ void main() {
   });
 
   group('hasObject', () {
-    test('hasObject returns true only if object exists', () {
+    test('hasObject is true when object exists and false after reset()', () {
       final pot = Pot(() => Foo(1));
       expect(pot.hasObject, isFalse);
 
@@ -26,6 +26,31 @@ void main() {
 
       pot.reset();
       expect(pot.hasObject, isFalse);
+    });
+
+    test('hasObject is true after create() whether object is null or not', () {
+      final pot = Pot(() => null);
+      expect(pot.hasObject, isFalse);
+
+      pot.create();
+      expect(pot.hasObject, isTrue);
+
+      pot.reset();
+      expect(pot.hasObject, isFalse);
+    });
+
+    test('replace() does not affect hasObject', () {
+      final pot = Pot.replaceable<Foo?>(() => Foo(1));
+      expect(pot.hasObject, isFalse);
+
+      pot.replace(() => Foo(2));
+      expect(pot.hasObject, isFalse);
+
+      pot.create();
+      expect(pot.hasObject, isTrue);
+
+      pot.replace(() => null);
+      expect(pot.hasObject, isTrue);
     });
   });
 
@@ -152,11 +177,11 @@ void main() {
         disposer: (f) => f.dispose(),
       );
       pot.create();
-      expect(pot.$expect((o) => o?.value == 1), isTrue);
+      expect(pot.$expect((o) => o.value == 1), isTrue);
       expect(isDisposed, isFalse);
 
       pot.replace(() => Foo(2));
-      expect(pot.$expect((o) => o?.value == 2), isTrue);
+      expect(pot.$expect((o) => o.value == 2), isTrue);
       expect(isDisposed, isTrue);
     });
 
@@ -267,11 +292,11 @@ void main() {
         disposer: (f) => f.dispose(),
       );
       pot.create();
-      expect(pot.$expect((o) => o?.value == 1), isTrue);
+      expect(pot.$expect((o) => o.value == 1), isTrue);
       expect(isDisposed, isFalse);
 
       pot.replaceForTesting(() => Foo(2));
-      expect(pot.$expect((o) => o?.value == 2), isTrue);
+      expect(pot.$expect((o) => o.value == 2), isTrue);
       expect(isDisposed, isTrue);
     });
 

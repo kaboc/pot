@@ -11,15 +11,19 @@ class _PotBody<T> {
   PotDisposer<T>? _disposer;
 
   T? _object;
+  bool _hasObject = false;
   int? _scope;
   int? _prevScope;
   bool _isDisposed = false;
 
   @visibleForTesting
-  bool $expect(bool Function(T?) test) => test(_object);
+  bool $expect(bool Function(T) test) => test(_object as T);
 
   /// Whether an object has been created by the factory and still exists.
-  bool get hasObject => _object != null;
+  ///
+  /// This returns `true` after a value is created with [call] or [create]
+  /// even if the value is `null`.
+  bool get hasObject => _hasObject;
 
   /// The index number of the scope that the object of this pot has
   /// been bound to.
@@ -84,7 +88,7 @@ class _PotBody<T> {
       throwStateError();
     }
 
-    if (_object == null) {
+    if (!_hasObject) {
       _debugWarning(suppressWarning);
 
       Pot._scopedResetters
@@ -92,10 +96,11 @@ class _PotBody<T> {
         ..addToScope(reset);
 
       _object = _factory();
+      _hasObject = true;
       _scope = Pot._currentScope;
       _prevScope = _scope;
     }
-    return _object!;
+    return _object as T;
   }
 
   /// Calls the factory to create an object of type [T].
@@ -183,10 +188,10 @@ class _PotBody<T> {
       throwStateError();
     }
 
-    final object = _object;
-    if (object != null) {
-      _disposer?.call(object);
+    if (_hasObject) {
+      _disposer?.call(_object as T);
       _object = null;
+      _hasObject = false;
       _scope = null;
       Pot._scopedResetters.removeFromScope(reset);
     }
@@ -239,9 +244,8 @@ class _PotBody<T> {
 
     _factory = factory;
 
-    final object = _object;
-    if (object != null) {
-      _disposer?.call(object);
+    if (_hasObject) {
+      _disposer?.call(_object as T);
       _object = factory();
     }
   }
