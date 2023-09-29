@@ -1,3 +1,5 @@
+// ignore_for_file: unreachable_from_main
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -66,7 +68,7 @@ void main() {
     'Pots are immediately available in the builder function',
     (tester) async {
       fooPot = Pot.replaceable(() => const Foo(10));
-      expect(fooPot?.call(), const Foo(10));
+      expect(fooPot?.call().value, 10);
 
       Foo? foo;
       await tester.pumpWidget(
@@ -80,7 +82,7 @@ void main() {
           },
         ),
       );
-      expect(foo, const Foo(20));
+      expect(foo?.value, 20);
     },
   );
 
