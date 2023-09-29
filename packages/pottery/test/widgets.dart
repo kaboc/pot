@@ -37,6 +37,52 @@ class _TestPotteryState extends State<TestPottery> {
   }
 }
 
+class TestScopedPottery extends StatefulWidget {
+  const TestScopedPottery({required this.pots, this.disposer, this.builder});
+
+  final PotReplacements pots;
+  final WidgetBuilder? builder;
+  final ValueSetter<ScopedPots>? disposer;
+
+  @override
+  State<TestScopedPottery> createState() => _TestScopedPotteryState();
+}
+
+class _TestScopedPotteryState extends State<TestScopedPottery> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Column(
+        children: [
+          if (!_pressed)
+            ScopedPottery(
+              pots: widget.pots,
+              disposer: widget.disposer,
+              builder: widget.builder ?? (_) => const SizedBox.shrink(),
+            ),
+          RemovePotteryButton(
+            onPressed: () => setState(() => _pressed = true),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class Descendant extends StatelessWidget {
+  const Descendant({required this.builder});
+
+  final WidgetBuilder builder;
+
+  @override
+  Widget build(BuildContext context) {
+    return builder(context);
+  }
+}
+
 class RemovePotteryButton extends StatelessWidget {
   const RemovePotteryButton({required this.onPressed});
 
