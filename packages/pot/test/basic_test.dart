@@ -152,11 +152,11 @@ void main() {
         disposer: (f) => f.dispose(),
       );
       pot.create();
-      expect(pot.$expect((o) => o?.value == 1), isTrue);
+      expect(pot.$expect((o) => o.value == 1), isTrue);
       expect(isDisposed, isFalse);
 
       pot.replace(() => Foo(2));
-      expect(pot.$expect((o) => o?.value == 2), isTrue);
+      expect(pot.$expect((o) => o.value == 2), isTrue);
       expect(isDisposed, isTrue);
     });
 
@@ -267,11 +267,11 @@ void main() {
         disposer: (f) => f.dispose(),
       );
       pot.create();
-      expect(pot.$expect((o) => o?.value == 1), isTrue);
+      expect(pot.$expect((o) => o.value == 1), isTrue);
       expect(isDisposed, isFalse);
 
       pot.replaceForTesting(() => Foo(2));
-      expect(pot.$expect((o) => o?.value == 2), isTrue);
+      expect(pot.$expect((o) => o.value == 2), isTrue);
       expect(isDisposed, isTrue);
     });
 
