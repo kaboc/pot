@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  pottery-tests:
+  pottery-ci:
     runs-on: ubuntu-latest
     defaults:
       run:
