@@ -8,6 +8,7 @@ import 'widgets.dart';
 
 ReplaceablePot<Foo>? fooPot;
 ReplaceablePot<Bar>? barPot;
+ReplaceablePot<Object?>? nullablePot;
 
 class Foo {
   const Foo([this.value]);
@@ -22,6 +23,7 @@ void main() {
   setUp(() {
     fooPot = null;
     barPot = null;
+    nullablePot = null;
   });
 
   testWidgets(
@@ -83,6 +85,20 @@ void main() {
       expect(foo?.value, 20);
     },
   );
+
+  testWidgets('Factory returning null causes no issue', (tester) async {
+    nullablePot = Pot.pending<Object?>();
+    expect(nullablePot?.create, throwsA(isA<PotNotReadyException>()));
+
+    await tester.pumpWidget(
+      TestPottery(
+        pots: {
+          nullablePot!: () => null,
+        },
+      ),
+    );
+    expect(nullablePot?.call(), isNull);
+  });
 
   testWidgets(
     'PotNotReadyException is thrown when Pottery calls reset() '

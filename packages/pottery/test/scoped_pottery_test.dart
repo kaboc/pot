@@ -8,6 +8,7 @@ import 'widgets.dart';
 
 ReplaceablePot<Foo>? fooPot;
 ReplaceablePot<Bar>? barPot;
+ReplaceablePot<Object?>? nullablePot;
 
 class Foo {
   const Foo([this.value]);
@@ -22,6 +23,7 @@ void main() {
   setUp(() {
     fooPot = null;
     barPot = null;
+    nullablePot = null;
   });
 
   testWidgets(
@@ -83,6 +85,25 @@ void main() {
       expect(foo2?.value, 20);
     },
   );
+
+  testWidgets('Factory returning null causes no issue', (tester) async {
+    nullablePot = Pot.pending<Object?>();
+    expect(nullablePot?.create, throwsA(isA<PotNotReadyException>()));
+
+    var isNullObtained = false;
+    await tester.pumpWidget(
+      TestScopedPottery(
+        pots: {
+          nullablePot!: () => null,
+        },
+        builder: (context) {
+          isNullObtained = nullablePot?.of(context) == null;
+          return const SizedBox.shrink();
+        },
+      ),
+    );
+    expect(isNullObtained, isTrue);
+  });
 
   testWidgets(
     'disposer of pot is not called when ScopedPottery is removed, '
