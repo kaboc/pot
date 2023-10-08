@@ -11,10 +11,10 @@ void main() {
 
   group('Scope', () {
     test('pushScope() adds new scope', () {
-      expect(Pot.currentScope, equals(0));
+      expect(Pot.currentScope, 0);
 
       Pot.pushScope();
-      expect(Pot.currentScope, equals(1));
+      expect(Pot.currentScope, 1);
     });
 
     test('Dimension for new scope is added before object is accessed', () {
@@ -26,52 +26,52 @@ void main() {
 
     test('Resetter is not added before object is accessed', () {
       Pot.pushScope();
-      Pot<Foo>(() => Foo(1));
-      expect(Pot.currentScope, equals(1));
-      expect(Pot.$scopedResetters, equals(<List<Resetter>>[[], []]));
+      Pot(() => Foo(1));
+      expect(Pot.currentScope, 1);
+      expect(Pot.$scopedResetters, <List<Resetter>>[[], []]);
     });
 
     test('Resetter is added to scope where object is first accessed', () {
       final pot = Pot<Foo>(() => Foo(101), disposer: (f) => f.dispose());
-      expect(Pot.currentScope, equals(0));
+      expect(Pot.currentScope, 0);
       expect(Pot.$scopedResetters[0], isEmpty);
 
       Pot.pushScope();
       pot.create();
-      expect(Pot.currentScope, equals(1));
+      expect(Pot.currentScope, 1);
       expect(Pot.$scopedResetters[0], isEmpty);
       expect(Pot.$scopedResetters[1], hasLength(1));
 
       Pot.$scopedResetters[1][0]();
-      expect(valueOfDisposedObject, equals(101));
+      expect(valueOfDisposedObject, 101);
     });
 
     test('`scope` of pot is set when an object is created', () {
-      final pot = Pot<Foo>(() => Foo(1));
+      final pot = Pot(() => Foo(1));
       expect(pot.scope, isNull);
 
       pot.create();
-      expect(pot.scope, equals(0));
+      expect(pot.scope, 0);
     });
 
     test('`scope` of pot has index of scope the object is bound to', () {
-      final pot = Pot<Foo>(() => Foo(1));
+      final pot = Pot(() => Foo(1));
       expect(pot.scope, isNull);
 
       Pot.pushScope();
       expect(pot.scope, isNull);
 
       pot.create();
-      expect(pot.scope, equals(1));
+      expect(pot.scope, 1);
     });
 
     test('`scope` of pot does not change when scope is added', () {
-      final pot = Pot<Foo>(() => Foo(1));
+      final pot = Pot(() => Foo(1));
       pot.create();
-      expect(pot.scope, equals(0));
+      expect(pot.scope, 0);
 
       Pot.pushScope();
-      expect(pot.scope, equals(0));
+      expect(pot.scope, 0);
     });
   });
 
@@ -86,16 +86,16 @@ void main() {
       expect(Pot.$scopedResetters[0], hasLength(3));
 
       pot2.reset();
-      expect(valueOfDisposedObject, equals(2));
+      expect(valueOfDisposedObject, 2);
       expect(Pot.$scopedResetters[0], hasLength(2));
 
       Pot.$scopedResetters[0][0]();
-      expect(valueOfDisposedObject, equals(1));
+      expect(valueOfDisposedObject, 1);
 
       Pot.$scopedResetters[0][0]();
-      expect(valueOfDisposedObject, equals(3));
+      expect(valueOfDisposedObject, 3);
 
-      expect(Pot.$scopedResetters, equals(<List<Resetter>>[[]]));
+      expect(Pot.$scopedResetters, <List<Resetter>>[[]]);
     });
 
     test('reset() removes resetter even if current scope is different', () {
@@ -110,20 +110,20 @@ void main() {
       expect(Pot.$scopedResetters[1], isEmpty);
 
       pot1.reset();
-      expect(valueOfDisposedObject, equals(1));
+      expect(valueOfDisposedObject, 1);
       expect(Pot.$scopedResetters[0], hasLength(1));
       expect(Pot.$scopedResetters[1], isEmpty);
 
       Pot.$scopedResetters[0][0]();
-      expect(valueOfDisposedObject, equals(2));
+      expect(valueOfDisposedObject, 2);
 
-      expect(Pot.$scopedResetters, equals(<List<Resetter>>[[], []]));
+      expect(Pot.$scopedResetters, <List<Resetter>>[[], []]);
     });
 
     test('reset() resets `scope` of pot to null', () {
-      final pot = Pot<Foo>(() => Foo(1));
+      final pot = Pot(() => Foo(1));
       pot.create();
-      expect(pot.scope, equals(0));
+      expect(pot.scope, 0);
 
       pot.reset();
       expect(pot.scope, isNull);
@@ -150,44 +150,44 @@ void main() {
         expect(pot4.$expect((o) => o.value == 4), isTrue);
         expect(Pot.$scopedResetters[0], hasLength(2));
         expect(Pot.$scopedResetters[1], hasLength(2));
-        expect(values, equals(<int>[]));
+        expect(values, <int>[]);
 
         Pot.resetAllInScope();
         expect(pot3.hasObject, isFalse);
         expect(pot4.hasObject, isFalse);
         expect(Pot.$scopedResetters[0], hasLength(2));
         expect(Pot.$scopedResetters[1], isEmpty);
-        expect(values, equals(<int>[4, 3]));
+        expect(values, <int>[4, 3]);
       },
     );
 
     test('resetAllInScope() does not affect number of scopes', () {
-      expect(Pot.currentScope, equals(0));
-      expect(Pot.$scopedResetters, equals(<List<Resetter>>[[]]));
+      expect(Pot.currentScope, 0);
+      expect(Pot.$scopedResetters, <List<Resetter>>[[]]);
 
-      final pot1 = Pot<Foo>(() => Foo(1));
-      final pot2 = Pot<Foo>(() => Foo(2));
+      final pot1 = Pot(() => Foo(1));
+      final pot2 = Pot(() => Foo(2));
       pot1.create();
       pot2.create();
       Pot.pushScope();
-      final pot3 = Pot<Foo>(() => Foo(3));
-      final pot4 = Pot<Foo>(() => Foo(4));
+      final pot3 = Pot(() => Foo(3));
+      final pot4 = Pot(() => Foo(4));
       pot3.create();
       pot4.create();
-      expect(Pot.currentScope, equals(1));
+      expect(Pot.currentScope, 1);
       expect(Pot.$scopedResetters, hasLength(2));
 
       Pot.resetAllInScope();
-      expect(Pot.currentScope, equals(1));
+      expect(Pot.currentScope, 1);
       expect(Pot.$scopedResetters, hasLength(2));
     });
 
     test('resetAllInScope() does not remove root scope', () {
-      expect(Pot.currentScope, equals(0));
-      expect(Pot.$scopedResetters, equals(<List<Resetter>>[[]]));
+      expect(Pot.currentScope, 0);
+      expect(Pot.$scopedResetters, <List<Resetter>>[[]]);
 
-      final pot1 = Pot<Foo>(() => Foo(1));
-      final pot2 = Pot<Foo>(() => Foo(2));
+      final pot1 = Pot(() => Foo(1));
+      final pot2 = Pot(() => Foo(2));
       pot1.create();
       pot2.create();
       expect(Pot.$scopedResetters, hasLength(1));
@@ -198,9 +198,9 @@ void main() {
     });
 
     test('resetAllInScope() resets `scope` of pot to null', () {
-      final pot = Pot<Foo>(() => Foo(1));
+      final pot = Pot(() => Foo(1));
       pot.create();
-      expect(pot.scope, equals(0));
+      expect(pot.scope, 0);
 
       Pot.resetAllInScope();
       expect(pot.scope, isNull);
@@ -225,43 +225,43 @@ void main() {
       expect(pot4.$expect((o) => o.value == 4), isTrue);
       expect(Pot.$scopedResetters[0], hasLength(2));
       expect(Pot.$scopedResetters[1], hasLength(2));
-      expect(values, equals(<int>[]));
+      expect(values, <int>[]);
 
       Pot.resetAll();
       expect(pot3.hasObject, isFalse);
       expect(pot4.hasObject, isFalse);
       expect(Pot.$scopedResetters[0], isEmpty);
       expect(Pot.$scopedResetters[1], isEmpty);
-      expect(values, equals(<int>[4, 3, 2, 1]));
+      expect(values, <int>[4, 3, 2, 1]);
     });
 
     test('resetAll() does not affect number of scopes', () {
-      expect(Pot.currentScope, equals(0));
-      expect(Pot.$scopedResetters, equals(<List<Resetter>>[[]]));
+      expect(Pot.currentScope, 0);
+      expect(Pot.$scopedResetters, <List<Resetter>>[[]]);
 
-      final pot1 = Pot<Foo>(() => Foo(1));
-      final pot2 = Pot<Foo>(() => Foo(2));
+      final pot1 = Pot(() => Foo(1));
+      final pot2 = Pot(() => Foo(2));
       pot1.create();
       pot2.create();
       Pot.pushScope();
-      final pot3 = Pot<Foo>(() => Foo(3));
-      final pot4 = Pot<Foo>(() => Foo(4));
+      final pot3 = Pot(() => Foo(3));
+      final pot4 = Pot(() => Foo(4));
       pot3.create();
       pot4.create();
-      expect(Pot.currentScope, equals(1));
+      expect(Pot.currentScope, 1);
       expect(Pot.$scopedResetters, hasLength(2));
 
       Pot.resetAll();
-      expect(Pot.currentScope, equals(1));
+      expect(Pot.currentScope, 1);
       expect(Pot.$scopedResetters, hasLength(2));
     });
 
     test('resetAll() does not remove root scope', () {
-      expect(Pot.currentScope, equals(0));
-      expect(Pot.$scopedResetters, equals(<List<Resetter>>[[]]));
+      expect(Pot.currentScope, 0);
+      expect(Pot.$scopedResetters, <List<Resetter>>[[]]);
 
-      final pot1 = Pot<Foo>(() => Foo(1));
-      final pot2 = Pot<Foo>(() => Foo(2));
+      final pot1 = Pot(() => Foo(1));
+      final pot2 = Pot(() => Foo(2));
       pot1.create();
       pot2.create();
       expect(Pot.$scopedResetters, hasLength(1));
@@ -272,33 +272,33 @@ void main() {
     });
 
     test('resetAll() resets `scope` of pot to null', () {
-      final pot = Pot<Foo>(() => Foo(1));
+      final pot = Pot(() => Foo(1));
       pot.create();
-      expect(pot.scope, equals(0));
+      expect(pot.scope, 0);
 
       Pot.resetAll();
       expect(pot.scope, isNull);
     });
 
     test('resetAll(keepScopes: false) removes objects and scopes except 0', () {
-      expect(Pot.currentScope, equals(0));
-      expect(Pot.$scopedResetters, equals(<List<Resetter>>[[]]));
+      expect(Pot.currentScope, 0);
+      expect(Pot.$scopedResetters, <List<Resetter>>[[]]);
 
-      final pot1 = Pot<Foo>(() => Foo(1));
-      final pot2 = Pot<Foo>(() => Foo(2));
+      final pot1 = Pot(() => Foo(1));
+      final pot2 = Pot(() => Foo(2));
       pot1.create();
       pot2.create();
       Pot.pushScope();
-      final pot3 = Pot<Foo>(() => Foo(3));
-      final pot4 = Pot<Foo>(() => Foo(4));
+      final pot3 = Pot(() => Foo(3));
+      final pot4 = Pot(() => Foo(4));
       pot3.create();
       pot4.create();
-      expect(Pot.currentScope, equals(1));
+      expect(Pot.currentScope, 1);
       expect(Pot.$scopedResetters, hasLength(2));
 
       Pot.resetAll(keepScopes: false);
-      expect(Pot.currentScope, equals(0));
-      expect(Pot.$scopedResetters, equals(<List<Resetter>>[[]]));
+      expect(Pot.currentScope, 0);
+      expect(Pot.$scopedResetters, <List<Resetter>>[[]]);
       expect(pot1.scope, isNull);
     });
   });
@@ -324,62 +324,62 @@ void main() {
         expect(Pot.$scopedResetters, hasLength(2));
         expect(Pot.$scopedResetters[0], hasLength(2));
         expect(Pot.$scopedResetters[1], hasLength(2));
-        expect(values, equals(<int>[]));
+        expect(values, <int>[]);
 
         Pot.popScope();
         expect(pot3.hasObject, isFalse);
         expect(pot4.hasObject, isFalse);
         expect(Pot.$scopedResetters, hasLength(1));
         expect(Pot.$scopedResetters[0], hasLength(2));
-        expect(values, equals(<int>[4, 3]));
+        expect(values, <int>[4, 3]);
       },
     );
 
     test(
       'popScope() removes resetters in root scope but the scope remains',
       () {
-        expect(Pot.currentScope, equals(0));
-        expect(Pot.$scopedResetters, equals(<List<Resetter>>[[]]));
+        expect(Pot.currentScope, 0);
+        expect(Pot.$scopedResetters, <List<Resetter>>[[]]);
 
-        final pot1 = Pot<Foo>(() => Foo(1));
-        final pot2 = Pot<Foo>(() => Foo(2));
+        final pot1 = Pot(() => Foo(1));
+        final pot2 = Pot(() => Foo(2));
         pot1.create();
         pot2.create();
         expect(Pot.$scopedResetters, hasLength(1));
         expect(Pot.$scopedResetters[0], hasLength(2));
 
         Pot.popScope();
-        expect(Pot.currentScope, equals(0));
+        expect(Pot.currentScope, 0);
         expect(Pot.$scopedResetters, <List<Resetter>>[[]]);
       },
     );
 
     test('popScope() removes the scope if it is not root', () {
-      expect(Pot.currentScope, equals(0));
-      expect(Pot.$scopedResetters, equals(<List<Resetter>>[[]]));
+      expect(Pot.currentScope, 0);
+      expect(Pot.$scopedResetters, <List<Resetter>>[[]]);
 
-      final pot1 = Pot<Foo>(() => Foo(1));
-      final pot2 = Pot<Foo>(() => Foo(2));
+      final pot1 = Pot(() => Foo(1));
+      final pot2 = Pot(() => Foo(2));
       pot1.create();
       pot2.create();
       Pot.pushScope();
-      final pot3 = Pot<Foo>(() => Foo(3));
-      final pot4 = Pot<Foo>(() => Foo(4));
+      final pot3 = Pot(() => Foo(3));
+      final pot4 = Pot(() => Foo(4));
       pot3.create();
       pot4.create();
-      expect(Pot.currentScope, equals(1));
+      expect(Pot.currentScope, 1);
       expect(Pot.$scopedResetters, hasLength(2));
 
       Pot.popScope();
-      expect(Pot.currentScope, equals(0));
+      expect(Pot.currentScope, 0);
       expect(Pot.$scopedResetters, hasLength(1));
     });
 
     test('popScope() resets `scope` of pot to null', () {
-      final pot = Pot<Foo>(() => Foo(1));
+      final pot = Pot(() => Foo(1));
       Pot.pushScope();
       pot.create();
-      expect(pot.scope, equals(1));
+      expect(pot.scope, 1);
 
       Pot.popScope();
       expect(pot.scope, isNull);
@@ -387,7 +387,7 @@ void main() {
 
     test('Warned if new object is created in older scope than before', () {
       Pot.pushScope();
-      final pot = Pot<Foo>(() => Foo(1));
+      final pot = Pot(() => Foo(1));
       pot.create();
       expect(warning, isNull);
 
@@ -398,7 +398,7 @@ void main() {
 
     test('Warning is suppressed if suppressWarning is true', () {
       Pot.pushScope();
-      final pot = Pot<Foo>(() => Foo(1));
+      final pot = Pot(() => Foo(1));
       pot.create();
 
       Pot.popScope();
@@ -414,31 +414,31 @@ void main() {
         disposer: (f) => f.dispose(),
       );
       pot.create();
-      expect(Pot.currentScope, equals(0));
+      expect(Pot.currentScope, 0);
       expect(pot.$expect((o) => o.value == 201), isTrue);
-      expect(pot.scope, equals(0));
+      expect(pot.scope, 0);
       expect(Pot.$scopedResetters, hasLength(1));
       expect(Pot.$scopedResetters[0], hasLength(1));
-      expect(valueOfDisposedObject, equals(-1));
+      expect(valueOfDisposedObject, -1);
 
       Pot.pushScope();
       pot.replace(() => Foo(202));
-      expect(Pot.currentScope, equals(1));
+      expect(Pot.currentScope, 1);
       expect(pot.$expect((o) => o.value == 202), isTrue);
-      expect(pot.scope, equals(0));
+      expect(pot.scope, 0);
       expect(Pot.$scopedResetters[0], hasLength(1));
       expect(Pot.$scopedResetters[1], hasLength(0));
-      expect(valueOfDisposedObject, equals(201));
+      expect(valueOfDisposedObject, 201);
     });
 
     test('replace() in new scope only replaces factory if no object', () {
-      final pot = Pot.replaceable<Foo>(() => Foo(201));
-      expect(Pot.currentScope, equals(0));
+      final pot = Pot.replaceable(() => Foo(201));
+      expect(Pot.currentScope, 0);
       expect(Pot.$scopedResetters[0], hasLength(0));
 
       Pot.pushScope();
       pot.replace(() => Foo(202));
-      expect(Pot.currentScope, equals(1));
+      expect(Pot.currentScope, 1);
       expect(pot.hasObject, isFalse);
       expect(Pot.$scopedResetters[0], isEmpty);
       expect(Pot.$scopedResetters[1], isEmpty);
@@ -449,21 +449,21 @@ void main() {
         () => Foo(201),
         disposer: (f) => f.dispose(),
       );
-      expect(Pot.currentScope, equals(0));
-      expect(Pot.$scopedResetters, equals(<List<Resetter>>[[]]));
+      expect(Pot.currentScope, 0);
+      expect(Pot.$scopedResetters, <List<Resetter>>[[]]);
 
       Pot.pushScope();
       pot.replace(() => Foo(202));
-      expect(Pot.currentScope, equals(1));
+      expect(Pot.currentScope, 1);
       expect(Pot.$scopedResetters, <List<Resetter>>[[], []]);
 
       final foo = pot();
-      expect(foo.value, equals(202));
+      expect(foo.value, 202);
       expect(Pot.$scopedResetters[0], isEmpty);
       expect(Pot.$scopedResetters[1], hasLength(1));
 
       Pot.$scopedResetters[1][0]();
-      expect(valueOfDisposedObject, equals(202));
+      expect(valueOfDisposedObject, 202);
     });
   });
 
@@ -473,39 +473,36 @@ void main() {
     test(
       'replaceForTesting() in new scope replaces object in original scope',
       () {
-        final pot = Pot<Foo>(
-          () => Foo(201),
-          disposer: (f) => f.dispose(),
-        );
+        final pot = Pot<Foo>(() => Foo(201), disposer: (f) => f.dispose());
         pot.create();
-        expect(Pot.currentScope, equals(0));
+        expect(Pot.currentScope, 0);
         expect(pot.$expect((o) => o.value == 201), isTrue);
-        expect(pot.scope, equals(0));
+        expect(pot.scope, 0);
         expect(Pot.$scopedResetters, hasLength(1));
         expect(Pot.$scopedResetters[0], hasLength(1));
-        expect(valueOfDisposedObject, equals(-1));
+        expect(valueOfDisposedObject, -1);
 
         Pot.pushScope();
         pot.replaceForTesting(() => Foo(202));
-        expect(Pot.currentScope, equals(1));
+        expect(Pot.currentScope, 1);
         expect(pot.$expect((o) => o.value == 202), isTrue);
-        expect(pot.scope, equals(0));
+        expect(pot.scope, 0);
         expect(Pot.$scopedResetters[0], hasLength(1));
         expect(Pot.$scopedResetters[1], hasLength(0));
-        expect(valueOfDisposedObject, equals(201));
+        expect(valueOfDisposedObject, 201);
       },
     );
 
     test(
       'replaceForTesting() in new scope only replaces factory if no object',
       () {
-        final pot = Pot<Foo>(() => Foo(201));
-        expect(Pot.currentScope, equals(0));
+        final pot = Pot(() => Foo(201));
+        expect(Pot.currentScope, 0);
         expect(Pot.$scopedResetters[0], hasLength(0));
 
         Pot.pushScope();
         pot.replaceForTesting(() => Foo(202));
-        expect(Pot.currentScope, equals(1));
+        expect(Pot.currentScope, 1);
         expect(pot.hasObject, isFalse);
         expect(Pot.$scopedResetters[0], isEmpty);
         expect(Pot.$scopedResetters[1], isEmpty);
@@ -515,25 +512,22 @@ void main() {
     test(
       'Resetter is lazily set after replaceForTesting() if pot has no object',
       () {
-        final pot = Pot<Foo>(
-          () => Foo(201),
-          disposer: (f) => f.dispose(),
-        );
-        expect(Pot.currentScope, equals(0));
-        expect(Pot.$scopedResetters, equals(<List<Resetter>>[[]]));
+        final pot = Pot<Foo>(() => Foo(201), disposer: (f) => f.dispose());
+        expect(Pot.currentScope, 0);
+        expect(Pot.$scopedResetters, <List<Resetter>>[[]]);
 
         Pot.pushScope();
         pot.replaceForTesting(() => Foo(202));
-        expect(Pot.currentScope, equals(1));
+        expect(Pot.currentScope, 1);
         expect(Pot.$scopedResetters, <List<Resetter>>[[], []]);
 
         final foo = pot();
-        expect(foo.value, equals(202));
+        expect(foo.value, 202);
         expect(Pot.$scopedResetters[0], isEmpty);
         expect(Pot.$scopedResetters[1], hasLength(1));
 
         Pot.$scopedResetters[1][0]();
-        expect(valueOfDisposedObject, equals(202));
+        expect(valueOfDisposedObject, 202);
       },
     );
   });
