@@ -36,7 +36,14 @@ dependencies:
 
 ## Usage
 
-Create a pot as pending if the pot is not necessary at the beginning of an app.
+This package comes with two widgets:
+
+- Pottery
+- ScopedPottery
+
+### Pottery
+
+Creates a pot as pending if it is not necessary yet at the start of an app.
 
 ```dart
 final counterNotifierPot = Pot.pending<CounterNotifier>();
@@ -83,6 +90,59 @@ MultiProvider of the provider package, although what they do are quite different
 Removing Pottery (e.g. navigating back from the page where Pottery is used) resets
 all pots passed to the `pots` argument and replaces their factories to throw an
 [PotNotReadyException].
+
+### ScopedPottery
+
+This widget defines new factories for existing pots and binds the objects created by
+them to the pots so that those objects are made available to descendants.
+
+An important fact is that the factories of the existing pots are not actually replaced,
+therefore calling the `call()` method of a pot still returns the object held in the
+global pot. Use `of()` instead to obtain the scoped object. The example below illustrates
+the behaviour.
+
+```dart
+final fooPot = Pot(() => Foo(111));
+```
+
+```dart
+class ParentWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ScopedPottery(
+      pots: {
+        fooPot: () => Foo(222),
+      },
+      builder: (context) {
+        print(fooPot()); // 111
+        print(fooPot.of(context)); // 222
+
+        return ChildWidget();
+      },
+    );
+  }
+}
+
+class ChildWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    print(fooPot()); // 111
+    print(fooPot.of(context)); // 222
+    ...
+  }
+}
+```
+
+See the document of `ScopedPottery` for usage in a more practical use case.
+
+Note that there are several important differences between `ScopedPottery` and `Pottery`:
+
+- Objects are created immediately when `ScopedPottery` is created.
+- As already mentioned, objects created with `ScopedPottery` are only accessible with
+  `of()`.
+- Objects created with `ScopedPottery` are not automatically discarded when the
+  `ScopedPottery` is removed from the tree. Use the `disposer` argument to specify a
+  callback function to clean them up.
 
 ## Caveats
 
