@@ -1,5 +1,3 @@
-// ignore_for_file: unreachable_from_main
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -16,8 +14,7 @@ class Foo {
 }
 
 class Bar {
-  const Bar([this.value]);
-  final int? value;
+  const Bar();
 }
 
 void main() {

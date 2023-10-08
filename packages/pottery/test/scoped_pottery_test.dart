@@ -14,8 +14,7 @@ class Foo {
 }
 
 class Bar {
-  const Bar([this.value]);
-  final int? value;
+  const Bar();
 }
 
 void main() {
@@ -102,7 +101,7 @@ void main() {
         TestScopedPottery(
           pots: {
             fooPot!: () => const Foo(20),
-            barPot!: () => const Bar(30),
+            barPot!: () => const Bar(),
           },
           disposer: (pots) {
             map = pots;
@@ -115,7 +114,7 @@ void main() {
       await tester.tap(buttonFinder);
       await tester.pump();
 
-      expect(map, {fooPot: const Foo(20), barPot: const Bar(30)});
+      expect(map, {fooPot: const Foo(20), barPot: const Bar()});
 
       // Global pot is still available.
       expect(globallyDisposed, isFalse);
