@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 
 class CounterNotifier extends ValueNotifier<int> {
-  CounterNotifier() : super(0) {
-    _showMessage('CounterNotifier was created.', Colors.green);
+  CounterNotifier({this.showMessage = false}) : super(0) {
+    if (showMessage) {
+      _showMessage('CounterNotifier was created.', Colors.green);
+    }
   }
+
+  final bool showMessage;
 
   @override
   void dispose() {
-    _showMessage('CounterNotifier was discarded.');
+    if (showMessage) {
+      _showMessage('CounterNotifier was discarded.');
+    }
     super.dispose();
   }
 
@@ -31,4 +37,9 @@ void _showMessage(String message, [Color? color]) {
         ),
       );
   });
+}
+
+class HyperCounterNotifier extends CounterNotifier {
+  @override
+  void increment() => value += 10;
 }

@@ -50,7 +50,7 @@ class CounterPage extends StatelessWidget with Grab {
     return MaterialPageRoute(
       builder: (_) => Pottery(
         pots: {
-          counterNotifierPot: CounterNotifier.new,
+          counterNotifierPot: () => CounterNotifier(showMessage: true),
         },
         builder: (_) => const CounterPage._(),
       ),

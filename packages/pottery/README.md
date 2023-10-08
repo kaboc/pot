@@ -133,7 +133,8 @@ class ChildWidget extends StatelessWidget {
 }
 ```
 
-See the document of `ScopedPottery` for usage in a more practical use case.
+See the examples in [main2.dart] and in the document of `ScopedPottery` for usage in
+more practical use cases.
 
 Note that there are several important differences between `ScopedPottery` and `Pottery`:
 
@@ -271,3 +272,4 @@ ElevatedButton(
 [Pot]: https://pub.dev/packages/pot
 [PotNotReadyException]: https://pub.dev/documentation/pot/latest/pot/PotNotReadyException-class.html
 [Grab]: https://pub.dev/packages/grab
+[main2.dart]: https://github.com/kaboc/pot/blob/main/packages/pottery/example/lib/main2.dart
