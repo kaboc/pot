@@ -270,6 +270,7 @@ class _PotBody<T> {
 /// of the flag status of [Pot.forTesting].
 @sealed
 class ReplaceablePot<T> extends Pot<T> {
+  // ignore: public_member_api_docs
   @internal
   ReplaceablePot(super.factory, {super.disposer});
 

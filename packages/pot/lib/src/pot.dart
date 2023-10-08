@@ -116,13 +116,14 @@ class Pot<T> extends _PotBody<T> {
   static final _ScopedResetters _scopedResetters = [[]];
 
   @visibleForTesting
-  // ignore: library_private_types_in_public_api
+  // ignore: library_private_types_in_public_api, public_member_api_docs
   static _ScopedResetters get $scopedResetters =>
       List.unmodifiable(<List<_Resetter>>[
         for (final resetter in _scopedResetters) List.unmodifiable(resetter),
       ]);
 
   @visibleForTesting
+  // ignore: public_member_api_docs
   static void Function(Object?) $warningPrinter = print;
 
   /// The flag that shows whether [replaceForTesting] is enabled.
