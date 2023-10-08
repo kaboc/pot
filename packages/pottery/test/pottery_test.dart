@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -142,4 +143,34 @@ void main() {
       expect(tester.takeException(), isNot(throwsA(anything)));
     },
   );
+
+  testWidgets('debugFillProperties()', (tester) async {
+    fooPot = Pot.pending<Foo>();
+    barPot = Pot.pending<Bar>(disposer: (_) => fooPot?.call());
+
+    // ignore: prefer_function_declarations_over_variables
+    final fooFactory = () => const Foo(10);
+    // ignore: prefer_function_declarations_over_variables
+    final barFactory = () => const Bar();
+
+    final key = GlobalKey();
+    await tester.pumpWidget(
+      TestPottery(
+        potteryKey: key,
+        pots: {
+          fooPot!: fooFactory,
+          barPot!: barFactory,
+        },
+      ),
+    );
+
+    final builder = DiagnosticPropertiesBuilder();
+    key.currentState?.debugFillProperties(builder);
+    final props = {
+      for (final prop in builder.properties)
+        if (prop.name != null) prop.name: prop.value,
+    };
+
+    expect(props['pots'], equals({fooPot: fooFactory, barPot: barFactory}));
+  });
 }

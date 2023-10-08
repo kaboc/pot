@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:pot/pot.dart';
@@ -182,6 +183,12 @@ class _ScopedPotteryState extends State<ScopedPottery> {
   @override
   Widget build(BuildContext context) {
     return widget.builder(context);
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<ScopedPots>('scopedPots', _scopedPots));
   }
 }
 

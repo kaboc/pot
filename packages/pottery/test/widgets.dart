@@ -5,8 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:pottery/pottery.dart';
 
 class TestPottery extends StatefulWidget {
-  const TestPottery({required this.pots, this.builder});
+  const TestPottery({
+    this.potteryKey,
+    required this.pots,
+    this.builder,
+  });
 
+  final GlobalKey<Object?>? potteryKey;
   final PotReplacements pots;
   final WidgetBuilder? builder;
 
@@ -25,6 +30,7 @@ class _TestPotteryState extends State<TestPottery> {
         children: [
           if (!_pressed)
             Pottery(
+              key: widget.potteryKey,
               pots: widget.pots,
               builder: widget.builder ?? (_) => const SizedBox.shrink(),
             ),
@@ -38,8 +44,14 @@ class _TestPotteryState extends State<TestPottery> {
 }
 
 class TestScopedPottery extends StatefulWidget {
-  const TestScopedPottery({required this.pots, this.disposer, this.builder});
+  const TestScopedPottery({
+    this.scopedPotteryKey,
+    required this.pots,
+    this.disposer,
+    this.builder,
+  });
 
+  final GlobalKey<Object?>? scopedPotteryKey;
   final PotReplacements pots;
   final WidgetBuilder? builder;
   final ValueSetter<ScopedPots>? disposer;
@@ -59,6 +71,7 @@ class _TestScopedPotteryState extends State<TestScopedPottery> {
         children: [
           if (!_pressed)
             ScopedPottery(
+              key: widget.scopedPotteryKey,
               pots: widget.pots,
               disposer: widget.disposer,
               builder: widget.builder ?? (_) => const SizedBox.shrink(),

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -211,5 +212,33 @@ void main() {
     expect(foo2?.value, 10);
     expect(foo3?.value, 20);
     expect(foo4?.value, 20);
+  });
+
+  testWidgets('debugFillProperties()', (tester) async {
+    fooPot = Pot.pending<Foo>();
+    barPot = Pot.pending<Bar>(disposer: (_) => fooPot?.call());
+
+    const foo = Foo(10);
+    const bar = Bar();
+
+    final key = GlobalKey();
+    await tester.pumpWidget(
+      TestScopedPottery(
+        scopedPotteryKey: key,
+        pots: {
+          fooPot!: () => foo,
+          barPot!: () => bar,
+        },
+      ),
+    );
+
+    final builder = DiagnosticPropertiesBuilder();
+    key.currentState?.debugFillProperties(builder);
+    final props = {
+      for (final prop in builder.properties)
+        if (prop.name != null) prop.name: prop.value,
+    };
+
+    expect(props['scopedPots'], equals({fooPot: foo, barPot: bar}));
   });
 }

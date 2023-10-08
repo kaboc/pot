@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:pot/pot.dart';
@@ -91,5 +92,11 @@ class _PotteryState extends State<Pottery> {
   @override
   Widget build(BuildContext context) {
     return widget.builder(context);
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<PotReplacements>('pots', widget.pots));
   }
 }
