@@ -6,20 +6,27 @@ An easy and safe DI (Dependency Injection) solution for Dart with support for sc
 
 ## Introduction
 
-A [Pot] is a sort of service locator, but a single pot is for a single type.
-An object of a certain type is created in a pot as needed and kept until it is discarded.
+[Pot] is a sort of service locator. It is like a container holding an object that
+is accessible from anywhere. That is where the name of this package came from. 
+
+A pot is usually assigned to a global variable. Each pot has a Singleton factory
+function that is triggered to create an object as needed. It is possible to replace
+the factory or discard the object in a pot at your preferred timing, which is useful
+for testing as well as for implementing app features.   
+
+### Advantages
 
 - Easy
     - Straightforward because it is specialised for DI, without other features.
-    - Simple API that you can be sure with confidence how to use.
-    - A pot as a global variable is easy to handle, and can take help from IDEs.
+    - Simple API that you can be sure how to use.
+    - A pot as a global variable is easy to handle; auto-completion works in IDEs.
 - Safe
     - Not dependent on types.
         - No runtime error basically. The object always exists when it is accessed
           as long as the pot has a valid factory.
     - Not dependent on strings either.
-        - Features to access an object or a scope by name were excluded on purpose.
-        - More of other similar design decisions for safety.
+        - Pot does not provide a dangerous way to access the content like
+          referencing it by type name.
 
 ### Policy
 
@@ -48,18 +55,17 @@ final counterPot = Pot(() => Counter(0));
 
 Now you can use the pot in whatever file importing the above declaration.
 
-Note that the created pot should be assigned to a global variable unless there is some
-special reason not to.
+Note that the created pot should be assigned to a global variable unless there is a
+special reason against it.
 
 ### Getting the object
 
-Call the [call()][call] method.
+Calling the [call()][call] method triggers the factory to create an object on the fly
+if no object has been created yet or one has already been discarded. Otherwise, the
+existing object is returned.
 
-An object is created on the fly by the factory. If no object has been created yet, one is
-created when it is first accessed, and the same object is returned from next time onwards.
-
-`call()` is a special function of Dart that allows a class instance to be called like
-a function, so you can omit the method name like below.
+`call()` is a special function in Dart that allows a class instance to be called like
+a function, so instead of `counterPot.call()`, you can write it as follows:
 
 ```dart
 void main() {
@@ -72,8 +78,8 @@ void main() {
 
 Use [create()][create] if you want to instantiate an object without obtaining it.
 
-This is practically the same as [call()][call], except whether the created object is
-returned or not.
+This is practically the same as [call()][call], except that `create()` does not return
+the created object while `call()` does.
 
 ```dart
 void main() {
@@ -90,12 +96,12 @@ if objects are properly discarded when they become unnecessary.
 Even if an object is discarded, the pot itself is not discarded. A new object is created when
 it is needed again, so no worry that the object may be no longer accessible.
 
-If a callback function is passed to the `disposer` of the [constructor][Pot-constructor] of Pot,
+If a callback function is passed to the `disposer` argument of the [constructor][Pot-constructor],
 it is triggered when the object in the pot is discarded. Use it for doing a clean-up related to
 the object.
 
 ```dart
-final counterPot = Pot<Counter>(
+final counterPot = Pot(
   () => Counter(0),
   disposer: (counter) => counter.dispose(),
 );
@@ -192,7 +198,7 @@ exists while the current scope is 1 or newer, so it is discarded and the dispose
 triggered when the scope 1 is removed. The current index number goes back to 0.
 
 ```dart
-final counterPot = Pot<Counter>(() => Counter());
+final counterPot = Pot(() => Counter());
 ```
 
 ```dart
@@ -307,12 +313,12 @@ discarded manually with [reset()][reset] or other methods that have the same eff
 
 ### Scoping in Flutter
 
-The scoping feature of this package is not very suitable for Flutter apps because this is not
-a package specific to Flutter but for Dart in general, and so is the scoping feature.
+This package is not specifically for Flutter for Dart in general, therefore the scoping
+feature of this package is also not designed for use in Flutter.
 
-It is recommended to use [Pottery] instead. It is just a utility that contains the pot package,
-limiting the scope of pots in the widget tree by making use of the widget lifecycle, which
-is more natural in Flutter and less error-prone.
+It is recommended to use [Pottery] instead. It is a utility that contains the pot package,
+limiting the scope of pots in the widget tree by making use of the widget lifecycle,
+which is more natural in Flutter and less error-prone.
 
 [Pot]: https://pub.dev/documentation/pot/latest/pot/Pot-class.html
 [Pottery]: https://pub.dev/packages/pottery
