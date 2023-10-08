@@ -1,3 +1,9 @@
+## 0.5.0
+
+- Raise minimum Dart version to 2.19 for better type inference and to align with Pottery.
+- Fix the bug of Pot not properly handling a factory that returns null. ([#3])
+- Improve documentation.
+
 ## 0.4.2+1
 
 - Change the project structure.
@@ -63,3 +69,5 @@
 ## 0.1.0
 
 - Initial version.
+
+[#3]: https://github.com/kaboc/pot/pull/3
