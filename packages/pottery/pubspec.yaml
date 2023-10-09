@@ -11,10 +11,10 @@ dependencies:
   flutter:
     sdk: flutter
 
-  pot: ^0.4.2+1
+  pot: ^0.5.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^2.0.1
+  flutter_lints: ^2.0.3

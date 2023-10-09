@@ -58,10 +58,10 @@ packages:
     dependency: "direct dev"
     description:
       name: flutter_lints
-      sha256: aeb0b80a8b3709709c9cc496cdc027c5b3216796bc0af0ce1007eaf24464fd4c
+      sha256: a25a15ebbdfc33ab1cd26c63a6ee519df92338a9c10f122adda92938253bef04
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.3"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -71,10 +71,10 @@ packages:
     dependency: "direct main"
     description:
       name: grab
-      sha256: "63bca8a7eaeedb6da234cc209eedb7280fc83958a0fae86c8b606db33a1e029d"
+      sha256: "373363d1d2d49ca9fea611417323d649efaa1b4aa9dbe50d62ff508f91e4e72f"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.0"
+    version: "0.4.1"
   js:
     dependency: transitive
     description:
@@ -127,10 +127,10 @@ packages:
     dependency: transitive
     description:
       name: pot
-      sha256: "0bd2445f8103dcab06d6d63aede97e067bda454706e8c414310e67906cebc1f8"
+      sha256: dd57ab5c92f52ebec503c7a81e5cde1235a54da938671248b2178df391a560a5
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.2+1"
+    version: "0.5.0"
   pottery:
     dependency: "direct main"
     description:
