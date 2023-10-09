@@ -46,10 +46,10 @@ void main() {
         ),
       );
 
-      expect(fooPot!(), isA<Foo>());
-      expect(barPot!(), isA<Bar>());
-      expect(fooPot!.hasObject, isTrue);
-      expect(barPot!.hasObject, isTrue);
+      expect(fooPot?.call(), isA<Foo>());
+      expect(barPot?.call(), isA<Bar>());
+      expect(fooPot?.hasObject, isTrue);
+      expect(barPot?.hasObject, isTrue);
 
       final buttonFinder = find.byType(RemovePotteryButton);
       await tester.tap(buttonFinder);
@@ -57,10 +57,10 @@ void main() {
 
       expect(fooDisposed, isTrue);
       expect(barDisposed, isTrue);
-      expect(fooPot!.create, throwsA(isA<PotNotReadyException>()));
-      expect(barPot!.create, throwsA(isA<PotNotReadyException>()));
-      expect(fooPot!.hasObject, isFalse);
-      expect(barPot!.hasObject, isFalse);
+      expect(fooPot?.create, throwsA(isA<PotNotReadyException>()));
+      expect(barPot?.create, throwsA(isA<PotNotReadyException>()));
+      expect(fooPot?.hasObject, isFalse);
+      expect(barPot?.hasObject, isFalse);
     },
   );
 
@@ -102,9 +102,9 @@ void main() {
 
   testWidgets(
     'PotNotReadyException is thrown when Pottery calls reset() '
-    'of a pot that depends on a pot located later in the map',
+    'of a pot that depends on a pot located later in the pots map',
     (tester) async {
-      fooPot = Pot.pending<Foo>(disposer: (_) => barPot!.call());
+      fooPot = Pot.pending<Foo>(disposer: (_) => barPot?.call());
       barPot = Pot.pending<Bar>();
 
       await tester.pumpWidget(
@@ -116,11 +116,8 @@ void main() {
         ),
       );
 
-      fooPot!.create();
-      barPot!.create();
-
-      expect(fooPot!(), isA<Foo>());
-      expect(barPot!(), isA<Bar>());
+      expect(fooPot?.call(), isA<Foo>());
+      expect(barPot?.call(), isA<Bar>());
 
       final buttonFinder = find.byType(RemovePotteryButton);
       await tester.tap(buttonFinder);
@@ -135,7 +132,7 @@ void main() {
     'of a pot that depends on a pot located earlier in the map',
     (tester) async {
       fooPot = Pot.pending<Foo>();
-      barPot = Pot.pending<Bar>(disposer: (_) => fooPot!.call());
+      barPot = Pot.pending<Bar>(disposer: (_) => fooPot?.call());
 
       await tester.pumpWidget(
         TestPottery(
@@ -146,11 +143,11 @@ void main() {
         ),
       );
 
-      fooPot!.create();
-      barPot!.create();
+      fooPot?.create();
+      barPot?.create();
 
-      expect(fooPot!(), isA<Foo>());
-      expect(barPot!(), isA<Bar>());
+      expect(fooPot?.call(), isA<Foo>());
+      expect(barPot?.call(), isA<Bar>());
 
       final buttonFinder = find.byType(RemovePotteryButton);
       await tester.tap(buttonFinder);

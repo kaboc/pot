@@ -106,7 +106,7 @@ void main() {
   });
 
   testWidgets(
-    'disposer of pot is not called when ScopedPottery is removed, '
+    'Disposer of pot is not called when ScopedPottery is removed, '
     'while disposer of ScopedPottery is called with correct map',
     (tester) async {
       var globallyDisposed = false;
