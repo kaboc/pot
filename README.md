@@ -14,4 +14,4 @@ An easy and safe DI (Dependency Injection) solution for Dart with support for sc
 [![Pub Version](https://img.shields.io/pub/v/pottery?label=pottery)](https://pub.dev/packages/pottery)
 [![pottery CI](https://github.com/kaboc/pot/actions/workflows/pottery.yml/badge.svg)](https://github.com/kaboc/pot/actions/workflows/pottery.yml)
 
-A widget to limit the scope where particular Pots are available in the widget tree.
+Widgets to limit the scope where particular Pots are available in the widget tree.
