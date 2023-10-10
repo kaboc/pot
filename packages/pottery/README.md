@@ -4,18 +4,20 @@
 
 ## Overview
 
-**Pottery** is a widget that limits the scope where particular [Pot]s are available
-in the widget tree. Using it makes it clearer from which point onwards pots are used.
+A package that provides two widgets, `Pottery` and `ScopedPottery`.
 
-### Why is this better than scoping by Pot itself?
+They limit the scope where particular [Pot]s are available in the widget tree.
+Using them make it clearer from which point onwards pots are used.
 
-The scoping feature of [Pot] is not very suitable for Flutter apps because Pot is
-not a package specific to Flutter but for Dart in general and so is the scoping feature.
+### Why is this better than the scoping feature of Pot?
+
+[Pot] is not a package specific to Flutter but it is for Dart in general, therefore
+its scoping feature is not designed for Flutter either.
 
 Pottery makes use of the widget lifecycle to limit the scope of pots. It is more
 natural in Flutter and less error-prone.
 
-### How beneficial is it to use this?
+### How is this beneficial?
 
 It is convenient that you can access a pot stored in a global variable from anywhere,
 but it gives you too much freedom, making it difficult to keep the architecture of
@@ -38,8 +40,8 @@ dependencies:
 
 This package comes with two widgets:
 
-- Pottery
-- ScopedPottery
+- [Pottery]
+- [ScopedPottery]
 
 ### Pottery
 
@@ -49,7 +51,7 @@ Creates a pot as pending if it is not necessary yet at the start of an app.
 final counterNotifierPot = Pot.pending<CounterNotifier>();
 ```
 
-Use `Pottery` and specify a factory right before you need to use the pot.
+Use [Pottery] and specify a factory right before you need to use the pot.
 
 ```dart
 Widget build(BuildContext context) {
@@ -79,8 +81,8 @@ The factory of each of the pot passed to the `pots` argument as a key in the map
 ready with the new factory passed as a value, and it makes the pots available from that
 point onwards.
 
-It is easier to understand how to use Pottery if you take it as similar to the usage of
-MultiProvider of the provider package, although what they do are quite different in fact.
+It is easier to understand how to use Pottery if you consider it as something similar to
+`MultiProvider` of the provider package, although they internally work quite differently.
 
 - MultiProvider
     - Creates objects and provides them so that they are available down the tree.
@@ -97,8 +99,8 @@ This widget defines new factories for existing pots and binds the objects create
 them to the pots so that those objects are made available to descendants.
 
 An important fact is that the factories of the existing pots are not actually replaced,
-therefore calling the `call()` method of a pot still returns the object held in the
-global pot. Use `of()` instead to obtain the scoped object. The example below illustrates
+therefore calling the [call()] method of a pot still returns the object held in the
+global pot. Use [of()] instead to obtain the scoped object. The example below illustrates
 the behaviour.
 
 ```dart
@@ -133,14 +135,14 @@ class ChildWidget extends StatelessWidget {
 }
 ```
 
-See the examples in [main2.dart] and in the document of `ScopedPottery` for usage in
+See the examples in [main2.dart] and in the document of [ScopedPottery] for usage in
 more practical use cases.
 
-Note that there are several important differences between `ScopedPottery` and `Pottery`:
+Note that there are several important differences between `ScopedPottery` and [Pottery]:
 
 - Objects are created immediately when `ScopedPottery` is created.
 - As already mentioned, objects created with `ScopedPottery` are only accessible with
-  `of()`.
+  [of()].
 - Objects created with `ScopedPottery` are not automatically discarded when the
   `ScopedPottery` is removed from the tree. Use the `disposer` argument to specify a
   callback function to clean them up.
@@ -171,8 +173,8 @@ The author created Pot and Pottery mainly for using them in combination with [Gr
 You can use Pottery + Grab as an alternative to package:provider.
 
 There is however an important thing to remember. The extension methods of Grab require
-the `BuildContext` of the widget in which they are used, not the one passed to the
-`builder` function of Pottery.
+the `BuildContext` of the widget that has the Grab mixin, not the one passed to the
+`builder` function of [Pottery].
 
 ```dart
 class MyWidget extends StatelessWidget with Grab {
@@ -184,8 +186,8 @@ class MyWidget extends StatelessWidget with Grab {
       pots: { ... },
       builder: (context) {
         // The BuildContext passed to this callback
-        // cannot be used for grab extension methods.
-        final count = counterNotifierPot().grab(context);
+        // cannot be used for methods of Grab.
+        final count = counterNotifierPot().grab(context); // Bad
       },
     )
   }
@@ -208,15 +210,14 @@ Widget build(BuildContext context) {
 ```
 
 However, using grab methods this way is discouraged as it is confusing and can
-easily lead to a bug. If you are using [grab_lints](https://github.com/kaboc/grab-lints),
-it will warn you about it.
+easily lead to a bug. If you are using [grab_lints], it will warn you about it.
 
-Make sure to use Pottery a little earlier to get pots ready before they are used
+Make sure to use `Pottery` a little earlier to get pots ready before they are used
 in a build method. Here are two options for it.
 
 ### Option 1
 
-Using Pottery in the builder function of PageRoute before navigation.
+Using `Pottery` in the builder function of PageRoute before navigation.
 
 ```dart
 ElevatedButton(
@@ -234,7 +235,7 @@ ElevatedButton(
 
 ### Option 2
 
-Using Pottery in the builder function of PageRoute in a route method.
+Using `Pottery` in the builder function of PageRoute in a route method.
 
 This is essentially the same as Option 1, but more recommended because Pottery
 is used in the class of the actual page where pots are used. It makes more sense
@@ -269,7 +270,12 @@ ElevatedButton(
 
 <!-- Links -->
 
+[Pottery]: https://pub.dev/documentation/pottery/latest/pottery/Pottery-class.html
+[ScopedPottery]: https://pub.dev/documentation/pottery/latest/pottery/ScopedPottery-class.html
+[of()]: https://pub.dev/documentation/pottery/latest/pottery/NearestPotOf/of.html
+[call()]: https://pub.dev/documentation/pot/latest/pot/Pot/call.html
 [Pot]: https://pub.dev/packages/pot
-[PotNotReadyException]: https://pub.dev/documentation/pot/latest/pot/PotNotReadyException-class.html
 [Grab]: https://pub.dev/packages/grab
+[grab_lints]: https://pub.dev/packages/grab_lints
+[PotNotReadyException]: https://pub.dev/documentation/pot/latest/pot/PotNotReadyException-class.html
 [main2.dart]: https://github.com/kaboc/pot/blob/main/packages/pottery/example/lib/main2.dart

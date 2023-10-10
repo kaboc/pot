@@ -3,22 +3,26 @@ import 'package:flutter/widgets.dart';
 
 import 'package:pot/pot.dart';
 
+import 'scoped_pottery.dart';
+
 /// The signature of a map consisting of replaceable pots and factories.
 typedef PotReplacements
     = Map<ReplaceablePot<Object?>, PotObjectFactory<Object?>>;
 
-/// A widget that limits the scope where particular [Pot]s are
-/// available in the widget tree.
+/// A widget that controls the availability of particular pots
+/// according to the widget lifecycle.
 ///
 /// {@template pottery.class}
 /// The factory of the [ReplaceablePot] specified as the key in the
-/// map ([pots]) is replaced with the [PotObjectFactory] specified as
-/// its value, and the factory creates an object inside the pot when
-/// the [Pottery] is inserted into the tree.
+/// map ([pots]) is replaced with the [PotObjectFactory] specified
+/// as its value. An existing object is also replaced immediately
+/// with a new one created by the new factory if one has already
+/// existed. If there was no object, a new one is not created soon
+/// but only when it is accessed for the first time.
 ///
-/// If the pottery is removed from the tree, the object is discarded
-/// and the factory is removed. After the removal, trying to access
-/// the object throws [PotNotReadyException].
+/// If the pottery is removed from the tree permanently, the object
+/// is discarded and the factory is removed. After the removal,
+/// trying to access the object throws [PotNotReadyException].
 ///
 /// ```dart
 /// final notesNotifierPot = Pot.pending<NotesNotifier>(
@@ -30,7 +34,6 @@ typedef PotReplacements
 ///
 /// ...
 ///
-///
 /// child: Pottery(
 ///   pots: {
 ///     notesNotifierPot: NotesNotifier.new,
@@ -41,10 +44,20 @@ typedef PotReplacements
 ///   },
 /// ),
 /// ```
+///
+/// Note that [Pottery] does not bind pots to the widget tree.
+/// It only uses the lifecycle of itself in the tree to control
+/// the lifespan of pots' content, which is an important difference
+/// from [ScopedPottery].
+///
+/// Also note that an error arises only at runtime if the map
+/// contains wrong pairs of pot and factory. Make sure to specify
+/// a correct factory creating an object of the right type.
 /// {@endtemplate}
 class Pottery extends StatefulWidget {
-  /// Creates a [Pottery] widget that limits the scope where
-  /// particular pots are available in the widget tree.
+  /// Creates a [Pottery] widget that limits the lifespan of the
+  /// factory and the object of particular [Pot]s according to
+  /// its own lifespan.
   ///
   /// {@macro pottery.class}
   const Pottery({
@@ -54,15 +67,9 @@ class Pottery extends StatefulWidget {
   });
 
   /// A map of replaceable pots and factories.
-  ///
-  /// {@macro pottery.class}
-  ///
-  /// Note that there is no warning even if you specify a factory
-  /// that creates a wrong type of object. Make sure to specify a
-  /// correct factory to avoid an error being thrown at runtime.
   final PotReplacements pots;
 
-  /// Called to obtain the child widget.
+  /// A function called to obtain the child widget.
   final WidgetBuilder builder;
 
   @override

@@ -111,10 +111,12 @@ typedef ScopedPots = Map<Pot<Object?>, Object?>;
 /// Note that there are several important differences between
 /// `ScopedPottery` and [Pottery]:
 ///
-/// * Objects are created immediately when `ScopedPottery` is created.
-/// * As already mentioned, objects created with `ScopedPottery` are
+/// * Objects are created in [Pot]s as soon as `ScopedPottery` is
+///   created, whereas in `Pottery`, objects are created (replaced,
+///   more precisely) only if Pots already have ones.
+/// * As already mentioned, objects created by `ScopedPottery` are
 ///   only accessible with [NearestPotOf.of].
-/// * Objects created with `ScopedPottery` are not automatically
+/// * Objects created by `ScopedPottery` are not automatically
 ///   discarded when the `ScopedPottery` is removed from the tree.
 ///   Use [disposer] to do clean-up.
 ///
@@ -146,7 +148,7 @@ class ScopedPottery extends StatefulWidget {
   /// with [NearestPotOf.of] (not with [Pot.call]) from the descendants.
   final PotOverrides pots;
 
-  /// A builder function called to obtain the child widget.
+  /// A function called to obtain the child widget.
   final WidgetBuilder builder;
 
   /// A function called when this [ScopedPottery] is removed from
@@ -212,8 +214,9 @@ extension NearestPotOf<T> on Pot<T> {
     return null;
   }
 
-  /// An extension method of [Pot] that finds the nearest [ScopedPottery]
-  /// from ancestors and obtains the object locally bound to the pot.
+  /// An extension method of [Pot] that recursively visits ancestors
+  /// to find the nearest [ScopedPottery] and obtains the object bound
+  /// locally to the pot.
   ///
   /// If the pot which this method is called on is contained as a key
   /// in the `pots` map of a [ScopedPottery] located up in the tree,
