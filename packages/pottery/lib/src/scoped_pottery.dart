@@ -196,9 +196,9 @@ class _ScopedPotteryState extends State<ScopedPottery> {
 
 /// Extension on [Pot] used in relation to [ScopedPottery].
 extension NearestPotOf<T> on Pot<T> {
-  MapEntry<Pot<Object?>, Object?>? _findEntry(BuildContext element) {
-    if (element.widget is ScopedPottery) {
-      final state = (element as StatefulElement).state;
+  MapEntry<Pot<Object?>, Object?>? _findEntry(BuildContext context) {
+    if (context.widget is ScopedPottery) {
+      final state = (context as StatefulElement).state;
       final pots = (state as _ScopedPotteryState)._scopedPots;
 
       for (final entry in pots.entries) {
