@@ -1,6 +1,6 @@
 name: pottery
 description: Widgets to limit the scope where particular Pots are available in the widget tree.
-version: 0.1.0
+version: 0.1.1
 repository: https://github.com/kaboc/pot
 
 topics:
