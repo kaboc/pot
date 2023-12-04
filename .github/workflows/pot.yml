@@ -1,11 +1,13 @@
 name: pot CI
 
 on:
-#  push:
+  push:
 #    branches: [main]
 #    paths:
 #      - "packages/pot/**"
 #      - ".github/workflows/pot.yaml"
+    tags:
+      - 'pot-*'
   pull_request:
     branches: [main]
     paths:

@@ -1,11 +1,13 @@
 name: pottery CI
 
 on:
-#  push:
+  push:
 #    branches: [main]
 #    paths:
 #      - "packages/pottery/**"
 #      - ".github/workflows/pottery.yaml"
+    tags:
+      - 'pottery-*'
   pull_request:
     branches: [main]
     paths:
