@@ -127,10 +127,10 @@ packages:
     dependency: transitive
     description:
       name: pot
-      sha256: dd57ab5c92f52ebec503c7a81e5cde1235a54da938671248b2178df391a560a5
+      sha256: a1df7d19ae2d2214a4444826e94e4c6c0dfafb797204302755c967e295220454
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.0"
+    version: "0.6.0"
   pottery:
     dependency: "direct main"
     description:
