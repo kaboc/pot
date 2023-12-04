@@ -184,7 +184,7 @@ class Pot<T> extends _PotBody<T> {
     return replaceable(
       () => throw PotNotReadyException(),
       disposer: disposer,
-    );
+    ).._isPending = true;
   }
 
   /// Adds a new scope to the stack of scopes.

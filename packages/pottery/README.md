@@ -36,6 +36,11 @@ dependencies:
   pottery: ^x.x.x
 ```
 
+## Examples
+
+- [Counters](https://github.com/kaboc/pot/blob/main/packages/pottery/example) - simple
+- [pub.dev explorer](https://github.com/kaboc/pubdev-explorer) - advanced
+
 ## Usage
 
 This package comes with two widgets:
@@ -45,7 +50,7 @@ This package comes with two widgets:
 
 ### Pottery
 
-Creates a pot as pending if it is not necessary yet at the start of an app.
+Create a pot as pending if it is not necessary yet at the start of an app.
 
 ```dart
 final counterNotifierPot = Pot.pending<CounterNotifier>();
@@ -77,20 +82,22 @@ Widget build(BuildContext context) {
 );
 ```
 
-The factory of each of the pot passed to the `pots` argument as a key in the map becomes
-ready with the new factory passed as a value, and it makes the pots available from that
-point onwards.
+`pots` is a Map with key-value pairs of a Pot and a factory. Each of the factories
+becomes available for a corresponding Pot thereafter.
 
-It is easier to understand how to use Pottery if you consider it as something similar to
+It is easier to understand how to use Pottery by imagining it as something similar to
 `MultiProvider` of the provider package, although they internally work quite differently.
 
 - MultiProvider
     - Creates objects and provides them so that they are available down the tree.
 - Pottery
     - Replaces factories to make pots ready so that they are available after that point.
+      The widget tree is only used to manage the lifespan of factories and objects in
+      Pots, so Pots are still available outside the tree. 
+      
 
-Removing Pottery (e.g. navigating back from the page where Pottery is used) resets
-all pots passed to the `pots` argument and replaces their factories to throw an
+Removing Pottery from the tree (e.g. navigating back from the page where Pottery is used)
+resets all pots in the `pots` map and replaces their factories to throw an
 [PotNotReadyException].
 
 ### ScopedPottery
@@ -140,7 +147,8 @@ more practical use cases.
 
 Note that there are several important differences between `ScopedPottery` and [Pottery]:
 
-- Objects are created immediately when `ScopedPottery` is created.
+- Objects are created immediately when `ScopedPottery` is created, not when objects
+  in Pots are accessed for the first time.
 - As already mentioned, objects created with `ScopedPottery` are only accessible with
   [of()].
 - Objects created with `ScopedPottery` are not automatically discarded when the

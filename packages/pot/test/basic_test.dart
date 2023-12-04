@@ -335,6 +335,33 @@ void main() {
     );
   });
 
+  group('resetAsPending()', () {
+    test('ReplaceablePot becomes pending if resetAsPending() is used', () {
+      final pot = Pot.pending<Foo>();
+      expect(pot.isPending, isTrue);
+
+      pot.replace(() => Foo(1));
+      expect(pot.isPending, isFalse);
+      expect(pot().value, 1);
+
+      pot.resetAsPending();
+      expect(pot.isPending, isTrue);
+      expect(pot.create, throwsA(isA<PotNotReadyException>()));
+    });
+
+    test(
+      'replaceForTesting() changes isPending to false if pot is ReplaceablePot',
+      () {
+        final pot = Pot.pending<Foo>();
+        expect(pot.isPending, isTrue);
+
+        pot.replaceForTesting(() => Foo(1));
+        expect(pot.isPending, isFalse);
+        expect(pot().value, 1);
+      },
+    );
+  });
+
   group('Disposing', () {
     test('Calling dispose() does not throw', () {
       final pot1 = Pot(() => Foo(1));

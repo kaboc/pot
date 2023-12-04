@@ -165,6 +165,9 @@ userPot.replace(() => User(id: userId));
 final user = userPot();
 ```
 
+It is also possible to remove the existing factory by [resetAsPending()][resetAsPending]
+to switch the state of the pot to pending.
+
 ### Replacements for testing
 
 If replacements are only necessary in tests, avoid using [Pot.replaceable][replaceable]
@@ -332,6 +335,7 @@ which is more natural in Flutter and less error-prone.
 [resetAll]: https://pub.dev/documentation/pot/latest/pot/Pot/resetAll.html
 [replaceable]: https://pub.dev/documentation/pot/latest/pot/Pot/replaceable.html
 [pending]: https://pub.dev/documentation/pot/latest/pot/Pot/pending.html
+[resetAsPending]: https://pub.dev/documentation/pot/latest/pot/ReplaceablePot/resetAsPending.html
 [PotNotReadyException]: https://pub.dev/documentation/pot/latest/pot/PotNotReadyException-class.html
 [forTesting]: https://pub.dev/documentation/pot/latest/pot/Pot/forTesting.html
 [replaceForTesting]: https://pub.dev/documentation/pot/latest/pot/Pot/replaceForTesting.html

@@ -244,6 +244,11 @@ class _PotBody<T> {
 
     _factory = factory;
 
+    final self = this;
+    if (self is ReplaceablePot<T>) {
+      self._isPending = false;
+    }
+
     if (_hasObject) {
       _disposer?.call(_object as T);
       _object = factory();
@@ -273,6 +278,15 @@ class ReplaceablePot<T> extends Pot<T> {
   // ignore: public_member_api_docs
   @internal
   ReplaceablePot(super.factory, {super.disposer});
+
+  bool _isPending = false;
+
+  /// Whether the pot is in the pending state.
+  ///
+  /// If this is true, it means the pot is not ready because a factory
+  /// has not been set since the pot was created by [Pot.pending]
+  /// or since an existing factory was removed by [resetAsPending].
+  bool get isPending => _isPending;
 
   /// Replaces the factory in a replaceable pot with a new one, and/or
   /// creates a new object using the new factory.
@@ -325,4 +339,18 @@ class ReplaceablePot<T> extends Pot<T> {
   /// You can use [replaceForTesting] on a non-replaceable pot instead if
   /// [Pot.forTesting] is set to `true`.
   void replace(PotObjectFactory<T> factory) => _replace(factory);
+
+  /// Calls [reset] and also removes the existing factory to switch
+  /// the state of the ReplaceablePot to pending.
+  ///
+  /// After a call to this method, a new factory must be set with
+  /// [ReplaceablePot.replace] before the pot is used. Otherwise the
+  /// [PotNotReadyException] is thrown.
+  void resetAsPending() {
+    if (!_isPending) {
+      reset();
+      replace(() => throw PotNotReadyException());
+      _isPending = true;
+    }
+  }
 }
