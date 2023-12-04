@@ -221,12 +221,12 @@ void main() {
   });
 
   group('pending()', () {
-    test('Pot created with Pot.pending() throws if used when not ready.', () {
+    test('Pot created with Pot.pending() throws if used when not ready', () {
       final pot = Pot.pending<Foo>();
       expect(pot.create, throwsA(isA<PotNotReadyException>()));
     });
 
-    test('Factory of pot created with Pot.pending() can be replaced.', () {
+    test('Factory of pot created with Pot.pending() can be replaced', () {
       final pot = Pot.pending<Foo>();
       pot.replace(() => Foo(1));
       final foo = pot();

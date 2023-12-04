@@ -1,3 +1,7 @@
+## 0.6.0
+
+- Add `resetAsPending()` and `isPending` to `ReplaceablePot`.
+
 ## 0.5.0
 
 - Raise minimum Dart version to 2.19 for better type inference and to align with Pottery.

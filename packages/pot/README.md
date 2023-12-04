@@ -35,8 +35,8 @@ The focus will be more on enhancing stability and robustness.
 
 ## Examples
 
-- [Todo](https://github.com/kaboc/pot/tree/main/example) - Dart
-- [pub.dev explorer](https://github.com/kaboc/pubdev-explorer) - Flutter
+- [Todo](https://github.com/kaboc/pot/blob/main/packages/pot/example/pot_example.dart) - Dart (simple)
+- [pub.dev explorer](https://github.com/kaboc/pubdev-explorer) - Flutter (advanced)
 
 ## Related package
 
