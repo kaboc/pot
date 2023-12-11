@@ -1,9 +1,8 @@
-import 'package:meta/meta.dart';
+import 'package:meta/meta.dart' show internal, sealed, visibleForTesting;
 
 import 'errors.dart';
 
 part 'extensions.dart';
-
 part 'pot_body.dart';
 
 /// The signature of a callback that creates and returns an object
@@ -14,10 +13,9 @@ typedef PotObjectFactory<T> = T Function();
 /// to be disposed of.
 typedef PotDisposer<T> = void Function(T);
 
-typedef _Resetter = void Function();
-typedef _ScopedResetters = List<List<_Resetter>>;
+typedef _Scopes = List<List<_PotBody<Object?>>>;
 
-/// A class that instantiates and keeps an object of type [T] until
+/// A class that instantiates and caches an object of type [T] until
 /// it is discarded.
 ///
 /// {@template pot.class}
@@ -25,9 +23,11 @@ typedef _ScopedResetters = List<List<_Resetter>>;
 ///
 /// The `factory` provided to the constructor instantiates an object.
 /// It always works in a lazy manner; it does not create an object
-/// until it is first needed.
+/// until it is first needed. The object is cached, so once it is
+/// created, a new one is not created unless the pot is reset or the
+/// factory is replaced.
 ///
-/// The `disposer` is triggered when the object is discarded by
+/// The `disposer` is triggered when the object is disposed by
 /// methods such as [reset] and [ReplaceablePot.replace].
 ///
 /// ```dart
@@ -106,22 +106,22 @@ typedef _ScopedResetters = List<List<_Resetter>>;
 /// {@endtemplate}
 @sealed
 class Pot<T> extends _PotBody<T> {
-  /// Creates a Pot that instantiates and keeps an object of type [T]
+  /// Creates a Pot that instantiates and caches an object of type [T]
   /// until it is discarded.
   ///
   /// {@macro pot.class}
   Pot(super.factory, {super.disposer});
 
   static int _currentScope = 0;
-  static final _ScopedResetters _scopedResetters = [[]];
+  static final _Scopes _scopes = [[]];
 
   @visibleForTesting
   // ignore: library_private_types_in_public_api, public_member_api_docs
-  static _ScopedResetters get $scopedResetters =>
-      List.unmodifiable(<List<_Resetter>>[
-        for (final resetter in _scopedResetters) List.unmodifiable(resetter),
-      ]);
+  static List<List<void Function()>> get $scopedResetters => [
+        for (final pots in _scopes) [for (final pot in pots) pot.reset],
+      ];
 
+  @internal
   @visibleForTesting
   // ignore: public_member_api_docs
   static void Function(Object?) $warningPrinter = print;
@@ -168,7 +168,7 @@ class Pot<T> extends _PotBody<T> {
     PotObjectFactory<T> factory, {
     PotDisposer<T>? disposer,
   }) {
-    return ReplaceablePot<T>(factory, disposer: disposer);
+    return ReplaceablePot<T>._(factory, disposer: disposer);
   }
 
   /// Creates a pot of type [ReplaceablePot] where its factory of
@@ -181,10 +181,15 @@ class Pot<T> extends _PotBody<T> {
   /// A factory must be set with [ReplaceablePot.replace] before
   /// the pot is used. Otherwise the [PotNotReadyException] is thrown.
   static ReplaceablePot<T> pending<T>({PotDisposer<T>? disposer}) {
-    return replaceable(
-      () => throw PotNotReadyException(),
-      disposer: disposer,
-    ).._isPending = true;
+    return ReplaceablePot._pending(disposer: disposer);
+  }
+
+  static void _incrementCurrentScopeNumber() {
+    _currentScope++;
+  }
+
+  static void _decrementCurrentScopeNumber() {
+    _currentScope--;
   }
 
   /// Adds a new scope to the stack of scopes.
@@ -217,8 +222,7 @@ class Pot<T> extends _PotBody<T> {
   /// }
   /// ```
   static void pushScope() {
-    _scopedResetters.createScope();
-    _currentScope++;
+    _scopes.createScope();
   }
 
   /// Removes the current scope from the stack of scopes.
@@ -249,7 +253,7 @@ class Pot<T> extends _PotBody<T> {
   /// If this is used in the root scope, the index number remains `0`
   /// although every pot in the scope is reset and its disposer is called.
   static void popScope() {
-    _scopedResetters.clearScope(_currentScope, keepScope: false);
+    _scopes.clearScope(_currentScope, keepScope: false);
   }
 
   /// Resets all pots in the current scope.
@@ -262,7 +266,7 @@ class Pot<T> extends _PotBody<T> {
   ///
   /// See [reset] for details on a reset of an object.
   static void resetAllInScope() {
-    _scopedResetters.clearScope(_currentScope, keepScope: true);
+    _scopes.clearScope(_currentScope, keepScope: true);
   }
 
   /// Resets all pots of all scopes.
@@ -278,7 +282,7 @@ class Pot<T> extends _PotBody<T> {
   static void resetAll({bool keepScopes = true}) {
     final count = _currentScope;
     for (var i = count; i >= 0; i--) {
-      _scopedResetters.clearScope(i, keepScope: keepScopes);
+      _scopes.clearScope(i, keepScope: keepScopes);
     }
   }
 }

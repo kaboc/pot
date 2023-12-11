@@ -34,35 +34,40 @@ extension<T> on _PotBody<T> {
 }
 
 // Private
-extension on _ScopedResetters {
+extension on _Scopes {
   void createScope() {
     add([]);
+    Pot._incrementCurrentScopeNumber();
   }
 
   void clearScope(int index, {required bool keepScope}) {
-    for (var i = this[index].length - 1; i >= 0; i--) {
-      this[index][i]();
+    final pots = this[index];
+    for (var i = pots.length - 1; i >= 0; i--) {
+      pots[i].reset();
     }
 
     if (index == 0 || keepScope) {
-      this[index].clear();
+      pots.clear();
     } else {
       removeAt(index);
-      Pot._currentScope--;
+      Pot._decrementCurrentScopeNumber();
     }
   }
 
-  void addToScope(_Resetter resetter) {
-    this[Pot._currentScope].add(resetter);
+  void addPot<T>(_PotBody<T> pot) {
+    final pots = this[Pot._currentScope];
+    if (!pots.contains(pot)) {
+      pots.add(pot);
+    }
   }
 
-  void removeFromScope(_Resetter resetter, {bool excludeCurrentScope = false}) {
+  void removePot<T>(_PotBody<T> pot, {bool excludeCurrentScope = false}) {
     final start =
         excludeCurrentScope ? Pot._currentScope - 1 : Pot._currentScope;
 
     for (var i = start; i >= 0; i--) {
-      if (this[i].contains(resetter)) {
-        this[i].remove(resetter);
+      if (this[i].contains(pot)) {
+        this[i].remove(pot);
         break;
       }
     }

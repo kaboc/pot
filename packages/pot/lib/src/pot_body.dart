@@ -1,6 +1,6 @@
 part of 'pot.dart';
 
-// Actual body of Pot.
+// Actual implementation of Pot.
 // This has instance members, whereas Pot has static members.
 class _PotBody<T> {
   _PotBody(PotObjectFactory<T> factory, {PotDisposer<T>? disposer})
@@ -15,9 +15,6 @@ class _PotBody<T> {
   int? _scope;
   int? _prevScope;
   bool _isDisposed = false;
-
-  @visibleForTesting
-  bool $expect(bool Function(T) test) => test(_object as T);
 
   /// Whether an object has been created by the factory and still exists.
   ///
@@ -35,6 +32,35 @@ class _PotBody<T> {
   /// This getter is useful when you want to verify in tests that
   /// a pot is associated with a certain scope as expected.
   int? get scope => _scope;
+
+  @visibleForTesting
+  bool $expect(bool Function(T) test) {
+    return test(_object as T);
+  }
+
+  void _callDisposer() {
+    if (_disposer != null) {
+      _disposer?.call(_object as T);
+    }
+  }
+
+  void _replace(PotObjectFactory<T> factory, {bool asPending = false}) {
+    if (_isDisposed) {
+      throwStateError();
+    }
+
+    _factory = factory;
+
+    final self = this;
+    if (self is ReplaceablePot<T>) {
+      self._isPending = asPending;
+    }
+
+    if (_hasObject) {
+      _callDisposer();
+      _object = factory();
+    }
+  }
 
   /// Returns the object of type [T] created by the factory.
   ///
@@ -91,9 +117,9 @@ class _PotBody<T> {
     if (!_hasObject) {
       _debugWarning(suppressWarning);
 
-      Pot._scopedResetters
-        ..removeFromScope(reset, excludeCurrentScope: true)
-        ..addToScope(reset);
+      Pot._scopes
+        ..removePot(this, excludeCurrentScope: true)
+        ..addPot(this);
 
       _object = _factory();
       _hasObject = true;
@@ -135,10 +161,10 @@ class _PotBody<T> {
   /// calls to its members will throw.
   void dispose() {
     reset();
-    Pot._scopedResetters.removeFromScope(reset);
+    _isDisposed = true;
     _scope = null;
     _disposer = null;
-    _isDisposed = true;
+    Pot._scopes.removePot(this);
   }
 
   /// Discards the object of type [T] that was created by the factory
@@ -189,11 +215,11 @@ class _PotBody<T> {
     }
 
     if (_hasObject) {
-      _disposer?.call(_object as T);
+      _callDisposer();
       _object = null;
       _hasObject = false;
       _scope = null;
-      Pot._scopedResetters.removeFromScope(reset);
+      Pot._scopes.removePot(this);
     }
   }
 
@@ -236,24 +262,6 @@ class _PotBody<T> {
 
     _replace(factory);
   }
-
-  void _replace(PotObjectFactory<T> factory) {
-    if (_isDisposed) {
-      throwStateError();
-    }
-
-    _factory = factory;
-
-    final self = this;
-    if (self is ReplaceablePot<T>) {
-      self._isPending = false;
-    }
-
-    if (_hasObject) {
-      _disposer?.call(_object as T);
-      _object = factory();
-    }
-  }
 }
 
 /// A variant of [Pot] with the [replace] method for replacing its
@@ -275,9 +283,16 @@ class _PotBody<T> {
 /// of the flag status of [Pot.forTesting].
 @sealed
 class ReplaceablePot<T> extends Pot<T> {
-  // ignore: public_member_api_docs
-  @internal
-  ReplaceablePot(super.factory, {super.disposer});
+  ReplaceablePot._(super.factory, {super.disposer, bool isPending = false})
+      : _isPending = isPending;
+
+  factory ReplaceablePot._pending({PotDisposer<T>? disposer}) {
+    return ReplaceablePot._(
+      () => throw PotNotReadyException(),
+      disposer: disposer,
+      isPending: true,
+    );
+  }
 
   bool _isPending = false;
 
@@ -349,8 +364,7 @@ class ReplaceablePot<T> extends Pot<T> {
   void resetAsPending() {
     if (!_isPending) {
       reset();
-      replace(() => throw PotNotReadyException());
-      _isPending = true;
+      _replace(() => throw PotNotReadyException(), asPending: true);
     }
   }
 }
