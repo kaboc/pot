@@ -38,6 +38,26 @@ class _PotBody<T> {
     return test(_object as T);
   }
 
+  String _identity() {
+    // ignore: no_runtimeType_toString
+    return '$runtimeType'
+        '#${hashCode.toUnsigned(20).toRadixString(16).padLeft(5, '0')}';
+  }
+
+  @override
+  String toString() {
+    final self = this;
+
+    return '$_identity('
+        'isPending: ${self is ReplaceablePot<T> && self._isPending}, '
+        'isDisposed: $_isDisposed, '
+        'hasDisposer: ${_disposer != null}, '
+        'hasObject: $_hasObject, '
+        'object: $_object, '
+        'scope: $_scope'
+        ')';
+  }
+
   void _callDisposer() {
     if (_disposer != null) {
       _disposer?.call(_object as T);
