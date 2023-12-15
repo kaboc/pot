@@ -43,24 +43,24 @@ class _TestPotteryState extends State<TestPottery> {
   }
 }
 
-class TestScopedPottery extends StatefulWidget {
-  const TestScopedPottery({
-    this.scopedPotteryKey,
+class TestLocalPottery extends StatefulWidget {
+  const TestLocalPottery({
+    this.localPotteryKey,
     required this.pots,
     this.disposer,
     this.builder,
   });
 
-  final GlobalKey<Object?>? scopedPotteryKey;
+  final GlobalKey<Object?>? localPotteryKey;
   final PotReplacements pots;
   final WidgetBuilder? builder;
-  final ValueSetter<ScopedPots>? disposer;
+  final void Function(LocalPotteryObjects)? disposer;
 
   @override
-  State<TestScopedPottery> createState() => _TestScopedPotteryState();
+  State<TestLocalPottery> createState() => _TestLocalPotteryState();
 }
 
-class _TestScopedPotteryState extends State<TestScopedPottery> {
+class _TestLocalPotteryState extends State<TestLocalPottery> {
   bool _pressed = false;
 
   @override
@@ -70,8 +70,8 @@ class _TestScopedPotteryState extends State<TestScopedPottery> {
       child: Column(
         children: [
           if (!_pressed)
-            ScopedPottery(
-              key: widget.scopedPotteryKey,
+            LocalPottery(
+              key: widget.localPotteryKey,
               pots: widget.pots,
               disposer: widget.disposer,
               builder: widget.builder ?? (_) => const SizedBox.shrink(),

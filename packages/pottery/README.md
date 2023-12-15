@@ -4,7 +4,7 @@
 
 ## Overview
 
-A package that provides two widgets, `Pottery` and `ScopedPottery`.
+A package that provides two widgets, `Pottery` and `LocalPottery`.
 
 They limit the scope where particular [Pot]s are available in the widget tree.
 Using them make it clearer from which point onwards pots are used.
@@ -46,7 +46,7 @@ dependencies:
 This package comes with two widgets:
 
 - [Pottery]
-- [ScopedPottery]
+- [LocalPottery]
 
 ### Pottery
 
@@ -100,15 +100,15 @@ Removing Pottery from the tree (e.g. navigating back from the page where Pottery
 resets all pots in the `pots` map and replaces their factories to throw an
 [PotNotReadyException].
 
-### ScopedPottery
+### LocalPottery
 
-This widget defines new factories for existing pots and binds the objects created by
-them to the pots so that those objects are made available to descendants.
+This widget defines new factories for existing pots to create objects that are available
+only in the subtree.
 
-An important fact is that the factories of the existing pots are not actually replaced,
-therefore calling the [call()] method of a pot still returns the object held in the
-global pot. Use [of()] instead to obtain the scoped object. The example below illustrates
-the behaviour.
+An important fact is that the factories of the existing pots are not replaced, but
+new factories are associated with those pots. Therefore, calling the [call()] method
+of a pot still returns the object held in the global pot. Use [of()] instead to obtain
+the local object. The example below illustrates the behaviour.
 
 ```dart
 final fooPot = Pot(() => Foo(111));
@@ -118,7 +118,7 @@ final fooPot = Pot(() => Foo(111));
 class ParentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ScopedPottery(
+    return LocalPottery(
       pots: {
         fooPot: () => Foo(222),
       },
@@ -142,18 +142,32 @@ class ChildWidget extends StatelessWidget {
 }
 ```
 
-See the examples in [main2.dart] and in the document of [ScopedPottery] for usage in
+See the examples in [main2.dart] and in the document of [LocalPottery] for usage in
 more practical use cases.
 
-Note that there are several important differences between `ScopedPottery` and [Pottery]:
+Note that there are several important differences between `LocalPottery` and [Pottery]:
 
-- Objects are created immediately when `ScopedPottery` is created, not when objects
+- Objects are created immediately when `LocalPottery` is created, not when objects
   in Pots are accessed for the first time.
-- As already mentioned, objects created with `ScopedPottery` are only accessible with
+- As already mentioned, objects created with `LocalPottery` are only accessible with
   [of()].
-- Objects created with `ScopedPottery` are not automatically discarded when the
-  `ScopedPottery` is removed from the tree. Use the `disposer` argument to specify a
-  callback function to clean them up.
+- Objects created with `LocalPottery` are not automatically discarded when the
+  `LocalPottery` is removed from the tree. Use the `disposer` argument to specify a
+  callback function to clean them up. Below is an example where the disposer function
+  disposes of all ChangeNotifier subtypes.
+
+```dart
+LocalPottery(
+  pots: {
+    myChangeNotifier: () => MyChangeNotifier(),
+    intValueNotifier: () => ValueNotifier(111),
+  },
+  disposer: (pots) {
+    pots.values.whereType<ChangeNotifier>().forEach((v) => v.dispose());
+  },
+  builder: (context) { ... },
+)
+```
 
 ## Caveats
 
@@ -279,7 +293,7 @@ ElevatedButton(
 <!-- Links -->
 
 [Pottery]: https://pub.dev/documentation/pottery/latest/pottery/Pottery-class.html
-[ScopedPottery]: https://pub.dev/documentation/pottery/latest/pottery/ScopedPottery-class.html
+[LocalPottery]: https://pub.dev/documentation/pottery/latest/pottery/LocalPottery-class.html
 [of()]: https://pub.dev/documentation/pottery/latest/pottery/NearestPotOf/of.html
 [call()]: https://pub.dev/documentation/pot/latest/pot/Pot/call.html
 [Pot]: https://pub.dev/packages/pot
