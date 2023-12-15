@@ -7,10 +7,13 @@ on:
 #      - "packages/pottery/**"
 #      - ".github/workflows/pottery.yaml"
     tags:
+      - 'pot-*'
       - 'pottery-*'
   pull_request:
     branches: [main]
     paths:
+      - "packages/pot/**"
+      - ".github/workflows/pot.yaml"
       - "packages/pottery/**"
       - ".github/workflows/pottery.yaml"
   workflow_dispatch:
