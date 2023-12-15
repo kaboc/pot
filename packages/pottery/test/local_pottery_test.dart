@@ -27,7 +27,7 @@ void main() {
   });
 
   testWidgets(
-    'Pots provided by nearest ScopedPottery are obtained with `of()`',
+    'Pots provided by nearest LocalPottery are obtained with `of()`',
     (tester) async {
       fooPot = Pot.pending<Foo>();
       barPot = Pot.pending<Bar>();
@@ -37,7 +37,7 @@ void main() {
 
       var called = false;
       await tester.pumpWidget(
-        TestScopedPottery(
+        TestLocalPottery(
           pots: {
             fooPot!: Foo.new,
           },
@@ -70,7 +70,7 @@ void main() {
       Foo? foo1;
       Foo? foo2;
       await tester.pumpWidget(
-        TestScopedPottery(
+        TestLocalPottery(
           pots: {
             fooPot!: () => const Foo(20),
           },
@@ -92,7 +92,7 @@ void main() {
 
     var isNullObtained = false;
     await tester.pumpWidget(
-      TestScopedPottery(
+      TestLocalPottery(
         pots: {
           nullablePot!: () => null,
         },
@@ -106,8 +106,8 @@ void main() {
   });
 
   testWidgets(
-    'Disposer of pot is not called when ScopedPottery is removed, '
-    'while disposer of ScopedPottery is called with correct map',
+    'Disposer of pot is not called when LocalPottery is removed, '
+    'while disposer of LocalPottery is called with correct map',
     (tester) async {
       var globallyDisposed = false;
       fooPot = Pot.replaceable(
@@ -118,9 +118,9 @@ void main() {
 
       fooPot?.create();
 
-      ScopedPots? map;
+      LocalPots? map;
       await tester.pumpWidget(
-        TestScopedPottery(
+        TestLocalPottery(
           pots: {
             fooPot!: () => const Foo(20),
             barPot!: () => const Bar(),
@@ -144,7 +144,7 @@ void main() {
     },
   );
 
-  testWidgets('Multiple ScopedPotteries as siblings', (tester) async {
+  testWidgets('Multiple LocalPottery as siblings', (tester) async {
     fooPot = Pot.pending<Foo>();
 
     Foo? foo1;
@@ -154,7 +154,7 @@ void main() {
     await tester.pumpWidget(
       Column(
         children: [
-          TestScopedPottery(
+          TestLocalPottery(
             pots: {
               fooPot!: () => const Foo(10),
             },
@@ -168,7 +168,7 @@ void main() {
               );
             },
           ),
-          TestScopedPottery(
+          TestLocalPottery(
             pots: {
               fooPot!: () => const Foo(20),
             },
@@ -192,7 +192,7 @@ void main() {
     expect(foo4?.value, 20);
   });
 
-  testWidgets('Nested ScopedPotteries', (tester) async {
+  testWidgets('Nested LocalPottery', (tester) async {
     fooPot = Pot.pending<Foo>();
 
     Foo? foo1;
@@ -200,7 +200,7 @@ void main() {
     Foo? foo3;
     Foo? foo4;
     await tester.pumpWidget(
-      TestScopedPottery(
+      TestLocalPottery(
         pots: {
           fooPot!: () => const Foo(10),
         },
@@ -209,7 +209,7 @@ void main() {
           return Descendant(
             builder: (context2) {
               foo2 = fooPot?.of(context2);
-              return TestScopedPottery(
+              return TestLocalPottery(
                 pots: {
                   fooPot!: () => const Foo(20),
                 },
@@ -244,8 +244,8 @@ void main() {
 
     final key = GlobalKey();
     await tester.pumpWidget(
-      TestScopedPottery(
-        scopedPotteryKey: key,
+      TestLocalPottery(
+        localPotteryKey: key,
         pots: {
           fooPot!: () => foo,
           barPot!: () => bar,
@@ -260,6 +260,6 @@ void main() {
         if (prop.name != null) prop.name: prop.value,
     };
 
-    expect(props['scopedPots'], equals({fooPot: foo, barPot: bar}));
+    expect(props['localPots'], equals({fooPot: foo, barPot: bar}));
   });
 }

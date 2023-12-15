@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:pot/pot.dart';
 
-import 'scoped_pottery.dart';
+import 'local_pottery.dart';
 
 /// The signature of a map consisting of replaceable pots and factories.
 typedef PotReplacements
@@ -48,7 +48,7 @@ typedef PotReplacements
 /// Note that [Pottery] does not bind pots to the widget tree.
 /// It only uses the lifecycle of itself in the tree to control
 /// the lifespan of pots' content, which is an important difference
-/// from [ScopedPottery].
+/// from [LocalPottery].
 ///
 /// Also note that an error arises only at runtime if the map
 /// contains wrong pairs of pot and factory. Make sure to specify

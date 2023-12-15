@@ -32,16 +32,16 @@ class App extends StatelessWidget {
               child: Column(
                 children: [
                   for (var i = 0; i < 50; i++)
-                    ScopedPottery(
+                    LocalPottery(
                       pots: {
                         indexPot: () => i,
-                        // A scoped notifier is provided to the descendant
+                        // A different notifier is provided to the subtree
                         // when the index is an odd number.
                         if (i.isOdd) counterPot: HyperCounterNotifier.new,
                       },
                       disposer: (pots) {
                         // It is your responsibility to dispose of the
-                        // objects created by ScopedPottery.
+                        // objects created by LocalPottery.
                         (pots[counterPot] as CounterNotifier?)?.dispose();
                       },
                       builder: (context) {
@@ -70,8 +70,8 @@ class App extends StatelessWidget {
 
 class _Item extends StatelessWidget with Grab {
   // This widget is const with no parameter.
-  // It is possible because of ScopedPottery and `of()`.
-  // The index and other values are obtained from the ScopedPottery above.
+  // It is possible because of LocalPottery and `of()`.
+  // The index and other values are obtained from the LocalPottery above.
   const _Item();
 
   @override
