@@ -118,7 +118,7 @@ void main() {
 
       fooPot?.create();
 
-      LocalPots? map;
+      LocalPotteryObjects? map;
       await tester.pumpWidget(
         TestLocalPottery(
           pots: {
@@ -260,6 +260,6 @@ void main() {
         if (prop.name != null) prop.name: prop.value,
     };
 
-    expect(props['localPots'], equals({fooPot: foo, barPot: bar}));
+    expect(props['objects'], equals({fooPot: foo, barPot: bar}));
   });
 }

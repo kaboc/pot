@@ -16,7 +16,7 @@ typedef ScopedPottery = LocalPottery;
 typedef PotOverrides = Map<Pot<Object?>, PotObjectFactory<Object?>>;
 
 /// The signature of a map consisting of pots and the objects they hold.
-typedef LocalPots = Map<Pot<Object?>, Object?>;
+typedef LocalPotteryObjects = Map<Pot<Object?>, Object?>;
 
 /// A widget that associates existing pots with new values and makes
 /// them accessible from descendants in the tree via the pots.
@@ -167,27 +167,27 @@ class LocalPottery extends StatefulWidget {
   /// to the [pots] argument. Use this disposer to specify a callback
   /// function to clean up the objects like ValueNotifiers, which are
   /// supposed to be disposed of when no longer used.
-  final void Function(LocalPots)? disposer;
+  final void Function(LocalPotteryObjects)? disposer;
 
   @override
   State<LocalPottery> createState() => _LocalPotteryState();
 }
 
 class _LocalPotteryState extends State<LocalPottery> {
-  late final LocalPots _localPots;
+  late final LocalPotteryObjects _objects;
 
   @override
   void initState() {
     super.initState();
 
-    _localPots = {
+    _objects = {
       for (final entry in widget.pots.entries) entry.key: entry.value(),
     };
   }
 
   @override
   void dispose() {
-    widget.disposer?.call(_localPots);
+    widget.disposer?.call(_objects);
     super.dispose();
   }
 
@@ -199,7 +199,8 @@ class _LocalPotteryState extends State<LocalPottery> {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<LocalPots>('localPots', _localPots));
+    properties
+        .add(DiagnosticsProperty<LocalPotteryObjects>('objects', _objects));
   }
 }
 
@@ -208,7 +209,7 @@ extension NearestPotOf<T> on Pot<T> {
   MapEntry<Pot<Object?>, Object?>? _findEntry(BuildContext context) {
     if (context.widget is LocalPottery) {
       final state = (context as StatefulElement).state;
-      final pots = (state as _LocalPotteryState)._localPots;
+      final pots = (state as _LocalPotteryState)._objects;
 
       for (final entry in pots.entries) {
         if (entry.key == this) {

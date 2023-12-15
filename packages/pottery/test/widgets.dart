@@ -54,7 +54,7 @@ class TestLocalPottery extends StatefulWidget {
   final GlobalKey<Object?>? localPotteryKey;
   final PotReplacements pots;
   final WidgetBuilder? builder;
-  final void Function(LocalPots)? disposer;
+  final void Function(LocalPotteryObjects)? disposer;
 
   @override
   State<TestLocalPottery> createState() => _TestLocalPotteryState();
