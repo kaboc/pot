@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:pot/pot.dart';
 
 import 'pottery.dart';
+import 'utils.dart';
 
 /// An alias of [LocalPottery].
 @Deprecated(
@@ -181,7 +182,8 @@ class _LocalPotteryState extends State<LocalPottery> {
     super.initState();
 
     _objects = {
-      for (final entry in widget.pots.entries) entry.key: entry.value(),
+      for (final (pot, objectFactory) in widget.pots.records)
+        pot: objectFactory(),
     };
   }
 
@@ -206,22 +208,22 @@ class _LocalPotteryState extends State<LocalPottery> {
 
 /// Extension on [Pot] used in relation to [LocalPottery].
 extension NearestPotOf<T> on Pot<T> {
-  MapEntry<Pot<Object?>, Object?>? _findEntry(BuildContext context) {
+  ({Object? object, bool found}) _findObject(BuildContext context) {
     if (context.widget is LocalPottery) {
       final state = (context as StatefulElement).state;
       final pots = (state as _LocalPotteryState)._objects;
 
-      for (final entry in pots.entries) {
-        if (entry.key == this) {
-          // Returns MapEntry instead of entry.value because
-          // it is impossible to distinguish `null` from "not found"
-          // if T (the type of the value) is nullable.
-          return entry;
+      for (final (pot, object) in pots.records) {
+        if (pot == this) {
+          // `found` flag is necessary because it is impossible
+          // to distinguish `null` in object from "not found"
+          // when T is nullable.
+          return (object: object, found: true);
         }
       }
     }
 
-    return null;
+    return (object: null, found: false);
   }
 
   /// An extension method of [Pot] that recursively visits ancestors
@@ -245,15 +247,15 @@ extension NearestPotOf<T> on Pot<T> {
   T of(BuildContext context) {
     // Targets the current BuildContext too so that the local objects
     // become available from within the builder callback.
-    var entry = _findEntry(context);
+    var (:object, :found) = _findObject(context);
 
-    if (entry == null) {
+    if (!found) {
       context.visitAncestorElements((element) {
-        entry = _findEntry(element);
-        return entry == null;
+        (:object, :found) = _findObject(element);
+        return !found;
       });
     }
 
-    return entry == null ? this() : entry!.value as T;
+    return found ? object as T : this();
   }
 }
