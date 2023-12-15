@@ -1,6 +1,6 @@
 name: pottery
-description: Widgets to limit the scope where particular Pots are available in the widget tree.
-version: 0.1.1
+description: Utility for using Pot in Flutter to limit the lifespan of particular Pots according to the widget lifecycle.
+version: 0.2.0
 repository: https://github.com/kaboc/pot
 
 topics:
