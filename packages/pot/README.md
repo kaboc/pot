@@ -189,6 +189,26 @@ void main() {
 }
 ```
 
+### Listening for events
+
+The static method `listen()` allows you to listen for events related to pots.
+
+```dart
+final removeListener = Pot.listen((event) {
+  ...
+});
+
+// Don't forget to stop listening when it is no longer necessary.
+removeListener();
+```
+
+Note:
+- Events of changes in the objects held in pots are not emitted automatically.
+    - Call `notifyObjectUpdate()` to manually emit those events if necessary.
+- There is no guarantee that the event data format remains unchanged in the
+  future. Use the method and the data passed to the callback function only
+  for debugging purposes.
+
 ### Scoping
 
 A "scope" in this package is a notion related to the lifespan of an object held in a pot.
