@@ -301,6 +301,15 @@ class Pot<T> extends _PotBody<T> {
   /// no longer necessary. Use the function returned by this method
   /// to remove the added listener.
   ///
+  /// ```dart
+  /// final removeListener = Pot.listen((event) {
+  ///   ...
+  /// });
+  ///
+  /// // Don't forget to stop listening when it is no longer necessary.
+  /// removeListener();
+  /// ```
+  ///
   /// The event data of type [PotEvent] passed to the callback of this
   /// method is subject to change. It is advised not to use the method
   /// for purposes other than debugging.
