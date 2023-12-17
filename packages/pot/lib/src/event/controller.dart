@@ -5,6 +5,7 @@ class _EventController {
   int _number = 0;
 
   bool get hasListener => _streamController?.hasListener ?? false;
+  bool get isClosed => _streamController?.isClosed ?? true;
 
   Future<void> _closeStreamController() async {
     await _streamController?.close();

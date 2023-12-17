@@ -311,6 +311,11 @@ class Pot<T> extends _PotBody<T> {
   /// Whether there is a listener of Pot events.
   static bool get hasListener => _eventController.hasListener;
 
+  @internal
+  @visibleForTesting
+  // ignore: public_member_api_docs
+  static bool get $isEventControllerClosed => _eventController.isClosed;
+
   // Used from package:pottery.
   @internal
   // ignore: public_member_api_docs
