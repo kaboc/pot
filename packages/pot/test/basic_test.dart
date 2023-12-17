@@ -137,6 +137,29 @@ void main() {
       expect(isDisposed, isFalse);
     });
 
+    test('reset() triggers disposer with null if object is null', () {
+      Foo? object;
+      var called = false;
+
+      final pot = Pot<Foo?>(
+        () => null,
+        disposer: (f) {
+          object = f;
+          called = true;
+        },
+      );
+
+      pot.create();
+      expect(object, isNull);
+      expect(called, isFalse);
+      expect(pot.hasObject, isTrue);
+
+      pot.reset();
+      expect(object, isNull);
+      expect(called, isTrue);
+      expect(pot.hasObject, isFalse);
+    });
+
     test('Object is created again when it is needed after reset', () {
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
       pot.create();
@@ -207,6 +230,29 @@ void main() {
 
       pot.replace(() => Foo(2));
       expect(isDisposed, isFalse);
+    });
+
+    test('replace() triggers disposer with null if object is null', () {
+      Foo? object;
+      var called = false;
+
+      final pot = Pot.replaceable<Foo?>(
+        () => null,
+        disposer: (f) {
+          object = f;
+          called = true;
+        },
+      );
+
+      pot.create();
+      expect(object, isNull);
+      expect(called, isFalse);
+      expect(pot.hasObject, isTrue);
+
+      pot.reset();
+      expect(object, isNull);
+      expect(called, isTrue);
+      expect(pot.hasObject, isFalse);
     });
 
     test('replace() does not call new factory if object does not exist', () {
