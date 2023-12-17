@@ -38,6 +38,7 @@ extension on _Scopes {
   void createScope() {
     add([]);
     Pot._incrementCurrentScopeNumber();
+    Pot._eventController.addEvent(PotEventKind.scopePushed, pots: []);
   }
 
   void clearScope(int index, {required bool keepScope}) {
@@ -48,9 +49,11 @@ extension on _Scopes {
 
     if (index == 0 || keepScope) {
       pots.clear();
+      Pot._eventController.addEvent(PotEventKind.scopeCleared, pots: []);
     } else {
       removeAt(index);
       Pot._decrementCurrentScopeNumber();
+      Pot._eventController.addEvent(PotEventKind.scopePopped, pots: []);
     }
   }
 
@@ -58,6 +61,7 @@ extension on _Scopes {
     final pots = this[Pot._currentScope];
     if (!pots.contains(pot)) {
       pots.add(pot);
+      Pot._eventController.addEvent(PotEventKind.addedToScope, pots: [pot]);
     }
   }
 
@@ -68,6 +72,12 @@ extension on _Scopes {
     for (var i = start; i >= 0; i--) {
       if (this[i].contains(pot)) {
         this[i].remove(pot);
+
+        Pot._eventController.addEvent(
+          PotEventKind.removedFromScope,
+          pots: [pot],
+        );
+
         break;
       }
     }
