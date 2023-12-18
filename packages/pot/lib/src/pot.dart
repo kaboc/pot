@@ -165,6 +165,16 @@ class Pot<T> extends _PotBody<T> {
   /// ```
   static int get currentScope => _currentScope;
 
+  static final Map<_PotBody<Object?>, DateTime> _allInstances = {};
+
+  // Used from package:pottery.
+  @internal
+  // ignore: public_member_api_docs
+  static Map<PotDescription, DateTime> get $allPotDescriptions => {
+        for (final entry in _allInstances.entries)
+          PotDescription.fromPot(entry.key as Pot): entry.value,
+      };
+
   /// Creates a pot of type [ReplaceablePot] that has the ability
   /// to replace its factory with another one of type [T].
   ///

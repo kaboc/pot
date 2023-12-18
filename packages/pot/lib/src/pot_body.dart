@@ -6,6 +6,7 @@ class _PotBody<T> {
   _PotBody(PotObjectFactory<T> factory, {PotDisposer<T>? disposer})
       : _factory = factory,
         _disposer = disposer {
+    Pot._allInstances[this] = DateTime.now();
     Pot._eventController.addEvent(PotEventKind.instantiated, pots: [this]);
   }
 
@@ -198,6 +199,7 @@ class _PotBody<T> {
     _scope = null;
     _disposer = null;
     Pot._scopes.removePot(this);
+    Pot._allInstances.remove(this);
     Pot._eventController.addEvent(PotEventKind.disposed, pots: [this]);
   }
 

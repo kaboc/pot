@@ -27,6 +27,18 @@ void main() {
     events.add(event);
   }
 
+  group('Getter and method', () {
+    test('isScopeEvent', () {
+      expect(PotEventKind.unknown.isScopeEvent, isFalse);
+      expect(PotEventKind.instantiated.isScopeEvent, isFalse);
+      expect(PotEventKind.scopePushed.isScopeEvent, isTrue);
+      expect(PotEventKind.scopeCleared.isScopeEvent, isTrue);
+      expect(PotEventKind.scopePopped.isScopeEvent, isTrue);
+      expect(PotEventKind.addedToScope.isScopeEvent, isTrue);
+      expect(PotEventKind.removedFromScope.isScopeEvent, isTrue);
+    });
+  });
+
   group('PotEvent data other than potDescription', () {
     test('number, time and currentScope', () async {
       final removeListener = Pot.listen(listener);
@@ -182,6 +194,22 @@ void main() {
         expect(events[3].potDescriptions[0].object, 'null');
         expect(events[4].potDescriptions[0].hasObject, false);
         expect(events[4].potDescriptions[0].object, 'null');
+      });
+
+      test('allPotDescriptions returns descriptions of all pots', () {
+        final prevLen = Pot.$allPotDescriptions.length;
+
+        final pot1 = Pot(() => 10);
+        final pot2 = Pot.pending<int?>();
+
+        final descs = Pot.$allPotDescriptions.keys;
+        final len = descs.length;
+
+        expect(len - prevLen, 2);
+        expect(descs.elementAt(len - 2).identity, pot1.$identity());
+        expect(descs.elementAt(len - 2).isPending, isNull);
+        expect(descs.elementAt(len - 1).identity, pot2.$identity());
+        expect(descs.elementAt(len - 1).isPending, isTrue);
       });
     });
 

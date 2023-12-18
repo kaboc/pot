@@ -27,22 +27,22 @@ enum PotEventKind {
   disposed,
 
   /// A value that represents an event when a new scope was created.
-  scopePushed,
+  scopePushed(isScopeEvent: true),
 
   /// A value that represents an event when all [Pot]s in a scope were reset.
-  scopeCleared,
+  scopeCleared(isScopeEvent: true),
 
   /// A value that represents an event when all [Pot]s in a scope were reset
   /// and the scope was removed.
-  scopePopped,
+  scopePopped(isScopeEvent: true),
 
   /// A value that represents an event when a [Pot] was associated with the
   /// current scope.
-  addedToScope,
+  addedToScope(isScopeEvent: true),
 
   /// A value that represents an event when a [Pot] was unassociated from
   /// a scope.
-  removedFromScope,
+  removedFromScope(isScopeEvent: true),
 
   /// A value that represents an event when the object held in a [Pot] was
   /// updated.
@@ -62,7 +62,13 @@ enum PotEventKind {
 
   /// A value that represents an event when a `LocalPottery` of
   /// package:pottery was removed from the tree.
-  localPotteryRemoved,
+  localPotteryRemoved;
+
+  // ignore: public_member_api_docs
+  const PotEventKind({this.isScopeEvent = false});
+
+  /// Whether the event is related to scoping.
+  final bool isScopeEvent;
 }
 
 /// A class that represents an event related to [Pot].
