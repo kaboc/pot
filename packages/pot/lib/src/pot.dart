@@ -1,7 +1,11 @@
+import 'dart:async' show StreamController;
+
 import 'package:meta/meta.dart' show internal, sealed, visibleForTesting;
 
 import 'errors.dart';
 
+part 'event/controller.dart';
+part 'event/data.dart';
 part 'extensions.dart';
 part 'pot_body.dart';
 
@@ -12,6 +16,10 @@ typedef PotObjectFactory<T> = T Function();
 /// The signature of a callback that receives an object of type [T]
 /// to be disposed of.
 typedef PotDisposer<T> = void Function(T);
+
+/// The signature of a function that removes the listener added
+/// by `listen()`.
+typedef RemovePotListener = Future<void> Function();
 
 typedef _Scopes = List<List<_PotBody<Object?>>>;
 
@@ -114,6 +122,7 @@ class Pot<T> extends _PotBody<T> {
 
   static int _currentScope = 0;
   static final _Scopes _scopes = [[]];
+  static final _eventController = _EventController();
 
   @visibleForTesting
   // ignore: library_private_types_in_public_api, public_member_api_docs
@@ -284,5 +293,45 @@ class Pot<T> extends _PotBody<T> {
     for (var i = count; i >= 0; i--) {
       _scopes.clearScope(i, keepScope: keepScopes);
     }
+  }
+
+  /// Starts listening for events related to pots.
+  ///
+  /// This adds a listener. It should be removed when listening is
+  /// no longer necessary. Use the function returned by this method
+  /// to remove the added listener.
+  ///
+  /// ```dart
+  /// final removeListener = Pot.listen((event) {
+  ///   ...
+  /// });
+  ///
+  /// // Don't forget to stop listening when it is no longer necessary.
+  /// removeListener();
+  /// ```
+  ///
+  /// The event data of type [PotEvent] passed to the callback of this
+  /// method is subject to change. It is advised not to use the method
+  /// for purposes other than debugging.
+  static RemovePotListener listen(void Function(PotEvent event) onData) {
+    return _eventController.listen(onData);
+  }
+
+  /// Whether there is a listener of Pot events.
+  static bool get hasListener => _eventController.hasListener;
+
+  @internal
+  @visibleForTesting
+  // ignore: public_member_api_docs
+  static bool get $isEventControllerClosed => _eventController.isClosed;
+
+  // Used from package:pottery.
+  @internal
+  // ignore: public_member_api_docs
+  static void $addEvent(
+    PotEventKind kind, {
+    required Iterable<Pot<Object?>> pots,
+  }) {
+    Pot._eventController.addEvent(kind, pots: pots);
   }
 }

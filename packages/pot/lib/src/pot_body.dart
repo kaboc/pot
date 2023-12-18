@@ -5,7 +5,9 @@ part of 'pot.dart';
 class _PotBody<T> {
   _PotBody(PotObjectFactory<T> factory, {PotDisposer<T>? disposer})
       : _factory = factory,
-        _disposer = disposer;
+        _disposer = disposer {
+    Pot._eventController.addEvent(PotEventKind.instantiated, pots: [this]);
+  }
 
   PotObjectFactory<T> _factory;
   PotDisposer<T>? _disposer;
@@ -38,7 +40,9 @@ class _PotBody<T> {
     return test(_object as T);
   }
 
-  String _identity() {
+  @internal
+  // ignore: public_member_api_docs
+  String $identity() {
     // ignore: no_runtimeType_toString
     return '$runtimeType'
         '#${hashCode.toUnsigned(20).toRadixString(16).padLeft(5, '0')}';
@@ -48,7 +52,7 @@ class _PotBody<T> {
   String toString() {
     final self = this;
 
-    return '$_identity('
+    return '${$identity}('
         'isPending: ${self is ReplaceablePot<T> && self._isPending}, '
         'isDisposed: $_isDisposed, '
         'hasDisposer: ${_disposer != null}, '
@@ -61,6 +65,7 @@ class _PotBody<T> {
   void _callDisposer() {
     if (_disposer != null) {
       _disposer?.call(_object as T);
+      Pot._eventController.addEvent(PotEventKind.disposerCalled, pots: [this]);
     }
   }
 
@@ -80,6 +85,11 @@ class _PotBody<T> {
       _callDisposer();
       _object = factory();
     }
+
+    Pot._eventController.addEvent(
+      asPending ? PotEventKind.markedAsPending : PotEventKind.replaced,
+      pots: [this],
+    );
   }
 
   /// Returns the object of type [T] created by the factory.
@@ -137,14 +147,17 @@ class _PotBody<T> {
     if (!_hasObject) {
       _debugWarning(suppressWarning);
 
+      _scope = Pot._currentScope;
+      _prevScope = _scope;
+
       Pot._scopes
         ..removePot(this, excludeCurrentScope: true)
         ..addPot(this);
 
       _object = _factory();
       _hasObject = true;
-      _scope = Pot._currentScope;
-      _prevScope = _scope;
+
+      Pot._eventController.addEvent(PotEventKind.created, pots: [this]);
     }
     return _object as T;
   }
@@ -185,6 +198,7 @@ class _PotBody<T> {
     _scope = null;
     _disposer = null;
     Pot._scopes.removePot(this);
+    Pot._eventController.addEvent(PotEventKind.disposed, pots: [this]);
   }
 
   /// Discards the object of type [T] that was created by the factory
@@ -240,6 +254,7 @@ class _PotBody<T> {
       _hasObject = false;
       _scope = null;
       Pot._scopes.removePot(this);
+      Pot._eventController.addEvent(PotEventKind.reset, pots: [this]);
     }
   }
 
@@ -281,6 +296,18 @@ class _PotBody<T> {
     }
 
     _replace(factory);
+  }
+
+  /// Notifies the listeners of an update of the object in the pot.
+  ///
+  /// Events of pot itself are automatically notified, but changes in
+  /// the object held in the pot are not. This method is for manually
+  /// notifying those events.
+  ///
+  /// e.g. Refreshing the value shown in the Pottery DevTools extension
+  /// page by a notification.
+  void notifyObjectUpdate() {
+    Pot._eventController.addEvent(PotEventKind.objectUpdated, pots: [this]);
   }
 }
 
