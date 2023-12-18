@@ -283,7 +283,7 @@ class Pot<T> extends _PotBody<T> {
   /// This discards all the objects bound to any scopes, and triggers
   /// the disposer of each pot.
   ///
-  /// If `keepScopes` is `false` or not specified, calling this method
+  /// If `keepScopes` is `true` or not specified, calling this method
   /// does not affect the scopes themselves; the index number of the
   /// current scope stays the same. Otherwise, the index is reset to 0.
   ///
