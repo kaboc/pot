@@ -19,7 +19,7 @@ void main() {
     controller?.close();
     controller = null;
     eventsCount = 0;
-    Pot.resetAll();
+    Pot.resetAll(keepScopes: false);
   });
 
   void listener(PotEvent event) {
@@ -364,7 +364,7 @@ void main() {
         controller?.stream,
         emitsInOrder([
           predicate<PotEvent>((v) => v.kind == PotEventKind.instantiated),
-          predicate<PotEvent>((v) => v.kind == PotEventKind.scopePopped),
+          predicate<PotEvent>((v) => v.kind == PotEventKind.scopeCleared),
         ]),
       );
       expect(eventsCount, 2);
@@ -386,7 +386,7 @@ void main() {
           predicate<PotEvent>((v) => v.kind == PotEventKind.created),
           predicate<PotEvent>((v) => v.kind == PotEventKind.removedFromScope),
           predicate<PotEvent>((v) => v.kind == PotEventKind.reset),
-          predicate<PotEvent>((v) => v.kind == PotEventKind.scopePopped),
+          predicate<PotEvent>((v) => v.kind == PotEventKind.scopeCleared),
         ]),
       );
       expect(eventsCount, 6);

@@ -19,7 +19,7 @@ void main() {
     controller?.close();
     controller = null;
     events.clear();
-    Pot.resetAll();
+    Pot.resetAll(keepScopes: false);
   });
 
   void listener(PotEvent event) {
