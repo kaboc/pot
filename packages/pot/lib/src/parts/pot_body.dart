@@ -1,4 +1,4 @@
-part of 'pot.dart';
+part of '../pot.dart';
 
 // Actual implementation of Pot.
 // This has instance members, whereas Pot has static members.
@@ -6,17 +6,17 @@ class _PotBody<T> {
   _PotBody(PotObjectFactory<T> factory, {PotDisposer<T>? disposer})
       : _factory = factory,
         _disposer = disposer {
-    Pot._allInstances[this] = DateTime.now();
-    Pot._eventController.addEvent(PotEventKind.instantiated, pots: [this]);
+    StaticPot.allInstances[_pot] = DateTime.now();
+    StaticPot.eventController.addEvent(PotEventKind.instantiated, pots: [_pot]);
   }
 
   PotObjectFactory<T> _factory;
   PotDisposer<T>? _disposer;
 
   T? _object;
-  bool _hasObject = false;
   int? _scope;
   int? _prevScope;
+  bool _hasObject = false;
   bool _isDisposed = false;
 
   /// Whether an object has been created by the factory and still exists.
@@ -36,24 +36,13 @@ class _PotBody<T> {
   /// a pot is associated with a certain scope as expected.
   int? get scope => _scope;
 
-  @visibleForTesting
-  bool $expect(bool Function(T) test) {
-    return test(_object as T);
-  }
-
-  @internal
-  // ignore: public_member_api_docs
-  String $identity() {
-    // ignore: no_runtimeType_toString
-    return '$runtimeType'
-        '#${hashCode.toUnsigned(20).toRadixString(16).padLeft(5, '0')}';
-  }
+  Pot<T> get _pot => this as Pot<T>;
 
   @override
   String toString() {
     final self = this;
 
-    return '${$identity}('
+    return '${_pot.identity()}('
         'isPending: ${self is ReplaceablePot<T> && self._isPending}, '
         'isDisposed: $_isDisposed, '
         'hasDisposer: ${_disposer != null}, '
@@ -66,7 +55,8 @@ class _PotBody<T> {
   void _callDisposer() {
     if (_disposer != null) {
       _disposer?.call(_object as T);
-      Pot._eventController.addEvent(PotEventKind.disposerCalled, pots: [this]);
+      StaticPot.eventController
+          .addEvent(PotEventKind.disposerCalled, pots: [_pot]);
     }
   }
 
@@ -87,9 +77,9 @@ class _PotBody<T> {
       _object = factory();
     }
 
-    Pot._eventController.addEvent(
+    StaticPot.eventController.addEvent(
       asPending ? PotEventKind.markedAsPending : PotEventKind.replaced,
-      pots: [this],
+      pots: [_pot],
     );
   }
 
@@ -146,19 +136,19 @@ class _PotBody<T> {
     }
 
     if (!_hasObject) {
-      _debugWarning(suppressWarning);
+      debugWarning(suppressWarning: suppressWarning);
 
-      _scope = Pot._currentScope;
+      _scope = StaticPot.currentScope;
       _prevScope = _scope;
 
-      Pot._scopes
-        ..removePot(this, excludeCurrentScope: true)
-        ..addPot(this);
+      StaticPot.scopes
+        ..removePot(_pot, excludeCurrentScope: true)
+        ..addPot(_pot);
 
       _object = _factory();
       _hasObject = true;
 
-      Pot._eventController.addEvent(PotEventKind.created, pots: [this]);
+      StaticPot.eventController.addEvent(PotEventKind.created, pots: [_pot]);
     }
     return _object as T;
   }
@@ -198,9 +188,9 @@ class _PotBody<T> {
     _isDisposed = true;
     _scope = null;
     _disposer = null;
-    Pot._scopes.removePot(this);
-    Pot._allInstances.remove(this);
-    Pot._eventController.addEvent(PotEventKind.disposed, pots: [this]);
+    StaticPot.scopes.removePot(_pot);
+    StaticPot.allInstances.remove(_pot);
+    StaticPot.eventController.addEvent(PotEventKind.disposed, pots: [_pot]);
   }
 
   /// Discards the object of type [T] that was created by the factory
@@ -255,8 +245,8 @@ class _PotBody<T> {
       _object = null;
       _hasObject = false;
       _scope = null;
-      Pot._scopes.removePot(this);
-      Pot._eventController.addEvent(PotEventKind.reset, pots: [this]);
+      StaticPot.scopes.removePot(_pot);
+      StaticPot.eventController.addEvent(PotEventKind.reset, pots: [_pot]);
     }
   }
 
@@ -309,7 +299,8 @@ class _PotBody<T> {
   /// e.g. Refreshing the value shown in the Pottery DevTools extension
   /// page by a notification.
   void notifyObjectUpdate() {
-    Pot._eventController.addEvent(PotEventKind.objectUpdated, pots: [this]);
+    StaticPot.eventController
+        .addEvent(PotEventKind.objectUpdated, pots: [_pot]);
   }
 }
 

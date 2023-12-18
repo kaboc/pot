@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:test/test.dart';
 
 import 'package:pot/pot.dart';
+import 'package:pot/src/private/static.dart';
 
 void main() {
   StreamController<PotEvent>? controller;
@@ -20,6 +21,7 @@ void main() {
     controller = null;
     eventsCount = 0;
     Pot.resetAll(keepScopes: false);
+    StaticPot.allInstances.clear();
   });
 
   void listener(PotEvent event) {
@@ -42,13 +44,13 @@ void main() {
     );
 
     test('StreamController is closed when all listeners are removed', () async {
-      expect(Pot.$isEventControllerClosed, isTrue);
+      expect(StaticPot.eventController.isClosed, isTrue);
 
       final removeListener = Pot.listen((_) {});
-      expect(Pot.$isEventControllerClosed, isFalse);
+      expect(StaticPot.eventController.isClosed, isFalse);
 
       await removeListener();
-      expect(Pot.$isEventControllerClosed, isTrue);
+      expect(StaticPot.eventController.isClosed, isTrue);
     });
   });
 

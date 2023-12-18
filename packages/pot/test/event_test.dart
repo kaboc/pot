@@ -5,6 +5,8 @@ import 'dart:async';
 import 'package:test/test.dart';
 
 import 'package:pot/pot.dart';
+import 'package:pot/src/private/static.dart';
+import 'package:pot/src/private/utils.dart';
 
 void main() {
   StreamController<PotEvent>? controller;
@@ -20,6 +22,7 @@ void main() {
     controller = null;
     events.clear();
     Pot.resetAll(keepScopes: false);
+    StaticPot.allInstances.clear();
   });
 
   void listener(PotEvent event) {
@@ -101,7 +104,7 @@ void main() {
 
         expect(events, hasLength(1));
         expect(events[0].potDescriptions, hasLength(1));
-        expect(events[0].potDescriptions[0].identity, pot.$identity());
+        expect(events[0].potDescriptions[0].identity, pot.identity());
       });
 
       test('isPending', () async {
@@ -197,19 +200,18 @@ void main() {
       });
 
       test('allPotDescriptions returns descriptions of all pots', () {
-        final prevLen = Pot.$allPotDescriptions.length;
-
         final pot1 = Pot(() => 10);
         final pot2 = Pot.pending<int?>();
 
-        final descs = Pot.$allPotDescriptions.keys;
-        final len = descs.length;
+        final pots = StaticPot.allInstances.keys;
+        expect(pots.length, 2);
 
-        expect(len - prevLen, 2);
-        expect(descs.elementAt(len - 2).identity, pot1.$identity());
-        expect(descs.elementAt(len - 2).isPending, isNull);
-        expect(descs.elementAt(len - 1).identity, pot2.$identity());
-        expect(descs.elementAt(len - 1).isPending, isTrue);
+        final desc1 = PotDescription.fromPot(pots.elementAt(0));
+        final desc2 = PotDescription.fromPot(pots.elementAt(1));
+        expect(desc1.identity, pot1.identity());
+        expect(desc1.isPending, isNull);
+        expect(desc2.identity, pot2.identity());
+        expect(desc2.isPending, isTrue);
       });
     });
 

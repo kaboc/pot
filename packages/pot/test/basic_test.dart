@@ -3,6 +3,7 @@
 import 'package:test/test.dart';
 
 import 'package:pot/pot.dart';
+import 'package:pot/src/private/static.dart';
 
 import 'utils.dart';
 
@@ -200,11 +201,11 @@ void main() {
         disposer: (f) => f.dispose(),
       );
       pot.create();
-      expect(pot.$expect((o) => o.value == 1), isTrue);
+      expect(pot.objectString(), 'Foo(1)');
       expect(isDisposed, isFalse);
 
       pot.replace(() => Foo(2));
-      expect(pot.$expect((o) => o.value == 2), isTrue);
+      expect(pot.objectString(), 'Foo(2)');
       expect(isDisposed, isTrue);
     });
 
@@ -335,11 +336,11 @@ void main() {
       Pot.forTesting = true;
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
       pot.create();
-      expect(pot.$expect((o) => o.value == 1), isTrue);
+      expect(pot.objectString(), 'Foo(1)');
       expect(isDisposed, isFalse);
 
       pot.replaceForTesting(() => Foo(2));
-      expect(pot.$expect((o) => o.value == 2), isTrue);
+      expect(pot.objectString(), 'Foo(2)');
       expect(isDisposed, isTrue);
     });
 
@@ -484,9 +485,9 @@ void main() {
           pot1.create();
         }
 
-        expect(Pot.$scopedResetters[0], isEmpty);
+        expect(StaticPot.resetters[0], isEmpty);
         declarePotLocally();
-        expect(Pot.$scopedResetters[0], hasLength(1));
+        expect(StaticPot.resetters[0], hasLength(1));
       },
     );
   });

@@ -1,8 +1,16 @@
 import 'package:meta/meta.dart';
 
 import 'package:pot/pot.dart';
+import 'package:pot/src/private/static.dart';
 
 typedef Resetter = void Function();
+
+extension PotObjectString<T> on Pot<T> {
+  String objectString() {
+    final desc = PotDescription.fromPot(this);
+    return desc.object;
+  }
+}
 
 late bool isInitialized;
 late bool isDisposed;
@@ -19,7 +27,7 @@ void _popAllScopes() {
 void prepare() {
   _popAllScopes();
   Pot.forTesting = false;
-  Pot.$warningPrinter = (w) => warning = w;
+  StaticPot.warningPrinter = (w) => warning = w;
 
   isInitialized = false;
   isDisposed = false;
@@ -44,6 +52,11 @@ class Foo {
 
   @override
   int get hashCode => Object.hashAll([uid, value]);
+
+  @override
+  String toString() {
+    return 'Foo($value)';
+  }
 
   void dispose() {
     isDisposed = true;

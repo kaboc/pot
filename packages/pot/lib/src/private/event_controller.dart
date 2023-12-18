@@ -1,6 +1,11 @@
-part of '../pot.dart';
+// ignore_for_file: public_member_api_docs
 
-class _EventController {
+import 'dart:async' show StreamController;
+
+import '../event.dart';
+import '../pot.dart';
+
+class EventController {
   StreamController<PotEvent>? _streamController;
   int _number = 0;
 
@@ -27,7 +32,7 @@ class _EventController {
 
   void addEvent(
     PotEventKind kind, {
-    required Iterable<_PotBody<Object?>> pots,
+    required Iterable<Pot<Object?>> pots,
   }) {
     final controller = _streamController;
     if (controller == null || !controller.hasListener) {
@@ -41,7 +46,7 @@ class _EventController {
         time: DateTime.now(),
         currentScope: Pot.currentScope,
         potDescriptions: [
-          for (final pot in pots) PotDescription.fromPot(pot as Pot),
+          for (final pot in pots) PotDescription.fromPot(pot),
         ],
       ),
     );

@@ -1,13 +1,14 @@
-import 'dart:async' show StreamController;
-
-import 'package:meta/meta.dart' show internal, sealed, visibleForTesting;
+import 'package:meta/meta.dart' show sealed;
 
 import 'errors.dart';
+import 'event.dart';
+import 'private/scopes_handler.dart';
+import 'private/static.dart';
+import 'private/utils.dart';
 
-part 'event/controller.dart';
-part 'event/data.dart';
-part 'extensions.dart';
-part 'pot_body.dart';
+part 'parts/description.dart';
+part 'parts/error_utils.dart';
+part 'parts/pot_body.dart';
 
 /// The signature of a callback that creates and returns an object
 /// of type [T].
@@ -20,8 +21,6 @@ typedef PotDisposer<T> = void Function(T);
 /// The signature of a function that removes the listener added
 /// by `listen()`.
 typedef RemovePotListener = Future<void> Function();
-
-typedef _Scopes = List<List<_PotBody<Object?>>>;
 
 /// A class that instantiates and caches an object of type [T] until
 /// it is discarded.
@@ -120,21 +119,6 @@ class Pot<T> extends _PotBody<T> {
   /// {@macro pot.class}
   Pot(super.factory, {super.disposer});
 
-  static int _currentScope = 0;
-  static final _Scopes _scopes = [[]];
-  static final _eventController = _EventController();
-
-  @visibleForTesting
-  // ignore: library_private_types_in_public_api, public_member_api_docs
-  static List<List<void Function()>> get $scopedResetters => [
-        for (final pots in _scopes) [for (final pot in pots) pot.reset],
-      ];
-
-  @internal
-  @visibleForTesting
-  // ignore: public_member_api_docs
-  static void Function(Object?) $warningPrinter = print;
-
   /// The flag that shows whether [replaceForTesting] is enabled.
   ///
   /// Defaults to `false`, which means disabled.
@@ -163,17 +147,7 @@ class Pot<T> extends _PotBody<T> {
   ///   print(Pot.currentScope); // 0
   /// }
   /// ```
-  static int get currentScope => _currentScope;
-
-  static final Map<_PotBody<Object?>, DateTime> _allInstances = {};
-
-  // Used from package:pottery.
-  @internal
-  // ignore: public_member_api_docs
-  static Map<PotDescription, DateTime> get $allPotDescriptions => {
-        for (final entry in _allInstances.entries)
-          PotDescription.fromPot(entry.key as Pot): entry.value,
-      };
+  static int get currentScope => StaticPot.currentScope;
 
   /// Creates a pot of type [ReplaceablePot] that has the ability
   /// to replace its factory with another one of type [T].
@@ -201,14 +175,6 @@ class Pot<T> extends _PotBody<T> {
   /// the pot is used. Otherwise the [PotNotReadyException] is thrown.
   static ReplaceablePot<T> pending<T>({PotDisposer<T>? disposer}) {
     return ReplaceablePot._pending(disposer: disposer);
-  }
-
-  static void _incrementCurrentScopeNumber() {
-    _currentScope++;
-  }
-
-  static void _decrementCurrentScopeNumber() {
-    _currentScope--;
   }
 
   /// Adds a new scope to the stack of scopes.
@@ -241,7 +207,7 @@ class Pot<T> extends _PotBody<T> {
   /// }
   /// ```
   static void pushScope() {
-    _scopes.createScope();
+    StaticPot.scopes.createScope();
   }
 
   /// Removes the current scope from the stack of scopes.
@@ -272,7 +238,7 @@ class Pot<T> extends _PotBody<T> {
   /// If this is used in the root scope, the index number remains `0`
   /// although every pot in the scope is reset and its disposer is called.
   static void popScope() {
-    _scopes.clearScope(_currentScope, keepScope: false);
+    StaticPot.scopes.clearScope(StaticPot.currentScope, keepScope: false);
   }
 
   /// Resets all pots in the current scope.
@@ -285,7 +251,7 @@ class Pot<T> extends _PotBody<T> {
   ///
   /// See [reset] for details on a reset of an object.
   static void resetAllInScope() {
-    _scopes.clearScope(_currentScope, keepScope: true);
+    StaticPot.scopes.clearScope(StaticPot.currentScope, keepScope: true);
   }
 
   /// Resets all pots of all scopes.
@@ -299,9 +265,9 @@ class Pot<T> extends _PotBody<T> {
   ///
   /// See [reset] for details on a reset of an object.
   static void resetAll({bool keepScopes = true}) {
-    final count = _currentScope;
+    final count = StaticPot.currentScope;
     for (var i = count; i >= 0; i--) {
-      _scopes.clearScope(i, keepScope: keepScopes);
+      StaticPot.scopes.clearScope(i, keepScope: keepScopes);
     }
   }
 
@@ -324,24 +290,9 @@ class Pot<T> extends _PotBody<T> {
   /// method is subject to change. It is advised not to use the method
   /// for purposes other than debugging.
   static RemovePotListener listen(void Function(PotEvent event) onData) {
-    return _eventController.listen(onData);
+    return StaticPot.eventController.listen(onData);
   }
 
   /// Whether there is a listener of Pot events.
-  static bool get hasListener => _eventController.hasListener;
-
-  @internal
-  @visibleForTesting
-  // ignore: public_member_api_docs
-  static bool get $isEventControllerClosed => _eventController.isClosed;
-
-  // Used from package:pottery.
-  @internal
-  // ignore: public_member_api_docs
-  static void $addEvent(
-    PotEventKind kind, {
-    required Iterable<Pot<Object?>> pots,
-  }) {
-    Pot._eventController.addEvent(kind, pots: pots);
-  }
+  static bool get hasListener => StaticPot.eventController.hasListener;
 }
