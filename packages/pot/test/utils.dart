@@ -1,7 +1,6 @@
-import 'package:meta/meta.dart';
+import 'package:meta/meta.dart' show immutable;
 
 import 'package:pot/pot.dart';
-import 'package:pot/src/private/static.dart';
 
 typedef Resetter = void Function();
 
@@ -12,27 +11,14 @@ extension PotObjectString<T> on Pot<T> {
   }
 }
 
-late bool isInitialized;
-late bool isDisposed;
-late int valueOfDisposedObject;
+bool isInitialized = false;
+bool isDisposed = false;
+int valueOfDisposedObject = -1;
 
-Object? warning;
-
-void _popAllScopes() {
-  for (var i = Pot.currentScope; i >= 0; i--) {
-    Pot.popScope();
-  }
-}
-
-void prepare() {
-  _popAllScopes();
-  Pot.forTesting = false;
-  StaticPot.warningPrinter = (w) => warning = w;
-
+void resetFoo() {
   isInitialized = false;
   isDisposed = false;
   valueOfDisposedObject = -1;
-  warning = null;
 }
 
 @immutable
@@ -51,7 +37,7 @@ class Foo {
       other is Foo && uid == other.uid && value == other.value;
 
   @override
-  int get hashCode => Object.hashAll([uid, value]);
+  int get hashCode => Object.hash(uid, value);
 
   @override
   String toString() {

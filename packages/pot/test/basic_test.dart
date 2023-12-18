@@ -8,7 +8,12 @@ import 'package:pot/src/private/static.dart';
 import 'utils.dart';
 
 void main() {
-  setUp(prepare);
+  tearDown(() {
+    Pot.forTesting = false;
+    Pot.resetAll(keepScopes: false);
+    StaticPot.allInstances.clear();
+    resetFoo();
+  });
 
   group('Inheritance', () {
     test('ReplaceablePot is a subtype of Pot', () {

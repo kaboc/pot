@@ -8,7 +8,18 @@ import 'package:pot/src/private/static.dart';
 import 'utils.dart';
 
 void main() {
-  setUp(prepare);
+  Object? warning;
+
+  setUpAll(() {
+    StaticPot.warningPrinter = (w) => warning = w;
+  });
+  tearDown(() {
+    Pot.forTesting = false;
+    Pot.resetAll(keepScopes: false);
+    StaticPot.allInstances.clear();
+    resetFoo();
+    warning = null;
+  });
 
   group('Scope', () {
     test('pushScope() adds new scope', () {

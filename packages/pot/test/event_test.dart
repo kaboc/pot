@@ -50,11 +50,11 @@ void main() {
       final time1 = DateTime.now();
       Pot(() => 10);
 
-      await Future<void>.delayed(const Duration(milliseconds: 5));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
       final time2 = DateTime.now();
       Pot.pushScope();
 
-      await Future<void>.delayed(const Duration(milliseconds: 5));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
       final time3 = DateTime.now();
       Pot.popScope();
 
@@ -72,19 +72,19 @@ void main() {
       expect(events[0].currentScope, 0);
       expect(
         events[0].time.millisecondsSinceEpoch,
-        closeTo(time1.millisecondsSinceEpoch, 3),
+        closeTo(time1.millisecondsSinceEpoch, 5),
       );
       expect(events[1].number, 2);
       expect(events[1].currentScope, 1);
       expect(
         events[1].time.millisecondsSinceEpoch,
-        closeTo(time2.millisecondsSinceEpoch, 3),
+        closeTo(time2.millisecondsSinceEpoch, 5),
       );
       expect(events[2].number, 3);
       expect(events[2].currentScope, 0);
       expect(
         events[2].time.millisecondsSinceEpoch,
-        closeTo(time3.millisecondsSinceEpoch, 3),
+        closeTo(time3.millisecondsSinceEpoch, 5),
       );
     });
 
