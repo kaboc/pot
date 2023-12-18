@@ -17,7 +17,7 @@ class EventController {
     _streamController = null;
   }
 
-  RemovePotListener listen(void Function(PotEvent event) onData) {
+  PotListenerRemover listen(void Function(PotEvent event) onData) {
     _streamController ??= StreamController<PotEvent>.broadcast();
     final subscription = _streamController?.stream.listen(onData);
     return () async {

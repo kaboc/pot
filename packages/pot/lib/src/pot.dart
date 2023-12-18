@@ -20,7 +20,7 @@ typedef PotDisposer<T> = void Function(T);
 
 /// The signature of a function that removes the listener added
 /// by `listen()`.
-typedef RemovePotListener = Future<void> Function();
+typedef PotListenerRemover = Future<void> Function();
 
 /// A class that instantiates and caches an object of type [T] until
 /// it is discarded.
@@ -289,7 +289,7 @@ class Pot<T> extends _PotBody<T> {
   /// The event data of type [PotEvent] passed to the callback of this
   /// method is subject to change. It is advised not to use the method
   /// for purposes other than debugging.
-  static RemovePotListener listen(void Function(PotEvent event) onData) {
+  static PotListenerRemover listen(void Function(PotEvent event) onData) {
     return StaticPot.eventController.listen(onData);
   }
 
