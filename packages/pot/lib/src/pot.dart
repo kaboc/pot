@@ -1,4 +1,4 @@
-import 'package:meta/meta.dart' show sealed;
+import 'package:meta/meta.dart' show immutable, sealed;
 
 import 'errors.dart';
 import 'event.dart';

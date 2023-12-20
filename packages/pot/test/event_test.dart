@@ -213,6 +213,11 @@ void main() {
         expect(desc2.identity, pot2.identity());
         expect(desc2.isPending, isTrue);
       });
+
+      test('Two PotDescription instances with same value are equal', () {
+        final pot1 = Pot(() => 10);
+        expect(PotDescription.fromPot(pot1), PotDescription.fromPot(pot1));
+      });
     });
 
     test('scope', () async {

@@ -1,6 +1,7 @@
 part of '../pot.dart';
 
 /// A class that describes the details of a [Pot].
+@immutable
 class PotDescription {
   /// Creates a [PotDescription] that describes the details of a [Pot].
   const PotDescription({
@@ -76,4 +77,25 @@ class PotDescription {
       'scope': scope,
     };
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(other, this) ||
+      other is PotDescription &&
+          identity == other.identity &&
+          isPending == other.isPending &&
+          isDisposed == other.isDisposed &&
+          hasObject == other.hasObject &&
+          object == other.object &&
+          scope == other.scope;
+
+  @override
+  int get hashCode => Object.hashAll([
+        identity,
+        isPending,
+        isDisposed,
+        hasObject,
+        object,
+        scope,
+      ]);
 }
