@@ -2,17 +2,17 @@
 [![pot CI](https://github.com/kaboc/pot/actions/workflows/pot.yml/badge.svg)](https://github.com/kaboc/pot/actions/workflows/pot.yml)
 [![codecov](https://codecov.io/gh/kaboc/pot/branch/main/graph/badge.svg?token=YZMCN6WZKM)](https://codecov.io/gh/kaboc/pot)
 
-An easy and safe DI (Dependency Injection) solution for Dart with support for scoping.
+An easy and safe DI (Dependency Injection) solution for Dart.
 
 ## Introduction
 
-[Pot] is a sort of service locator. It is like a container holding an object that
-is accessible from anywhere. That is where the name of this package came from. 
+[Pot] is a single-type DI container holding an object of a particular type.
 
-A pot is usually assigned to a global variable. Each pot has a Singleton factory
-function that is triggered to create an object as needed. It is possible to replace
-the factory or discard the object in a pot at your preferred timing, which is useful
-for testing as well as for implementing app features.   
+A pot is usually assigned to a global variable. Each pot has a Singleton
+factory function that is triggered to create an object as needed. It is
+possible to replace the factory or discard the object in a pot at your
+preferred timing, which is useful for testing as well as for implementing
+app features.
 
 ### Advantages
 
@@ -192,6 +192,8 @@ void main() {
 ### Listening for events
 
 The static method `listen()` allows you to listen for events related to pots.
+See the document of [PotEventKind] for event types, such as `instantiated`
+and `reset`.
 
 ```dart
 final removeListener = Pot.listen((event) {
@@ -210,6 +212,15 @@ Note:
   for debugging purposes.
 
 ### Scoping
+
+#### Pot or Pottery
+
+The scoping feature of this package is for Dart in general, not designed for Flutter.
+Consider using [Pottery] instead. It is a utility wrapping this pot package for use in
+Flutter. It limits the lifespan of pots according to the lifecycle of widgets, which is
+more natural in Flutter and less error-prone.
+
+#### What is scoping
 
 A "scope" in this package is a notion related to the lifespan of an object held in a pot.
 It is given a sequential number starting from `0`. Adding a scope increments the index
@@ -270,7 +281,8 @@ final user = userPot();
 ...
 
 // The scope is removed and the object is discarded.
-// It is better to replace the factory so that it throws if called unexpectedly after this. 
+// It is better to replace the factory so that it throws if called
+// unexpectedly after this.
 Pot.popScope();
 userPot.replace(() => throw PotNotReadyException());
 ```
@@ -334,15 +346,6 @@ the data related to scoping is stored globally even if the pot is assigned to a 
 and it is not automatically discarded when the variable goes out of use. It therefore must be
 discarded manually with [reset()][reset] or other methods that have the same effect.
 
-### Scoping in Flutter
-
-This package is not specifically for Flutter for Dart in general, therefore the scoping
-feature of this package is also not designed for use in Flutter.
-
-It is recommended to use [Pottery] instead. It is a utility that contains the pot package,
-limiting the scope of pots in the widget tree by making use of the widget lifecycle,
-which is more natural in Flutter and less error-prone.
-
 [Pot]: https://pub.dev/documentation/pot/latest/pot/Pot-class.html
 [Pottery]: https://pub.dev/packages/pottery
 [Pot-constructor]: https://pub.dev/documentation/pot/latest/pot/Pot/Pot.html
@@ -359,3 +362,4 @@ which is more natural in Flutter and less error-prone.
 [PotNotReadyException]: https://pub.dev/documentation/pot/latest/pot/PotNotReadyException-class.html
 [forTesting]: https://pub.dev/documentation/pot/latest/pot/Pot/forTesting.html
 [replaceForTesting]: https://pub.dev/documentation/pot/latest/pot/Pot/replaceForTesting.html
+[PotEventKind]: https://pub.dev/documentation/pot/latest/pot/PotEventKind.html

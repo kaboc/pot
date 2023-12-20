@@ -303,18 +303,24 @@ class _PotBody<T> {
   }
 }
 
-/// A variant of [Pot] with the [replace] method for replacing its
-/// factory and the object of type [T] created by the factory.
+/// A variant of [Pot] with the [replace] method that allows its
+/// factory to be replaced.
 ///
-/// This pot is created through [Pot.replaceable].
+/// This type of pot is created through either [Pot.replaceable] or
+/// [Pot.pending].
 ///
 /// {@template pot.replaceablePot}
 /// ```dart
-/// // This pot does not have the replace() method.
+/// // replace() is not available in this pot.
 /// final pot = Pot(() => Counter());
 ///
-/// // This pot has the replace() method.
-/// final replaceablePot = Pot.replaceable(() => Counter());
+/// // replace() is available in these pots.
+/// final replaceablePot1 = Pot.replaceable(() => Counter());
+/// final replaceablePot2 = Pot.pending<Counter>();
+///
+/// ...
+///
+/// replaceablePot2.replace(() => SubtypeOfCounter());
 /// ```
 /// {@endtemplate}
 ///

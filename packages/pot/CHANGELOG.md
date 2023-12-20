@@ -1,3 +1,12 @@
+## 0.7.0
+
+- Add `Pot.listen()`. ([#8])
+    - `hasListener` and `notifyObjectUpdate()` are also available.
+- Add `toString()` so that the content of a pot is visible by print.
+- Fix the document of `resetAll()`.
+    - The meaning of `keepScope` was oppositely explained.
+- Improve the overall structure.
+
 ## 0.6.0
 
 - Add `resetAsPending()` and `isPending` to `ReplaceablePot`.
@@ -75,3 +84,4 @@
 - Initial version.
 
 [#3]: https://github.com/kaboc/pot/pull/3
+[#8]: https://github.com/kaboc/pot/pull/8

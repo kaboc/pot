@@ -10,8 +10,8 @@ part 'parts/description.dart';
 part 'parts/error_utils.dart';
 part 'parts/pot_body.dart';
 
-/// The signature of a callback that creates and returns an object
-/// of type [T].
+/// The signature of a Singleton factory that creates and returns
+/// an object of type [T].
 typedef PotObjectFactory<T> = T Function();
 
 /// The signature of a callback that receives an object of type [T]
@@ -286,9 +286,9 @@ class Pot<T> extends _PotBody<T> {
   /// removeListener();
   /// ```
   ///
-  /// The event data of type [PotEvent] passed to the callback of this
-  /// method is subject to change. It is advised not to use the method
-  /// for purposes other than debugging.
+  /// The event data of type [PotEvent] passed to the callback is
+  /// subject to change. It is advised not to use this method for
+  /// purposes other than debugging.
   static PotListenerRemover listen(void Function(PotEvent event) onData) {
     return StaticPot.eventHandler.listen(onData);
   }
