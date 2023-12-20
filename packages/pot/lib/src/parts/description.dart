@@ -56,6 +56,27 @@ class PotDescription {
   final int? scope;
 
   @override
+  bool operator ==(Object other) =>
+      identical(other, this) ||
+      other is PotDescription &&
+          identity == other.identity &&
+          isPending == other.isPending &&
+          isDisposed == other.isDisposed &&
+          hasObject == other.hasObject &&
+          object == other.object &&
+          scope == other.scope;
+
+  @override
+  int get hashCode => Object.hashAll([
+        identity,
+        isPending,
+        isDisposed,
+        hasObject,
+        object,
+        scope,
+      ]);
+
+  @override
   String toString() {
     return 'PotDescription('
         'identity: $identity, '
@@ -78,25 +99,4 @@ class PotDescription {
       'scope': scope,
     };
   }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(other, this) ||
-      other is PotDescription &&
-          identity == other.identity &&
-          isPending == other.isPending &&
-          isDisposed == other.isDisposed &&
-          hasObject == other.hasObject &&
-          object == other.object &&
-          scope == other.scope;
-
-  @override
-  int get hashCode => Object.hashAll([
-        identity,
-        isPending,
-        isDisposed,
-        hasObject,
-        object,
-        scope,
-      ]);
 }

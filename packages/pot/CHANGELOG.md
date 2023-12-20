@@ -1,3 +1,8 @@
+## 0.7.1
+
+- Fix the `fromMap` constructor and `toString()` of `PotDescription`.
+- Add missing tests.
+
 ## 0.7.0
 
 - Add `Pot.listen()`. ([#8])
