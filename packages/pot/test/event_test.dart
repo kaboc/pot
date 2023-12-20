@@ -42,6 +42,163 @@ void main() {
     });
   });
 
+  group('Converters', () {
+    test('PotDescription.fromMap', () {
+      final desc = PotDescription.fromMap(const {
+        'identity': 'aaa',
+        'isPending': false,
+        'isDisposed': false,
+        'hasObject': true,
+        'object': null,
+        'scope': 10,
+      });
+
+      expect(desc.identity, 'aaa');
+      expect(desc.isPending, isFalse);
+      expect(desc.isDisposed, isFalse);
+      expect(desc.hasObject, isTrue);
+      expect(desc.object, 'null');
+      expect(desc.scope, 10);
+    });
+
+    test('PotDescription.toMap', () {
+      final map = const PotDescription(
+        identity: 'aaa',
+        isPending: false,
+        isDisposed: false,
+        hasObject: true,
+        object: 'null',
+        scope: 10,
+      ).toMap();
+
+      expect(map['identity'], 'aaa');
+      expect(map['isPending'], isFalse);
+      expect(map['isDisposed'], isFalse);
+      expect(map['hasObject'], isTrue);
+      expect(map['object'], 'null');
+      expect(map['scope'], 10);
+    });
+
+    test('PotEvent.fromMap', () {
+      final now = DateTime.now();
+
+      final event = PotEvent.fromMap({
+        'number': 10,
+        'kind': 'reset',
+        'time': now.microsecondsSinceEpoch,
+        'currentScope': 20,
+        'potDescriptions': [
+          {
+            'identity': 'aaa',
+            'isPending': true,
+            'isDisposed': true,
+            'hasObject': false,
+            'object': 'bbb',
+            'scope': 30,
+          },
+        ],
+      });
+
+      expect(event.number, 10);
+      expect(event.kind, PotEventKind.reset);
+      expect(event.time, now);
+      expect(event.currentScope, 20);
+      expect(event.potDescriptions.first.identity, 'aaa');
+      expect(event.potDescriptions.first.object, 'bbb');
+    });
+
+    test('PotEvent.toMap', () {
+      final now = DateTime.now();
+
+      final map = PotEvent(
+        number: 10,
+        kind: PotEventKind.created,
+        time: now,
+        currentScope: 20,
+        potDescriptions: const [
+          PotDescription(
+            identity: 'aaa',
+            isPending: false,
+            isDisposed: false,
+            hasObject: true,
+            object: 'bbb',
+            scope: 30,
+          ),
+        ],
+      ).toMap();
+
+      expect(map['number'], 10);
+      expect(map['kind'], 'created');
+      expect(map['time'], now.microsecondsSinceEpoch);
+      expect(map['currentScope'], 20);
+
+      final descs = map['potDescriptions'] as List?;
+      final desc = descs?.first as Map<String, Object?>?;
+      expect(desc?['identity'], 'aaa');
+      expect(desc?['object'], 'bbb');
+    });
+  });
+
+  group('toString()', () {
+    test('PotDescription.toString()', () {
+      const desc = PotDescription(
+        identity: 'aaa',
+        isPending: false,
+        isDisposed: false,
+        hasObject: true,
+        object: 'null',
+        scope: 10,
+      );
+
+      expect(
+        desc.toString(),
+        'PotDescription(identity: aaa, isPending: false, isDisposed: false, '
+        'hasObject: true, object: null, scope: 10)',
+      );
+    });
+
+    test('PotEvent.toString()', () {
+      final now = DateTime.now();
+      const desc = PotDescription(
+        identity: 'aaa',
+        isPending: true,
+        isDisposed: false,
+        hasObject: false,
+        object: 'bbb',
+        scope: 30,
+      );
+
+      final event = PotEvent(
+        number: 10,
+        kind: PotEventKind.markedAsPending,
+        time: now,
+        currentScope: 20,
+        potDescriptions: const [desc],
+      );
+
+      expect(
+        event.toString(),
+        'PotEvent(number: 10, kind: markedAsPending, time: $now, '
+        'currentScope: 20, potDescriptions: [$desc])',
+      );
+    });
+  });
+
+  group('Equality and hash code', () {
+    test('Two PotDescriptions with same values are equal', () {
+      final pot1 = Pot(() => 10);
+      expect(PotDescription.fromPot(pot1), PotDescription.fromPot(pot1));
+    });
+
+    test('Two PotDescriptions with same values have same hash code', () {
+      final pot1 = Pot(() => 10);
+      expect(
+        PotDescription.fromPot(pot1).hashCode,
+        PotDescription.fromPot(pot1).hashCode,
+      );
+    });
+  });
+
   group('PotEvent data other than potDescription', () {
     test('number, time and currentScope', () async {
       final removeListener = Pot.listen(listener);
@@ -212,11 +369,6 @@ void main() {
         expect(desc1.isPending, isNull);
         expect(desc2.identity, pot2.identity());
         expect(desc2.isPending, isTrue);
-      });
-
-      test('Two PotDescription instances with same value are equal', () {
-        final pot1 = Pot(() => 10);
-        expect(PotDescription.fromPot(pot1), PotDescription.fromPot(pot1));
       });
     });
 

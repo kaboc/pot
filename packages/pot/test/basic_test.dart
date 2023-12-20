@@ -1,5 +1,6 @@
 // ignore_for_file: cascade_invocations
 
+import 'package:pot/src/private/utils.dart';
 import 'package:test/test.dart';
 
 import 'package:pot/pot.dart';
@@ -412,6 +413,30 @@ void main() {
         expect(pot().value, 1);
       },
     );
+  });
+
+  group('toString()', () {
+    test('toString() on pot of type Pot', () {
+      final pot = Pot(() => Foo(10), disposer: (_) {});
+      pot.create();
+
+      expect(
+        pot.toString(),
+        'Pot<Foo>#${pot.shortHash()}(isPending: false, isDisposed: false, '
+        'hasDisposer: true, hasObject: true, object: Foo(10), scope: 0)',
+      );
+    });
+
+    test('toString() on pot of type ReplaceablePot', () {
+      final pot = Pot.pending<Foo>(disposer: (_) {});
+
+      expect(
+        pot.toString(),
+        'ReplaceablePot<Foo>#${pot.shortHash()}(isPending: true, '
+        'isDisposed: false, hasDisposer: true, hasObject: false, '
+        'object: null, scope: null)',
+      );
+    });
   });
 
   group('Disposing', () {
