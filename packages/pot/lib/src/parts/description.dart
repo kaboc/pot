@@ -20,7 +20,7 @@ class PotDescription {
       isPending: map['isPending'] as bool?,
       isDisposed: map['isDisposed'] as bool? ?? false,
       hasObject: map['hasObject'] as bool? ?? false,
-      object: map['object'] as String? ?? '',
+      object: map['object'] as String? ?? 'null',
       scope: map['scope'] as int?,
     );
   }
@@ -57,7 +57,8 @@ class PotDescription {
 
   @override
   String toString() {
-    return '$identity('
+    return 'PotDescription('
+        'identity: $identity, '
         'isPending: $isPending, '
         'isDisposed: $isDisposed, '
         'hasObject: $hasObject, '
