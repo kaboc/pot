@@ -5,7 +5,7 @@ import 'dart:async' show StreamController;
 import '../event.dart';
 import '../pot.dart';
 
-class EventController {
+class PotEventHandler {
   StreamController<PotEvent>? _streamController;
   int _number = 0;
 

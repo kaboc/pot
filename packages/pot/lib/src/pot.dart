@@ -290,9 +290,9 @@ class Pot<T> extends _PotBody<T> {
   /// method is subject to change. It is advised not to use the method
   /// for purposes other than debugging.
   static PotListenerRemover listen(void Function(PotEvent event) onData) {
-    return StaticPot.eventController.listen(onData);
+    return StaticPot.eventHandler.listen(onData);
   }
 
   /// Whether there is a listener of Pot events.
-  static bool get hasListener => StaticPot.eventController.hasListener;
+  static bool get hasListener => StaticPot.eventHandler.hasListener;
 }

@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs
 
 import '../pot.dart';
-import 'event_controller.dart';
+import 'event_handler.dart';
 
 typedef Scopes = List<List<Pot<Object?>>>;
 
@@ -15,7 +15,7 @@ class StaticPot {
   static final Map<Pot<Object?>, DateTime> allInstances = {};
 
   // For Pottery DevTools extension
-  static final eventController = EventController();
+  static final eventHandler = PotEventHandler();
 
   // For tests
   static List<List<void Function()>> get resetters => [

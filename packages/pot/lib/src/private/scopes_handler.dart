@@ -8,7 +8,7 @@ extension ScopesHandler on Scopes {
   void createScope() {
     add([]);
     StaticPot.currentScope++;
-    StaticPot.eventController.addEvent(PotEventKind.scopePushed, pots: []);
+    StaticPot.eventHandler.addEvent(PotEventKind.scopePushed, pots: []);
   }
 
   void clearScope(int index, {required bool keepScope}) {
@@ -19,11 +19,11 @@ extension ScopesHandler on Scopes {
 
     if (index == 0 || keepScope) {
       pots.clear();
-      StaticPot.eventController.addEvent(PotEventKind.scopeCleared, pots: []);
+      StaticPot.eventHandler.addEvent(PotEventKind.scopeCleared, pots: []);
     } else {
       removeAt(index);
       StaticPot.currentScope--;
-      StaticPot.eventController.addEvent(PotEventKind.scopePopped, pots: []);
+      StaticPot.eventHandler.addEvent(PotEventKind.scopePopped, pots: []);
     }
   }
 
@@ -31,8 +31,7 @@ extension ScopesHandler on Scopes {
     final pots = this[StaticPot.currentScope];
     if (!pots.contains(pot)) {
       pots.add(pot);
-      StaticPot.eventController
-          .addEvent(PotEventKind.addedToScope, pots: [pot]);
+      StaticPot.eventHandler.addEvent(PotEventKind.addedToScope, pots: [pot]);
     }
   }
 
@@ -45,7 +44,7 @@ extension ScopesHandler on Scopes {
       if (this[i].contains(pot)) {
         this[i].remove(pot);
 
-        StaticPot.eventController
+        StaticPot.eventHandler
             .addEvent(PotEventKind.removedFromScope, pots: [pot]);
 
         break;

@@ -7,7 +7,7 @@ class _PotBody<T> {
       : _factory = factory,
         _disposer = disposer {
     StaticPot.allInstances[_pot] = DateTime.now();
-    StaticPot.eventController.addEvent(PotEventKind.instantiated, pots: [_pot]);
+    StaticPot.eventHandler.addEvent(PotEventKind.instantiated, pots: [_pot]);
   }
 
   PotObjectFactory<T> _factory;
@@ -55,7 +55,7 @@ class _PotBody<T> {
   void _callDisposer() {
     if (_disposer != null) {
       _disposer?.call(_object as T);
-      StaticPot.eventController
+      StaticPot.eventHandler
           .addEvent(PotEventKind.disposerCalled, pots: [_pot]);
     }
   }
@@ -77,7 +77,7 @@ class _PotBody<T> {
       _object = factory();
     }
 
-    StaticPot.eventController.addEvent(
+    StaticPot.eventHandler.addEvent(
       asPending ? PotEventKind.markedAsPending : PotEventKind.replaced,
       pots: [_pot],
     );
@@ -148,7 +148,7 @@ class _PotBody<T> {
       _object = _factory();
       _hasObject = true;
 
-      StaticPot.eventController.addEvent(PotEventKind.created, pots: [_pot]);
+      StaticPot.eventHandler.addEvent(PotEventKind.created, pots: [_pot]);
     }
     return _object as T;
   }
@@ -190,7 +190,7 @@ class _PotBody<T> {
     _disposer = null;
     StaticPot.scopes.removePot(_pot);
     StaticPot.allInstances.remove(_pot);
-    StaticPot.eventController.addEvent(PotEventKind.disposed, pots: [_pot]);
+    StaticPot.eventHandler.addEvent(PotEventKind.disposed, pots: [_pot]);
   }
 
   /// Discards the object of type [T] that was created by the factory
@@ -246,7 +246,7 @@ class _PotBody<T> {
       _hasObject = false;
       _scope = null;
       StaticPot.scopes.removePot(_pot);
-      StaticPot.eventController.addEvent(PotEventKind.reset, pots: [_pot]);
+      StaticPot.eventHandler.addEvent(PotEventKind.reset, pots: [_pot]);
     }
   }
 
@@ -299,8 +299,7 @@ class _PotBody<T> {
   /// e.g. Refreshing the value shown in the Pottery DevTools extension
   /// page by a notification.
   void notifyObjectUpdate() {
-    StaticPot.eventController
-        .addEvent(PotEventKind.objectUpdated, pots: [_pot]);
+    StaticPot.eventHandler.addEvent(PotEventKind.objectUpdated, pots: [_pot]);
   }
 }
 
