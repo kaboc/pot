@@ -23,4 +23,5 @@ dev_dependencies:
   flutter_lints: ^3.0.1
 
 screenshots:
-  - screenshots/devtools_extension.jpg
+  - description: 'DevTools extension'
+    path: screenshots/devtools_extension.jpg
