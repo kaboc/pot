@@ -7,7 +7,9 @@ import 'package:pottery_devtools_extension/src/event_handler.dart';
 import 'package:pottery_devtools_extension/src/utils.dart';
 import 'package:pottery_devtools_extension/src/view_type_notifier.dart';
 import 'package:pottery_devtools_extension/src/views/events_view.dart';
+import 'package:pottery_devtools_extension/src/views/local_pottery_view.dart';
 import 'package:pottery_devtools_extension/src/views/pots_view.dart';
+import 'package:pottery_devtools_extension/src/views/pottery_view.dart';
 
 class PotteryExtensionPage extends StatefulWidget with Grabful {
   const PotteryExtensionPage();
@@ -61,12 +63,23 @@ class _PotteryExtensionPageState extends State<PotteryExtensionPage> {
                   child: Text(viewType.title),
                 ),
                 actions: [
-                  if (viewType == ViewType.pots)
+                  if (viewType.refreshable)
                     DevToolsTooltip(
                       message: 'Refresh',
                       child: IconButton(
                         icon: const Icon(Icons.refresh),
-                        onPressed: _eventHandler.getPots,
+                        onPressed: () {
+                          switch (viewType) {
+                            case ViewType.pots:
+                              _eventHandler.getPots();
+                            case ViewType.potteries:
+                              _eventHandler.getPotteries();
+                            case ViewType.localPotteries:
+                              _eventHandler.getLocalPotteries();
+                            case ViewType.events:
+                              break;
+                          }
+                        },
                       ),
                     )
                   else if (viewType == ViewType.events)
@@ -85,8 +98,8 @@ class _PotteryExtensionPageState extends State<PotteryExtensionPage> {
                 child: RoundedOutlinedBorder.onlyBottom(
                   child: switch (viewType) {
                     ViewType.pots => PotsView(_eventHandler),
-                    ViewType.potteries => const SizedBox.expand(),
-                    ViewType.localPotteries => const SizedBox.expand(),
+                    ViewType.potteries => PotteryView(_eventHandler),
+                    ViewType.localPotteries => LocalPotteryView(_eventHandler),
                     ViewType.events => EventsView(_eventHandler),
                   },
                 ),

@@ -16,12 +16,14 @@ enum ViewType {
   events(
     'Events',
     'Pot events',
+    refreshable: false,
   );
 
-  const ViewType(this.menuLabel, this.title);
+  const ViewType(this.menuLabel, this.title, {this.refreshable = true});
 
   final String menuLabel;
   final String title;
+  final bool refreshable;
 }
 
 class ViewTypeNotifier extends ValueNotifier<ViewType> {

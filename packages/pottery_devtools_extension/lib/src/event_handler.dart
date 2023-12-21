@@ -19,13 +19,19 @@ class PotteryEventHandler {
 
   PotEventsNotifier? _potEventsNotifier;
   PotsNotifier? _potsNotifier;
+  PotteriesNotifier? _potteriesNotifier;
+  LocalPotteriesNotifier? _localPotteriesNotifier;
 
   PotEventsNotifier get potEventsNotifier => _potEventsNotifier!;
   PotsNotifier get potsNotifier => _potsNotifier!;
+  PotteriesNotifier get potteriesNotifier => _potteriesNotifier!;
+  LocalPotteriesNotifier get localPotteriesNotifier => _localPotteriesNotifier!;
 
   Future<void> dispose() async {
     _potEventsNotifier?.dispose();
     _potsNotifier?.dispose();
+    _potteriesNotifier?.dispose();
+    _localPotteriesNotifier?.dispose();
 
     _fetchingDebounceTimer?.cancel();
     await _subscription?.cancel();
@@ -34,6 +40,8 @@ class PotteryEventHandler {
   Future<void> _initialize() async {
     _potEventsNotifier = PotEventsNotifier([]);
     _potsNotifier = PotsNotifier({});
+    _potteriesNotifier = PotteriesNotifier({});
+    _localPotteriesNotifier = LocalPotteriesNotifier({});
 
     await serviceManager.onServiceAvailable;
 
@@ -54,6 +62,8 @@ class PotteryEventHandler {
     switch (event.extensionKind) {
       case 'pottery:initialize':
         potsNotifier.value = {};
+        potteriesNotifier.value = {};
+        localPotteriesNotifier.value = {};
         potEventsNotifier.value = [];
       case 'pottery:pot_event':
         final potEvent = PotEvent.fromMap(data);
@@ -75,7 +85,13 @@ class PotteryEventHandler {
 
   void _scheduleFetching(PotEvent event) {
     _fetchingDebounceTimer?.cancel();
-    _fetchingDebounceTimer = Timer(_kFetchingDebounceDuration, getPots);
+    _fetchingDebounceTimer = Timer(_kFetchingDebounceDuration, () async {
+      await Future.wait([
+        getPots(),
+        getPotteries(),
+        getLocalPotteries(),
+      ]);
+    });
   }
 
   Future<void> getPots() async {
@@ -96,7 +112,59 @@ class PotteryEventHandler {
     };
   }
 
+  Future<void> getPotteries() async {
+    final response = await serviceManager
+        .callServiceExtensionOnMainIsolate('ext.pottery.getPotteries');
+
+    potteriesNotifier.value = response.json._toPotteries();
+  }
+
+  Future<void> getLocalPotteries() async {
+    final response = await serviceManager
+        .callServiceExtensionOnMainIsolate('ext.pottery.getLocalPotteries');
+
+    localPotteriesNotifier.value = response.json._toLocalPotteries();
+  }
+
   void clearEvents() {
     potEventsNotifier.value = [];
+  }
+}
+
+extension on Map<String, Object?>? {
+  Potteries _toPotteries() {
+    final records = (this ?? <String, Object>{}).records;
+
+    return {
+      for (final (id, data) in records)
+        if (data is Map<String, Object?>)
+          id: (
+            time: (data['time'] as int?).toDateTime(),
+            potDescriptions: [
+              for (final desc in data['potDescriptions'] as List? ?? [])
+                if (desc is Map<String, Object?>) PotDescription.fromMap(desc),
+            ],
+          ),
+    };
+  }
+
+  LocalPotteries _toLocalPotteries() {
+    final records = (this ?? <String, Object>{}).records;
+
+    return {
+      for (final (id, data) in records)
+        if (data is Map<String, Object?>)
+          id: (
+            time: (data['time'] as int?).toDateTime(),
+            objects: [
+              for (final object in data['objects'] as List? ?? [])
+                if (object is Map<String, Object?>)
+                  (
+                    potIdentity: object['potIdentity'] as String? ?? '',
+                    object: object['object'] as String? ?? '',
+                  ),
+            ],
+          ),
+    };
   }
 }
