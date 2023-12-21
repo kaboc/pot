@@ -1,4 +1,4 @@
-import 'dart:async' show StreamSubscription;
+import 'dart:async' show StreamSubscription, Timer;
 
 import 'package:devtools_extensions/devtools_extensions.dart';
 import 'package:pottery/pottery.dart';
@@ -7,12 +7,15 @@ import 'package:vm_service/vm_service.dart';
 import 'package:pottery_devtools_extension/src/types.dart';
 import 'package:pottery_devtools_extension/src/utils.dart';
 
+const _kFetchingDebounceDuration = Duration(milliseconds: 400);
+
 class PotteryEventHandler {
   PotteryEventHandler() {
     _initialize();
   }
 
   StreamSubscription<Event>? _subscription;
+  Timer? _fetchingDebounceTimer;
 
   PotEventsNotifier? _potEventsNotifier;
   PotsNotifier? _potsNotifier;
@@ -24,6 +27,7 @@ class PotteryEventHandler {
     _potEventsNotifier?.dispose();
     _potsNotifier?.dispose();
 
+    _fetchingDebounceTimer?.cancel();
     await _subscription?.cancel();
   }
 
@@ -64,7 +68,14 @@ class PotteryEventHandler {
             potEvent,
           ];
         }
+
+        _scheduleFetching(potEvent);
     }
+  }
+
+  void _scheduleFetching(PotEvent event) {
+    _fetchingDebounceTimer?.cancel();
+    _fetchingDebounceTimer = Timer(_kFetchingDebounceDuration, getPots);
   }
 
   Future<void> getPots() async {
