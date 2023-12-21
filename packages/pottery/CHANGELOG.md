@@ -1,3 +1,8 @@
+## 0.3.0
+
+- Add DevTools extension.
+- Use pot 0.7.1.
+
 ## 0.2.0
 
 - **Breaking**
