@@ -6,7 +6,10 @@ import 'package:pottery/pottery.dart';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 
 import 'package:pottery_devtools_extension/src/event_handler.dart';
+import 'package:pottery_devtools_extension/src/utils.dart';
 import 'package:pottery_devtools_extension/src/widgets/_widgets.dart';
+
+typedef _Selection = ({PotEvent event, PotDescription potDescription});
 
 class EventsView extends StatefulWidget with Grabful {
   const EventsView(this.eventHandler);
@@ -19,10 +22,12 @@ class EventsView extends StatefulWidget with Grabful {
 
 class _EventsViewState extends State<EventsView> {
   final _horizontalController = ScrollController();
+  final _selectionNotifier = ValueNotifier<_Selection?>(null);
 
   @override
   void dispose() {
     _horizontalController.dispose();
+    _selectionNotifier.dispose();
     super.dispose();
   }
 
@@ -31,22 +36,38 @@ class _EventsViewState extends State<EventsView> {
     final length =
         widget.eventHandler.potEventsNotifier.grabAt(context, (s) => s.length);
 
-    return OutlineDecoration(
-      showLeft: false,
-      showRight: false,
-      showTop: false,
-      child: AutoScroller(
-        itemCount: length,
-        child: Scrollbar(
-          child: Scrollbar(
-            controller: _horizontalController,
-            child: _Table(
-              eventHandler: widget.eventHandler,
-              horizontalController: _horizontalController,
+    return Split(
+      axis: Axis.vertical,
+      minSizes: const [200.0, 100.0],
+      initialFractions: const [0.75, 0.25],
+      children: [
+        OutlineDecoration(
+          showLeft: false,
+          showRight: false,
+          showTop: false,
+          child: AutoScroller(
+            itemCount: length,
+            child: Scrollbar(
+              child: Scrollbar(
+                controller: _horizontalController,
+                child: _Table(
+                  eventHandler: widget.eventHandler,
+                  horizontalController: _horizontalController,
+                  selectionNotifier: _selectionNotifier,
+                ),
+              ),
             ),
           ),
         ),
-      ),
+        OutlineDecoration(
+          showLeft: false,
+          showRight: false,
+          showBottom: false,
+          child: _Details(
+            selectionNotifier: _selectionNotifier,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -55,10 +76,12 @@ class _Table extends StatelessWidget with Grab {
   const _Table({
     required this.eventHandler,
     required this.horizontalController,
+    required this.selectionNotifier,
   });
 
   final PotteryEventHandler eventHandler;
   final ScrollController horizontalController;
+  final ValueNotifier<_Selection?> selectionNotifier;
 
   @override
   Widget build(BuildContext context) {
@@ -192,6 +215,10 @@ class _Table extends StatelessWidget with Grab {
                 for (final desc in descs)
                   CellConfig(
                     isLocalPottery ? '--' : desc.object,
+                    onTap: isLocalPottery
+                        ? null
+                        : () => selectionNotifier.value =
+                            (event: event, potDescription: desc),
                   ),
               ],
               rowNumber: vicinity.row,
@@ -199,6 +226,23 @@ class _Table extends StatelessWidget with Grab {
           _ => const SizedBox.shrink(),
         };
       },
+    );
+  }
+}
+
+class _Details extends StatelessWidget with Grab {
+  const _Details({required this.selectionNotifier});
+
+  final ValueNotifier<_Selection?> selectionNotifier;
+
+  @override
+  Widget build(BuildContext context) {
+    final selection = selectionNotifier.grab(context);
+
+    return DetailsViewer(
+      title: selection?.event.kind.name,
+      time: selection?.event.time,
+      json: selection?.potDescription.toFormattedJson(),
     );
   }
 }

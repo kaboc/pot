@@ -46,3 +46,30 @@ class IdentityText extends StatelessWidget {
     );
   }
 }
+
+class TappableText extends StatelessWidget {
+  const TappableText(this.text, {required this.onTap});
+
+  final String text;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final linkStyle = context.textTheme.bodyMedium?.copyWith(
+      color: context.colorScheme.primary,
+    );
+
+    return CustomText(
+      text,
+      definitions: const [
+        TextDefinition(matcher: PatternMatcher('.*')),
+      ],
+      style: linkStyle,
+      hoverStyle: linkStyle?.copyWith(
+        color: linkStyle.color?.withOpacity(0.7),
+      ),
+      overflow: TextOverflow.ellipsis,
+      onTap: (_) => onTap(),
+    );
+  }
+}

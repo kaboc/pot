@@ -4,9 +4,10 @@ import 'package:pottery_devtools_extension/src/utils.dart';
 import 'package:pottery_devtools_extension/src/widgets/special_text.dart';
 
 class CellConfig {
-  const CellConfig(Object? data) : text = '$data';
+  const CellConfig(Object? data, {this.onTap}) : text = '$data';
 
   final String text;
+  final VoidCallback? onTap;
 }
 
 class _CellContent extends StatelessWidget {
@@ -33,16 +34,21 @@ class _CellContent extends StatelessWidget {
       alignment: alignment,
       padding: const EdgeInsets.all(8.0),
       color: backgroundColor,
-      child: textType == null
-          ? Text(
+      child: config.onTap == null
+          ? textType == null
+              ? Text(
+                  config.text,
+                  style: style,
+                  overflow: TextOverflow.ellipsis,
+                )
+              : IdentityText(
+                  config.text,
+                  type: textType,
+                  style: style,
+                )
+          : TappableText(
               config.text,
-              style: style,
-              overflow: TextOverflow.ellipsis,
-            )
-          : IdentityText(
-              config.text,
-              type: textType,
-              style: style,
+              onTap: () => config.onTap?.call(),
             ),
     );
   }
