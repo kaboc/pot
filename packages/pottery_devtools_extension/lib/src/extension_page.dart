@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:devtools_app_shared/ui.dart';
 import 'package:grab/grab.dart';
 
+import 'package:pottery_devtools_extension/src/event_handler.dart';
 import 'package:pottery_devtools_extension/src/utils.dart';
 import 'package:pottery_devtools_extension/src/view_type_notifier.dart';
+import 'package:pottery_devtools_extension/src/views/events_view.dart';
 
 class PotteryExtensionPage extends StatefulWidget with Grabful {
   const PotteryExtensionPage();
@@ -14,10 +16,12 @@ class PotteryExtensionPage extends StatefulWidget with Grabful {
 }
 
 class _PotteryExtensionPageState extends State<PotteryExtensionPage> {
+  final _eventHandler = PotteryEventHandler();
   final _viewTypeNotifier = ViewTypeNotifier();
 
   @override
   void dispose() {
+    _eventHandler.dispose();
     _viewTypeNotifier.dispose();
     super.dispose();
   }
@@ -25,6 +29,7 @@ class _PotteryExtensionPageState extends State<PotteryExtensionPage> {
   @override
   Widget build(BuildContext context) {
     final viewType = _viewTypeNotifier.grab(context);
+    final potEventsNotifier = _eventHandler.potEventsNotifier;
 
     return Scaffold(
       body: Split(
@@ -54,10 +59,27 @@ class _PotteryExtensionPageState extends State<PotteryExtensionPage> {
                   style: context.textTheme.titleMedium!,
                   child: Text(viewType.title),
                 ),
+                actions: [
+                  if (viewType == ViewType.events)
+                    if (potEventsNotifier.grabAt(context, (s) => s.isNotEmpty))
+                      DevToolsTooltip(
+                        message: 'Clear',
+                        child: IconButton(
+                          icon: const Icon(Icons.delete_outline),
+                          onPressed: _eventHandler.clearEvents,
+                        ),
+                      ),
+                  const SizedBox(width: 8.0),
+                ],
               ),
               Expanded(
                 child: RoundedOutlinedBorder.onlyBottom(
-                  child: const SizedBox.expand(),
+                  child: switch (viewType) {
+                    ViewType.pots => const SizedBox.expand(),
+                    ViewType.potteries => const SizedBox.expand(),
+                    ViewType.localPotteries => const SizedBox.expand(),
+                    ViewType.events => EventsView(_eventHandler),
+                  },
                 ),
               ),
             ],
