@@ -8,7 +8,7 @@ import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 import 'package:pottery_devtools_extension/src/event_handler.dart';
 import 'package:pottery_devtools_extension/src/widgets/_widgets.dart';
 
-class EventsView extends StatefulWidget {
+class EventsView extends StatefulWidget with Grabful {
   const EventsView(this.eventHandler);
 
   final PotteryEventHandler eventHandler;
@@ -28,16 +28,22 @@ class _EventsViewState extends State<EventsView> {
 
   @override
   Widget build(BuildContext context) {
+    final length =
+        widget.eventHandler.potEventsNotifier.grabAt(context, (s) => s.length);
+
     return OutlineDecoration(
       showLeft: false,
       showRight: false,
       showTop: false,
-      child: Scrollbar(
+      child: AutoScroller(
+        itemCount: length,
         child: Scrollbar(
-          controller: _horizontalController,
-          child: _Table(
-            eventHandler: widget.eventHandler,
-            horizontalController: _horizontalController,
+          child: Scrollbar(
+            controller: _horizontalController,
+            child: _Table(
+              eventHandler: widget.eventHandler,
+              horizontalController: _horizontalController,
+            ),
           ),
         ),
       ),
