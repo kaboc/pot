@@ -72,7 +72,7 @@ class _EventsViewState extends State<EventsView> {
   }
 }
 
-class _Table extends StatelessWidget with Grab {
+class _Table extends StatefulWidget with Grabful {
   const _Table({
     required this.eventHandler,
     required this.horizontalController,
@@ -84,8 +84,39 @@ class _Table extends StatelessWidget with Grab {
   final ValueNotifier<_Selection?> selectionNotifier;
 
   @override
+  State<_Table> createState() => _TableState();
+}
+
+class _TableState extends State<_Table> {
+  List<PotEvent>? _prevEvents;
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.eventHandler.potEventsNotifier.addListener(_updatePrevAfterFrame);
+    _updatePrev();
+  }
+
+  @override
+  void dispose() {
+    widget.eventHandler.potEventsNotifier.removeListener(_updatePrevAfterFrame);
+    _prevEvents?.clear();
+
+    super.dispose();
+  }
+
+  void _updatePrev() {
+    _prevEvents = List.of(widget.eventHandler.potEventsNotifier.value);
+  }
+
+  void _updatePrevAfterFrame() {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updatePrev());
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final events = eventHandler.potEventsNotifier.grab(context);
+    final events = widget.eventHandler.potEventsNotifier.grab(context);
 
     return TableView.builder(
       primary: true,
@@ -94,7 +125,7 @@ class _Table extends StatelessWidget with Grab {
       pinnedColumnCount: 2,
       pinnedRowCount: 1,
       horizontalDetails: ScrollableDetails.horizontal(
-        controller: horizontalController,
+        controller: widget.horizontalController,
       ),
       columnBuilder: (index) {
         return TableSpan(
@@ -141,6 +172,7 @@ class _Table extends StatelessWidget with Grab {
         final event = events[vicinity.row - 1];
         final descs = event.potDescriptions;
 
+        final isNew = _prevEvents?.any((v) => v.number == event.number) != true;
         final isLocalPottery = event.kind == PotEventKind.localPotteryCreated ||
             event.kind == PotEventKind.localPotteryRemoved;
 
@@ -149,6 +181,7 @@ class _Table extends StatelessWidget with Grab {
               [
                 CellConfig(
                   event.kind.name,
+                  highlight: isNew,
                 ),
               ],
               rowNumber: vicinity.row,
@@ -158,6 +191,7 @@ class _Table extends StatelessWidget with Grab {
               [
                 CellConfig(
                   event.time,
+                  highlight: isNew,
                 ),
               ],
               rowNumber: vicinity.row,
@@ -168,6 +202,7 @@ class _Table extends StatelessWidget with Grab {
                 for (final desc in descs)
                   CellConfig(
                     desc.identity,
+                    highlight: isNew,
                   ),
               ],
               rowNumber: vicinity.row,
@@ -178,6 +213,7 @@ class _Table extends StatelessWidget with Grab {
                 for (final desc in descs)
                   CellConfig(
                     desc.identity,
+                    highlight: isNew,
                   ),
               ],
               rowNumber: vicinity.row,
@@ -188,6 +224,7 @@ class _Table extends StatelessWidget with Grab {
                 for (final desc in descs)
                   CellConfig(
                     isLocalPottery ? '--' : desc.isPending ?? '--',
+                    highlight: isNew,
                   ),
               ],
               rowNumber: vicinity.row,
@@ -197,6 +234,7 @@ class _Table extends StatelessWidget with Grab {
                 for (final desc in descs)
                   CellConfig(
                     isLocalPottery ? '--' : desc.isDisposed,
+                    highlight: isNew,
                   ),
               ],
               rowNumber: vicinity.row,
@@ -206,6 +244,7 @@ class _Table extends StatelessWidget with Grab {
                 for (final desc in descs)
                   CellConfig(
                     isLocalPottery ? '--' : desc.hasObject,
+                    highlight: isNew,
                   ),
               ],
               rowNumber: vicinity.row,
@@ -215,9 +254,10 @@ class _Table extends StatelessWidget with Grab {
                 for (final desc in descs)
                   CellConfig(
                     isLocalPottery ? '--' : desc.object,
+                    highlight: isNew,
                     onTap: isLocalPottery
                         ? null
-                        : () => selectionNotifier.value =
+                        : () => widget.selectionNotifier.value =
                             (event: event, potDescription: desc),
                   ),
               ],

@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 
 import 'package:pottery_devtools_extension/src/utils.dart';
+import 'package:pottery_devtools_extension/src/widgets/fading_colored_box.dart';
 import 'package:pottery_devtools_extension/src/widgets/special_text.dart';
 
 class CellConfig {
-  const CellConfig(Object? data, {this.onTap}) : text = '$data';
+  const CellConfig(Object? data, {required this.highlight, this.onTap})
+      : text = '$data';
 
   final String text;
+  final bool highlight;
   final VoidCallback? onTap;
 }
 
-class _CellContent extends StatelessWidget {
+class _CellContent extends StatefulWidget {
   const _CellContent({
     required this.config,
     required this.alignment,
@@ -26,30 +29,51 @@ class _CellContent extends StatelessWidget {
   final Color backgroundColor;
 
   @override
-  Widget build(BuildContext context) {
-    final textType = specialTextType;
-    final style = textStyle ?? context.textTheme.bodyMedium;
+  State<_CellContent> createState() => _CellContentState();
+}
 
-    return Container(
-      alignment: alignment,
-      padding: const EdgeInsets.all(8.0),
-      color: backgroundColor,
-      child: config.onTap == null
-          ? textType == null
-              ? Text(
-                  config.text,
-                  style: style,
-                  overflow: TextOverflow.ellipsis,
-                )
-              : IdentityText(
-                  config.text,
-                  type: textType,
-                  style: style,
-                )
-          : TappableText(
-              config.text,
-              onTap: () => config.onTap?.call(),
-            ),
+class _CellContentState extends State<_CellContent> {
+  VoidCallback? _fadeStarter;
+
+  @override
+  void didUpdateWidget(_CellContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.config.highlight) {
+      _fadeStarter?.call();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textType = widget.specialTextType;
+    final style = widget.textStyle ?? context.textTheme.bodyMedium;
+
+    return FadingColoredBox(
+      color: context.baseColor,
+      enabled: widget.config.highlight,
+      onCreated: (starter) => _fadeStarter = starter,
+      child: Container(
+        alignment: widget.alignment,
+        padding: const EdgeInsets.all(8.0),
+        color: widget.backgroundColor,
+        child: widget.config.onTap == null
+            ? textType == null
+                ? Text(
+                    widget.config.text,
+                    style: style,
+                    overflow: TextOverflow.ellipsis,
+                  )
+                : IdentityText(
+                    widget.config.text,
+                    type: textType,
+                    style: style,
+                  )
+            : TappableText(
+                widget.config.text,
+                onTap: () => widget.config.onTap?.call(),
+              ),
+      ),
     );
   }
 }
@@ -125,7 +149,7 @@ class HeadingCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Cell.center(
-      [CellConfig(text)],
+      [CellConfig(text, highlight: false)],
       textStyle: context.textTheme.bodyMedium?.copyWith(
         color: context.colorScheme.onSecondary,
         fontWeight: FontWeight.bold,

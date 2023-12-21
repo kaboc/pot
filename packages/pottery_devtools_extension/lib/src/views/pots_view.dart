@@ -88,10 +88,37 @@ class _Table extends StatefulWidget with Grabful {
 }
 
 class _TableState extends State<_Table> {
+  Pots? _prevPots;
+  bool _initialFetchCompleted = false;
+
   @override
   void initState() {
     super.initState();
-    widget.eventHandler.getPots();
+
+    widget.eventHandler
+      ..potsNotifier.addListener(_updatePrevAfterFrame)
+      ..getPots().then((_) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _initialFetchCompleted = true;
+          _updatePrev();
+        });
+      });
+  }
+
+  @override
+  void dispose() {
+    widget.eventHandler.potsNotifier.removeListener(_updatePrevAfterFrame);
+    _prevPots?.clear();
+
+    super.dispose();
+  }
+
+  void _updatePrev() {
+    _prevPots = Map.of(widget.eventHandler.potsNotifier.value);
+  }
+
+  void _updatePrevAfterFrame() {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updatePrev());
   }
 
   @override
@@ -146,11 +173,16 @@ class _TableState extends State<_Table> {
         final pot = pots.values.elementAt(vicinity.row - 1);
         final desc = pot.description;
 
+        final prevPot = _prevPots?[desc.identity];
+        final isNew = prevPot == null;
+        final prevDesc = prevPot?.description;
+
         return switch (vicinity.column) {
           0 => BoldCell(
               [
                 CellConfig(
                   desc.identity,
+                  highlight: _initialFetchCompleted && isNew,
                 ),
               ],
               rowNumber: vicinity.row,
@@ -160,6 +192,7 @@ class _TableState extends State<_Table> {
               [
                 CellConfig(
                   pot.time,
+                  highlight: _initialFetchCompleted && isNew,
                 ),
               ],
               rowNumber: vicinity.row,
@@ -168,6 +201,7 @@ class _TableState extends State<_Table> {
               [
                 CellConfig(
                   desc.identity,
+                  highlight: _initialFetchCompleted && isNew,
                 ),
               ],
               rowNumber: vicinity.row,
@@ -177,6 +211,8 @@ class _TableState extends State<_Table> {
               [
                 CellConfig(
                   desc.isPending ?? '--',
+                  highlight: _initialFetchCompleted &&
+                      (isNew || desc.isPending != prevDesc?.isPending),
                 ),
               ],
               rowNumber: vicinity.row,
@@ -185,6 +221,8 @@ class _TableState extends State<_Table> {
               [
                 CellConfig(
                   desc.isDisposed,
+                  highlight: _initialFetchCompleted &&
+                      desc.isDisposed != prevDesc?.isDisposed,
                 ),
               ],
               rowNumber: vicinity.row,
@@ -193,6 +231,8 @@ class _TableState extends State<_Table> {
               [
                 CellConfig(
                   desc.hasObject,
+                  highlight: _initialFetchCompleted &&
+                      desc.hasObject != prevDesc?.hasObject,
                 ),
               ],
               rowNumber: vicinity.row,
@@ -201,6 +241,8 @@ class _TableState extends State<_Table> {
               [
                 CellConfig(
                   desc.object,
+                  highlight: _initialFetchCompleted &&
+                      (isNew || desc.object != prevDesc?.object),
                   onTap: () => widget.selectionNotifier.value = desc,
                 ),
               ],
