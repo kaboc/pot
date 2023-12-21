@@ -14,6 +14,17 @@ extension ThemeGetter on BuildContext {
   bool get isDark => theme.brightness == Brightness.dark;
 }
 
+extension MapToRecord<K, V> on Map<K, V> {
+  Iterable<(K, V)> get records =>
+      entries.map((entry) => (entry.key, entry.value));
+}
+
+extension MicrosecondsToDateTime on int? {
+  DateTime toDateTime() {
+    return DateTime.fromMicrosecondsSinceEpoch(this ?? 0);
+  }
+}
+
 extension PotDescriptionText on PotDescription {
   String toFormattedJson() {
     final map = toMap()..remove('scope');
