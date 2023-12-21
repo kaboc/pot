@@ -26,6 +26,12 @@ your app well-organised.
 By using Pottery, it becomes possible to manage pots in a similar manner to using
 package:provider. See the example described later in this document.
 
+### DevTools extension
+
+This package includes the DevTools extension.
+
+<img src="https://github.com/kaboc/pot/assets/20254485/db1e69e8-241a-4969-b6be-3081fd34d5df">
+
 ## Getting started
 
 This package contains the [pot] package and exposes it. It is enough to only add
