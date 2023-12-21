@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs
+// coverage:ignore-file
 
 import 'dart:convert' show jsonEncode;
 import 'dart:developer' as developer;
