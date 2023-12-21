@@ -6,10 +6,6 @@ import 'package:pottery/pottery.dart';
 
 import 'widgets.dart';
 
-ReplaceablePot<Foo>? fooPot;
-ReplaceablePot<Bar>? barPot;
-ReplaceablePot<Object?>? nullablePot;
-
 class Foo {
   const Foo([this.value]);
   final int? value;
@@ -20,9 +16,16 @@ class Bar {
 }
 
 void main() {
-  setUp(() {
+  ReplaceablePot<Foo>? fooPot;
+  ReplaceablePot<Bar>? barPot;
+  ReplaceablePot<Object?>? nullablePot;
+
+  tearDown(() {
+    fooPot?.dispose();
     fooPot = null;
+    barPot?.dispose();
     barPot = null;
+    nullablePot?.dispose();
     nullablePot = null;
   });
 
@@ -106,6 +109,12 @@ void main() {
     (tester) async {
       fooPot = Pot.pending<Foo>(disposer: (_) => barPot?.call());
       barPot = Pot.pending<Bar>();
+
+      addTearDown(() {
+        // A factory must be set so that dispose does not
+        // throw when clean-up runs at the end of the test.
+        barPot?.replace(Bar.new);
+      });
 
       await tester.pumpWidget(
         TestPottery(

@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:pot/pot.dart';
 
+import 'extension/extension_manager.dart';
 import 'pottery.dart';
 import 'utils.dart';
 
@@ -176,6 +177,7 @@ class LocalPottery extends StatefulWidget {
 
 class _LocalPotteryState extends State<LocalPottery> {
   late final LocalPotteryObjects _objects;
+  PotteryExtensionManager? _extensionManager;
 
   @override
   void initState() {
@@ -185,11 +187,17 @@ class _LocalPotteryState extends State<LocalPottery> {
       for (final (pot, objectFactory) in widget.pots.records)
         pot: objectFactory(),
     };
+
+    runIfDebug(() {
+      _extensionManager = PotteryExtensionManager.createSingle()
+        ..onLocalPotteryCreated(this, _objects);
+    });
   }
 
   @override
   void dispose() {
     widget.disposer?.call(_objects);
+    _extensionManager?.onLocalPotteryRemoved(this, _objects);
     super.dispose();
   }
 
@@ -251,6 +259,8 @@ extension NearestPotOf<T> on Pot<T> {
 
     if (!found) {
       context.visitAncestorElements((element) {
+        // Suppresses false positive warning
+        // ignore: unnecessary_statements
         (:object, :found) = _findObject(element);
         return !found;
       });

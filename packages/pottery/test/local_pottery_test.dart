@@ -6,10 +6,6 @@ import 'package:pottery/pottery.dart';
 
 import 'widgets.dart';
 
-ReplaceablePot<Foo>? fooPot;
-ReplaceablePot<Bar>? barPot;
-ReplaceablePot<Object?>? nullablePot;
-
 class Foo {
   const Foo([this.value]);
   final int? value;
@@ -20,9 +16,16 @@ class Bar {
 }
 
 void main() {
-  setUp(() {
+  ReplaceablePot<Foo>? fooPot;
+  ReplaceablePot<Bar>? barPot;
+  ReplaceablePot<Object?>? nullablePot;
+
+  tearDown(() {
+    fooPot?.dispose();
     fooPot = null;
+    barPot?.dispose();
     barPot = null;
+    nullablePot?.dispose();
     nullablePot = null;
   });
 
