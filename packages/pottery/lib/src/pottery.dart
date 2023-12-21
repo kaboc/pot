@@ -3,7 +3,9 @@ import 'package:flutter/widgets.dart';
 
 import 'package:pot/pot.dart';
 
+import 'extension/extension_manager.dart';
 import 'local_pottery.dart';
+import 'utils.dart';
 
 /// The signature of a map consisting of replaceable pots and factories.
 typedef PotReplacements
@@ -77,9 +79,16 @@ class Pottery extends StatefulWidget {
 }
 
 class _PotteryState extends State<Pottery> {
+  PotteryExtensionManager? _extensionManager;
+
   @override
   void initState() {
     super.initState();
+
+    runIfDebug(() {
+      _extensionManager = PotteryExtensionManager.createSingle()
+        ..onPotteryCreated(this, widget.pots.keys);
+    });
     widget.pots.forEach((pot, factory) => pot.replace(factory));
   }
 
@@ -90,6 +99,7 @@ class _PotteryState extends State<Pottery> {
     widget.pots.keys.toList().reversed.forEach((pot) {
       pot.resetAsPending();
     });
+    _extensionManager?.onPotteryRemoved(this, widget.pots.keys);
 
     super.dispose();
   }
