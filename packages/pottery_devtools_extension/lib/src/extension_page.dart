@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:devtools_app_shared/ui.dart';
+import 'package:devtools_extensions/devtools_extensions.dart';
 import 'package:grab/grab.dart';
 
 import 'package:pottery_devtools_extension/src/event_handler.dart';
@@ -19,7 +20,10 @@ class PotteryExtensionPage extends StatefulWidget with Grabful {
 }
 
 class _PotteryExtensionPageState extends State<PotteryExtensionPage> {
-  final _eventHandler = PotteryEventHandler();
+  final _eventHandler = PotteryEventHandler(
+    serviceManager: serviceManager,
+    fetchingDebounceDuration: const Duration(milliseconds: 400),
+  );
   final _viewTypeNotifier = ViewTypeNotifier();
 
   @override

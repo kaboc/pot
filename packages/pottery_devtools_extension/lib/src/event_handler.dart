@@ -1,18 +1,22 @@
 import 'dart:async' show StreamSubscription, Timer;
 
-import 'package:devtools_extensions/devtools_extensions.dart';
+import 'package:devtools_app_shared/service.dart';
 import 'package:pottery/pottery.dart';
 import 'package:vm_service/vm_service.dart';
 
 import 'package:pottery_devtools_extension/src/types.dart';
 import 'package:pottery_devtools_extension/src/utils.dart';
 
-const _kFetchingDebounceDuration = Duration(milliseconds: 400);
-
 class PotteryEventHandler {
-  PotteryEventHandler() {
+  PotteryEventHandler({
+    required this.serviceManager,
+    required this.fetchingDebounceDuration,
+  }) {
     _initialize();
   }
+
+  final ServiceManager serviceManager;
+  final Duration fetchingDebounceDuration;
 
   StreamSubscription<Event>? _subscription;
   Timer? _fetchingDebounceTimer;
@@ -85,7 +89,7 @@ class PotteryEventHandler {
 
   void _scheduleFetching(PotEvent event) {
     _fetchingDebounceTimer?.cancel();
-    _fetchingDebounceTimer = Timer(_kFetchingDebounceDuration, () async {
+    _fetchingDebounceTimer = Timer(fetchingDebounceDuration, () async {
       await Future.wait([
         getPots(),
         getPotteries(),
