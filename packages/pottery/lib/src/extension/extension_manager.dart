@@ -1,9 +1,6 @@
 // ignore: lines_longer_than_80_chars
 // ignore_for_file: implementation_imports, library_private_types_in_public_api, public_member_api_docs
 
-import 'dart:convert' show jsonEncode;
-import 'dart:developer' as developer;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart' show State;
 
@@ -14,6 +11,7 @@ import 'package:pot/src/private/utils.dart';
 import '../local_pottery.dart';
 import '../pottery.dart';
 import '../utils.dart';
+import 'communicator.dart';
 
 typedef _Pots = Iterable<Pot<Object?>>;
 typedef _Potteries = Map<State<Pottery>, ({DateTime time, _Pots pots})>;
@@ -21,12 +19,16 @@ typedef _LocalPotteries = Map<State<LocalPottery>,
     ({DateTime time, List<({Pot<Object?> pot, Object? localObject})> list})>;
 
 class PotteryExtensionManager {
-  PotteryExtensionManager._() {
-    _initialize();
+  PotteryExtensionManager._(ExtensionCommunicator communicator) {
+    _initialize(communicator);
   }
 
-  factory PotteryExtensionManager.createSingle() {
-    return _instance ??= PotteryExtensionManager._();
+  factory PotteryExtensionManager.createSingle({
+    ExtensionCommunicator? testCommunicator,
+  }) {
+    return _instance ??= PotteryExtensionManager._(
+      testCommunicator ?? const ExtensionCommunicator(),
+    );
   }
 
   static PotteryExtensionManager? _instance;
@@ -61,73 +63,59 @@ class PotteryExtensionManager {
     });
   }
 
-  void _initialize() {
+  void _initialize(ExtensionCommunicator communicator) {
     if (_initialized) {
       return;
     }
     _initialized = true;
 
     _runIfDebugAndInitialized(() {
-      developer.postEvent('pottery:initialize', {});
+      communicator.post('pottery:initialize');
 
       _listenerRemover = Pot.listen((event) {
         if (!event.kind.isScopeEvent) {
-          developer.postEvent('pottery:pot_event', event.toMap());
+          communicator.post('pottery:pot_event', event.toMap());
         }
       });
 
-      developer.registerExtension(
-        'ext.pottery.getPots',
-        (_, __) async {
-          return developer.ServiceExtensionResponse.result(
-            jsonEncode({
-              for (final (pot, time) in StaticPot.allInstances.records)
-                pot.identity(): {
-                  'time': time.microsecondsSinceEpoch,
-                  'potDescription': PotDescription.fromPot(pot).toMap(),
-                },
-            }),
-          );
-        },
-      );
-      developer.registerExtension(
-        'ext.pottery.getPotteries',
-        (_, __) async {
-          return developer.ServiceExtensionResponse.result(
-            jsonEncode({
-              for (final (state, data) in _potteries.records)
-                state.widgetIdentity(): {
-                  'time': data.time.microsecondsSinceEpoch,
-                  'potDescriptions': [
-                    for (final pot in data.pots)
-                      PotDescription.fromPot(pot).toMap(),
-                  ],
-                },
-            }),
-          );
-        },
-      );
-      developer.registerExtension(
-        'ext.pottery.getLocalPotteries',
-        (_, __) async {
-          return developer.ServiceExtensionResponse.result(
-            jsonEncode({
-              for (final (state, data) in _localPotteries.records)
-                state.widgetIdentity(): {
-                  'time': data.time.microsecondsSinceEpoch,
-                  'objects': [
-                    for (final v in data.list)
-                      {
-                        // ignore: invalid_use_of_internal_member
-                        'potIdentity': v.pot.identity(),
-                        'object': '${v.localObject}',
-                      },
-                  ],
-                },
-            }),
-          );
-        },
-      );
+      communicator
+        ..onRequest('ext.pottery.getPots', () {
+          return {
+            for (final (pot, time) in StaticPot.allInstances.records)
+              pot.identity(): {
+                'time': time.microsecondsSinceEpoch,
+                'potDescription': PotDescription.fromPot(pot).toMap(),
+              },
+          };
+        })
+        ..onRequest('ext.pottery.getPotteries', () {
+          return {
+            for (final (state, data) in _potteries.records)
+              state.widgetIdentity(): {
+                'time': data.time.microsecondsSinceEpoch,
+                'potDescriptions': [
+                  for (final pot in data.pots)
+                    PotDescription.fromPot(pot).toMap(),
+                ],
+              },
+          };
+        })
+        ..onRequest('ext.pottery.getLocalPotteries', () {
+          return {
+            for (final (state, data) in _localPotteries.records)
+              state.widgetIdentity(): {
+                'time': data.time.microsecondsSinceEpoch,
+                'objects': [
+                  for (final v in data.list)
+                    {
+                      // ignore: invalid_use_of_internal_member
+                      'potIdentity': v.pot.identity(),
+                      'object': '${v.localObject}',
+                    },
+                ],
+              },
+          };
+        });
     });
   }
 
