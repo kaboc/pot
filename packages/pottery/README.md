@@ -295,12 +295,14 @@ ElevatedButton(
 This package includes the DevTools extension. Run your app in debug mode with
 Flutter 3.16 or newer and open the DevTools.
 
-<img src="https://github.com/kaboc/pot/assets/20254485/db1e69e8-241a-4969-b6be-3081fd34d5df">
+<img src="https://github.com/kaboc/pot/assets/20254485/2a9f6a28-244f-44cc-bc9e-87b958ff4a36">
 
 Note that updates of objects in Pot are not automatically reflected in the
 table until an event of either `Pot`, `Pottery` or `LocalPottery` happens.
 Press the refresh icon button if you want to see the changes quickly, or use
 `notifyObjectUpdate()` on a pot to manually emit an event to cause a refresh.
+
+<img src="https://github.com/kaboc/pot/assets/20254485/3e5aa399-8189-4e80-a9f4-d7e35c083f15">
 
 <!-- Links -->
 
