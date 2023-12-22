@@ -1,3 +1,8 @@
+## 0.4.0
+
+- Add `startExtension()` to allow to start the DevTools extension manually
+  before using `Pottery` or `LocalPottery`.
+
 ## 0.3.0
 
 - Add DevTools extension.

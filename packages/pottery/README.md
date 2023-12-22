@@ -292,8 +292,10 @@ ElevatedButton(
 
 ### DevTools extension
 
-This package includes the DevTools extension. Run your app in debug mode with
-Flutter 3.16 or newer and open the DevTools.
+This package includes the DevTools extension.
+
+To use the extension, run your app in debug mode with Flutter 3.16 or newer
+and open the DevTools.
 
 <img src="https://github.com/kaboc/pot/assets/20254485/2a9f6a28-244f-44cc-bc9e-87b958ff4a36">
 

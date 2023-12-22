@@ -47,7 +47,7 @@ void main() {
   });
 
   group('Initialization', () {
-    test('"pottery:initialize" on initialization', () {
+    test('"pottery:initialize" event is posted on initialization', () {
       expect(communicator.log, hasLength(1));
       expect(communicator.log[0], ('pottery:initialize', '{}'));
     });
