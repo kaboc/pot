@@ -297,6 +297,9 @@ Flutter 3.16 or newer and open the DevTools.
 
 <img src="https://github.com/kaboc/pot/assets/20254485/2a9f6a28-244f-44cc-bc9e-87b958ff4a36">
 
+The extension starts when either [Pottery] or [LocalPottery] is first used.
+It is also possible to start it earlier by calling `Pottery.startExtension()`.
+
 Note that updates of objects in Pot are not automatically reflected in the
 table until an event of either `Pot`, `Pottery` or `LocalPottery` happens.
 Press the refresh icon button if you want to see the changes quickly, or use

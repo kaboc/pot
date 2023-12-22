@@ -19,19 +19,17 @@ typedef _LocalPotteries = Map<State<LocalPottery>,
     ({DateTime time, List<({Pot<Object?> pot, Object? localObject})> list})>;
 
 class PotteryExtensionManager {
-  PotteryExtensionManager._(ExtensionCommunicator communicator) {
-    _initialize(communicator);
+  PotteryExtensionManager._() {
+    _communicator ??= const ExtensionCommunicator();
+    _initialize();
   }
 
-  factory PotteryExtensionManager.createSingle({
-    ExtensionCommunicator? testCommunicator,
-  }) {
-    return _instance ??= PotteryExtensionManager._(
-      testCommunicator ?? const ExtensionCommunicator(),
-    );
+  factory PotteryExtensionManager.createSingle() {
+    return _instance ??= PotteryExtensionManager._();
   }
 
   static PotteryExtensionManager? _instance;
+  static ExtensionCommunicator? _communicator;
 
   bool _initialized = false;
   Future<void> Function()? _listenerRemover;
@@ -49,10 +47,17 @@ class PotteryExtensionManager {
     _listenerRemover = null;
 
     _instance = null;
+    _communicator = null;
     _initialized = false;
 
     _potteries.clear();
     _localPotteries.clear();
+  }
+
+  @visibleForTesting
+  // ignore: use_setters_to_change_properties
+  static void setCommunicator(ExtensionCommunicator communicator) {
+    _communicator = communicator;
   }
 
   void _runIfDebugAndInitialized(void Function() func) {
@@ -63,23 +68,23 @@ class PotteryExtensionManager {
     });
   }
 
-  void _initialize(ExtensionCommunicator communicator) {
+  void _initialize() {
     if (_initialized) {
       return;
     }
     _initialized = true;
 
     _runIfDebugAndInitialized(() {
-      communicator.post('pottery:initialize');
+      _communicator?.post('pottery:initialize');
 
       _listenerRemover = Pot.listen((event) {
         if (!event.kind.isScopeEvent) {
-          communicator.post('pottery:pot_event', event.toMap());
+          _communicator?.post('pottery:pot_event', event.toMap());
         }
       });
 
-      communicator
-        ..onRequest('ext.pottery.getPots', () {
+      _communicator
+        ?..onRequest('ext.pottery.getPots', () {
           return {
             for (final (pot, time) in StaticPot.allInstances.records)
               pot.identity(): {

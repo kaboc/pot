@@ -31,8 +31,8 @@ void main() {
     );
 
     communicator = FakeExtensionCommunicator();
-    extensionManager =
-        PotteryExtensionManager.createSingle(testCommunicator: communicator);
+    PotteryExtensionManager.setCommunicator(communicator);
+    extensionManager = PotteryExtensionManager.createSingle();
   });
   tearDown(() async {
     await eventHandler.dispose();
@@ -91,9 +91,8 @@ void main() {
         expect(eventHandler.potEventsNotifier.value, isNotEmpty);
 
         extensionManager.dispose();
-        extensionManager = PotteryExtensionManager.createSingle(
-          testCommunicator: communicator,
-        );
+        PotteryExtensionManager.setCommunicator(communicator);
+        extensionManager = PotteryExtensionManager.createSingle();
         await Future<void>.delayed(Duration.zero);
 
         expect(eventHandler.potsNotifier.value, isEmpty);

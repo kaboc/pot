@@ -76,6 +76,15 @@ class Pottery extends StatefulWidget {
 
   @override
   State<Pottery> createState() => _PotteryState();
+
+  /// Starts the DevTools extension manually.
+  ///
+  /// The extension starts automatically in debug mode without this
+  /// method, but only when [Pottery] or [LocalPottery] is first used.
+  /// This method allows to start it earlier.
+  static void startExtension() {
+    PotteryExtensionManager.createSingle();
+  }
 }
 
 class _PotteryState extends State<Pottery> {

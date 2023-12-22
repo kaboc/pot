@@ -31,8 +31,8 @@ void main() {
 
   setUp(() {
     communicator = SpyExtensionCommunicator();
-    extensionManager =
-        PotteryExtensionManager.createSingle(testCommunicator: communicator);
+    PotteryExtensionManager.setCommunicator(communicator);
+    extensionManager = PotteryExtensionManager.createSingle();
   });
   tearDown(() {
     extensionManager.dispose();
@@ -53,10 +53,27 @@ void main() {
     });
 
     test('Calling createSingle() many times does not create new manager', () {
-      final extensionManager2 = PotteryExtensionManager.createSingle(
-        testCommunicator: communicator,
-      );
+      final extensionManager2 = PotteryExtensionManager.createSingle();
       expect(extensionManager2, extensionManager);
+      expect(communicator.log, hasLength(1));
+      expect(communicator.log[0], ('pottery:initialize', '{}'));
+    });
+
+    test('startExtension()', () {
+      expect(communicator.log, hasLength(1));
+
+      extensionManager.dispose();
+      communicator.dispose();
+      expect(communicator.log, isEmpty);
+
+      communicator = SpyExtensionCommunicator();
+      PotteryExtensionManager.setCommunicator(communicator);
+      Pottery.startExtension();
+      addTearDown(() {
+        // Gets existing instance and calls dispose() on it.
+        PotteryExtensionManager.createSingle().dispose();
+      });
+
       expect(communicator.log, hasLength(1));
       expect(communicator.log[0], ('pottery:initialize', '{}'));
     });
