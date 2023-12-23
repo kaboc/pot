@@ -83,11 +83,11 @@ class PotteryEventHandler {
           ];
         }
 
-        _scheduleFetching(potEvent);
+        _scheduleFetching();
     }
   }
 
-  void _scheduleFetching(PotEvent event) {
+  void _scheduleFetching() {
     _fetchingDebounceTimer?.cancel();
     _fetchingDebounceTimer = Timer(fetchingDebounceDuration, () async {
       await Future.wait([
