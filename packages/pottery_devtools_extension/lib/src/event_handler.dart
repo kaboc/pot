@@ -70,18 +70,14 @@ class PotteryEventHandler {
         localPotteriesNotifier.value = {};
         potEventsNotifier.value = [];
       case 'pottery:pot_event':
-        final potEvent = PotEvent.fromMap(data);
-
-        if (potEvent.kind != PotEventKind.objectUpdated) {
-          final len = potEventsNotifier.value.length;
-          potEventsNotifier.value = [
-            if (len > 1000)
-              ...potEventsNotifier.value.skip(len - 1000)
-            else
-              ...potEventsNotifier.value,
-            potEvent,
-          ];
-        }
+        final len = potEventsNotifier.value.length;
+        potEventsNotifier.value = [
+          if (len > 1000)
+            ...potEventsNotifier.value.skip(len - 1000)
+          else
+            ...potEventsNotifier.value,
+          PotEvent.fromMap(data),
+        ];
 
         _scheduleFetching();
     }

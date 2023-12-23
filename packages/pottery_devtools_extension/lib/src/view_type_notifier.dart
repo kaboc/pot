@@ -15,7 +15,7 @@ enum ViewType {
   ),
   events(
     'Events',
-    'Pot events',
+    'Events',
     refreshable: false,
   );
 
