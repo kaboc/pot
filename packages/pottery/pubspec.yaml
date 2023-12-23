@@ -1,6 +1,6 @@
 name: pottery
 description: Utility for using Pot in Flutter to limit the lifespan of particular Pots according to the widget lifecycle.
-version: 0.4.0
+version: 0.4.1
 repository: https://github.com/kaboc/pot
 
 topics:

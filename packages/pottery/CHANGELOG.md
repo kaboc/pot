@@ -1,3 +1,7 @@
+## 0.4.1
+
+- Improve DevTools extension to show `objectUpdate` events in events view.
+
 ## 0.4.0
 
 - Add `startExtension()` to allow to start the DevTools extension manually
