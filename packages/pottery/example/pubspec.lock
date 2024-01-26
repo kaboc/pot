@@ -71,10 +71,10 @@ packages:
     dependency: "direct main"
     description:
       name: grab
-      sha256: "5cec4da7ac70e218c2a4884b24abf1f21d4e3f5fba1288d4e5d659e85d96671e"
+      sha256: "0dce3258548cfa800f2442e06b54b04198a2f3bdfbb2aed7bc34fbec2bff182f"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.2"
+    version: "1.0.0-dev.1"
   js:
     dependency: transitive
     description:

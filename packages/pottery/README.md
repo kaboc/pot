@@ -4,59 +4,53 @@
 
 ## Overview
 
-A package that provides two widgets, `Pottery` and `LocalPottery`.
+This package provides two widgets, [Pottery] and [LocalPottery], which manage
+the lifetime of [Pot]s (single-type DI containers) according to the lifecycle
+of widgets in Flutter.
 
-They limit the scope where particular [Pot]s are available in the widget tree.
-Using them make it clearer from which point onwards pots are used.
 
 ### Why is this better than the scoping feature of Pot?
 
-[Pot] is not a package specific to Flutter but it is for Dart in general, therefore
-its scoping feature is not designed for Flutter either.
+[Pot] itself from package:pot has the feature of scoping, but it is a package
+for Dart, not specific to Flutter.
 
-Pottery makes use of the widget lifecycle to limit the scope of pots. It is more
-natural in Flutter and less error-prone.
+Pottery is a utility that makes up for it. It makes use of the widget lifecycle
+to limit the scope of Pots. It is more natural in Flutter and less error-prone.
 
-### How is this beneficial?
+### How will this make things better?
 
-It is convenient that you can access a pot stored in a global variable from anywhere,
-but it gives you too much freedom, making it difficult to keep the architecture of
-your app well-organised.
+While it is convenient that you can access a [Pot] stored in a global variable
+from anywhere, it gives you too much freedom, making you wonder how Pots should
+be managed in a Flutter app. For example, you may easily lose track of from
+where in your app code a particular Pot is used.
 
-By using Pottery, it becomes possible to manage pots in a similar manner to using
-package:provider. See the example described later in this document.
-
-## Getting started
-
-This package contains the [pot] package and exposes it. It is enough to only add
-pottery without pot to pubspec.yaml.
-
-```yaml
-dependencies:
-  pottery: ^x.x.x
-```
+Pottery makes it possible to manage Pots in a similar manner to using package:provider.
+See the example described later in this document.
 
 ## Examples
 
 - [Counters](https://github.com/kaboc/pot/blob/main/packages/pottery/example) - simple
 - [pub.dev explorer](https://github.com/kaboc/pubdev-explorer) - advanced
 
+## Getting started
+
+```yaml
+dependencies:
+  pottery: ^x.x.x
+```
+
 ## Usage
-
-This package comes with two widgets:
-
-- [Pottery]
-- [LocalPottery]
 
 ### Pottery
 
-Create a pot as pending if it is not necessary yet at the start of an app.
+Create a [Pot] as "pending" first if it is not necessary yet at the start of
+your app. The Pot should usually be assigned to a global variable.
 
 ```dart
 final counterNotifierPot = Pot.pending<CounterNotifier>();
 ```
 
-Use [Pottery] and specify a factory right before you need to use the pot.
+Use [Pottery] and specify a factory right before you need to start using the Pot.
 
 ```dart
 Widget build(BuildContext context) {
@@ -91,24 +85,30 @@ It is easier to understand how to use Pottery by imagining it as something simil
 - MultiProvider
     - Creates objects and provides them so that they are available down the tree.
 - Pottery
-    - Replaces factories to make pots ready so that they are available after that point.
+    - Replaces factories to make Pots ready so that they are available after that point.
       The widget tree is only used to manage the lifespan of factories and objects in
       Pots, so Pots are still available outside the tree. 
       
 
 Removing Pottery from the tree (e.g. navigating back from the page where Pottery is used)
-resets all pots in the `pots` map and replaces their factories to throw an
+resets all Pots in the `pots` map and replaces their factories to throw an
 [PotNotReadyException].
+
+**Note:**
+
+If a target Pot is not pending and an object already exists in it when Pottery
+is created, Pottery replaces the object as well as the factory immediately. 
 
 ### LocalPottery
 
-This widget defines new factories for existing pots to create objects that are available
-only in the subtree.
+This widget defines new factories for existing Pots to create objects that are
+available only in the subtree.
 
-An important fact is that the factories of the existing pots are not replaced, but
-new factories are associated with those pots. Therefore, calling the [call()] method
-of a pot still returns the object held in the global pot. Use [of()] instead to obtain
-the local object. The example below illustrates the behaviour.
+An important fact is that the factories of the existing Pots are not replaced,
+but new separate factories are associated with those Pots for local use only.
+Therefore, calling a Pot still returns the object held globally in the Pot.
+Use [of()] instead to obtain the local object. The example below illustrates
+the behaviour.
 
 ```dart
 final fooPot = Pot(() => Foo(111));
@@ -151,10 +151,10 @@ Note that there are several important differences between `LocalPottery` and [Po
   in Pots are accessed for the first time.
 - As already mentioned, objects created with `LocalPottery` are only accessible with
   [of()].
-- Objects created with `LocalPottery` are not automatically discarded when the
-  `LocalPottery` is removed from the tree. Use the `disposer` argument to specify a
-  callback function to clean them up. Below is an example where the disposer function
-  disposes of all ChangeNotifier subtypes.
+- Objects created with `LocalPottery` are not automatically disposed when the
+  `LocalPottery` is removed from the tree. Use `disposer` to specify a callback
+  function to clean them up. Below is an example where the disposer function
+  disposes all ChangeNotifier subtypes.
 
 ```dart
 LocalPottery(
@@ -173,129 +173,28 @@ LocalPottery(
 
 ### Make sure to specify a factory that returns a correct type.
 
-The `pots` argument is not type-safe as it uses a generic Map.
+Key-value pairs passed to `pots` are not type-safe.
+
+In the following example, a function returning an `int` value is specified as
+a new factory of a Pot for `String`. Although it is obviously wrong, the static
+analysis does not tell you about the mistake. The error only occurs at runtime.
 
 ```dart
-final counterNotifierPot = Pot.pending<CounterNotifier>();
+final stringPot = Pot.pending<String>();
 ```
 
 ```dart
 pots: {
-  counterNotifierPot: TodoNotifier.new,
+  stringPot: () => 123,
 }
 ```
 
-In this example, the factory of counterNotifierPot must be a function that returns
-CounterNotifier. However, the static analysis does not tell you it is wrong to specify
-a factory that creates TodoNotifier. The error only occurs at runtime.
-
-## Usage with Grab
-
-The author created Pot and Pottery mainly for using them in combination with [Grab].
-You can use Pottery + Grab as an alternative to package:provider.
-
-There is however an important thing to remember. The extension methods of Grab require
-the `BuildContext` of the widget that has the Grab mixin, not the one passed to the
-`builder` function of [Pottery].
-
-```dart
-class MyWidget extends StatelessWidget with Grab {
-  const MyWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return Pottery(
-      pots: { ... },
-      builder: (context) {
-        // The BuildContext passed to this callback
-        // cannot be used for methods of Grab.
-        final count = counterNotifierPot().grab(context); // Bad
-      },
-    )
-  }
-}
-```
-
-It is actually possible to get around it by using the outer BuildContext instead.
-
-```dart
-Widget build(BuildContext context) {
-  return Pottery(
-    pots: { ... },
-    builder: (innerContext) {
-      // Grab works if you use the `context` passed to
-      // the build method instead of `innerContext`.
-      final count = counterNotifierPot().grab(context);
-    },
-  );
-)
-```
-
-However, using grab methods this way is discouraged as it is confusing and can
-easily lead to a bug. If you are using [grab_lints], it will warn you about it.
-
-Make sure to use `Pottery` a little earlier to get pots ready before they are used
-in a build method. Here are two options for it.
-
-### Option 1
-
-Using `Pottery` in the builder function of PageRoute before navigation.
-
-```dart
-ElevatedButton(
-  onPressed: () => Navigator.of(context).push(
-    MaterialPageRoute<void>(
-      builder: (_) => Pottery(
-        pots: { ... },
-        builder: (_) => const CounterPage(),
-      ),
-    ),
-  ),
-  child: const Text('To CounterPage'),
-)
-```
-
-### Option 2
-
-Using `Pottery` in the builder function of PageRoute in a route method.
-
-This is essentially the same as Option 1, but more recommended because Pottery
-is used in the class of the actual page where pots are used. It makes more sense
-and helps you easily grasp the scope of pots when you get back to the code after
-a long while.
-
-```dart
-class CounterPage extends StatelessWidget {
-  const CounterPage._();
-
-  static Route<void> route() {
-    return MaterialPageRoute(
-      builder: (_) => Pottery(
-        pots: { ... },
-        builder: (_) => const CounterPage._(),
-      ),
-    );
-  }
-
-  Widget build(BuildContext context) {
-    final count = counterNotifierPot().grab(context);
-  }
-}
-```
-
-```dart
-ElevatedButton(
-  onPressed: () => Navigator.of(context).push(CounterPage.route()),
-  child: const Text('To CounterPage'),
-)
-```
-
-### DevTools extension
+## DevTools extension
 
 This package includes the DevTools extension.
 
-To use the extension, run your app in debug mode with Flutter 3.16 or newer
-and open the DevTools.
+To use it, run your app in debug mode with Flutter 3.16 or newer and open the
+DevTools.
 
 <img src="https://github.com/kaboc/pot/assets/20254485/2a9f6a28-244f-44cc-bc9e-87b958ff4a36">
 
@@ -303,9 +202,9 @@ The extension starts when either [Pottery] or [LocalPottery] is first used.
 It is also possible to start it earlier by calling `Pottery.startExtension()`.
 
 Note that updates of objects in Pot are not automatically reflected in the
-table until an event of either `Pot`, `Pottery` or `LocalPottery` happens.
+table view until an event of either `Pot`, `Pottery` or `LocalPottery` happens.
 Press the refresh icon button if you want to see the changes quickly, or use
-`notifyObjectUpdate()` on a pot to manually emit an event to cause a refresh.
+`notifyObjectUpdate()` on a Pot to manually emit an event to cause a refresh.
 
 <img src="https://github.com/kaboc/pot/assets/20254485/3e5aa399-8189-4e80-a9f4-d7e35c083f15">
 
@@ -314,9 +213,6 @@ Press the refresh icon button if you want to see the changes quickly, or use
 [Pottery]: https://pub.dev/documentation/pottery/latest/pottery/Pottery-class.html
 [LocalPottery]: https://pub.dev/documentation/pottery/latest/pottery/LocalPottery-class.html
 [of()]: https://pub.dev/documentation/pottery/latest/pottery/NearestPotOf/of.html
-[call()]: https://pub.dev/documentation/pot/latest/pot/Pot/call.html
 [Pot]: https://pub.dev/packages/pot
-[Grab]: https://pub.dev/packages/grab
-[grab_lints]: https://pub.dev/packages/grab_lints
 [PotNotReadyException]: https://pub.dev/documentation/pot/latest/pot/PotNotReadyException-class.html
 [main2.dart]: https://github.com/kaboc/pot/blob/main/packages/pottery/example/lib/main2.dart

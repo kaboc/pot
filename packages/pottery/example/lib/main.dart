@@ -10,7 +10,9 @@ final counterNotifierPot = Pot.pending<CounterNotifier>(
 );
 
 void main() {
-  runApp(const App());
+  runApp(
+    const Grab(child: App()),
+  );
 }
 
 class App extends StatelessWidget {
@@ -34,7 +36,9 @@ class HomePage extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
           onPressed: () => Navigator.of(context).push(
-            CounterPage.route(),
+            MaterialPageRoute<void>(
+              builder: (_) => const CounterPage(),
+            ),
           ),
           child: const Text('To counter page'),
         ),
@@ -43,40 +47,39 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class CounterPage extends StatelessWidget with Grab {
-  const CounterPage._();
-
-  static Route<void> route() {
-    return MaterialPageRoute(
-      builder: (_) => Pottery(
-        pots: {
-          counterNotifierPot: () => CounterNotifier(showMessage: true),
-        },
-        builder: (_) => const CounterPage._(),
-      ),
-    );
-  }
+class CounterPage extends StatelessWidget {
+  const CounterPage();
 
   @override
   Widget build(BuildContext context) {
-    final notifier = counterNotifierPot();
-    final count = notifier.grab(context);
+    return Pottery(
+      pots: {
+        // counterNotifierPot should be prepared here because it is not used
+        // before this page,
+        // The notifier is disposed automatically when this page is disposed.
+        counterNotifierPot: () => CounterNotifier(showMessage: true),
+      },
+      builder: (context) {
+        final notifier = counterNotifierPot();
+        final count = counterNotifierPot().grab(context);
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Counter')),
-      body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '$count',
-              style: const TextStyle(fontSize: 32.0),
+        return Scaffold(
+          appBar: AppBar(title: const Text('Counter')),
+          body: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '$count',
+                  style: const TextStyle(fontSize: 32.0),
+                ),
+                const SizedBox(width: 16.0),
+                IncrementButton(onPressed: notifier.increment),
+              ],
             ),
-            const SizedBox(width: 16.0),
-            IncrementButton(onPressed: notifier.increment),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
