@@ -12,7 +12,7 @@ import 'package:pottery_devtools_extension/src/views/local_pottery_view.dart';
 import 'package:pottery_devtools_extension/src/views/pots_view.dart';
 import 'package:pottery_devtools_extension/src/views/pottery_view.dart';
 
-class PotteryExtensionPage extends StatefulWidget with Grabful {
+class PotteryExtensionPage extends StatefulWidget {
   const PotteryExtensionPage();
 
   @override

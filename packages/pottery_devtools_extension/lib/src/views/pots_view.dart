@@ -10,7 +10,7 @@ import 'package:pottery_devtools_extension/src/types.dart';
 import 'package:pottery_devtools_extension/src/utils.dart';
 import 'package:pottery_devtools_extension/src/widgets/_widgets.dart';
 
-class PotsView extends StatefulWidget with Grabful {
+class PotsView extends StatefulWidget {
   const PotsView(this.eventHandler);
 
   final PotteryEventHandler eventHandler;
@@ -72,7 +72,7 @@ class _PotsViewState extends State<PotsView> {
   }
 }
 
-class _Table extends StatefulWidget with Grabful {
+class _Table extends StatefulWidget {
   const _Table({
     required this.eventHandler,
     required this.horizontalController,
@@ -255,7 +255,7 @@ class _TableState extends State<_Table> {
   }
 }
 
-class _Details extends StatelessWidget with Grab {
+class _Details extends StatelessWidget {
   const _Details({
     required this.selectionNotifier,
     required this.potsNotifier,

@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 0.0.1
 
 environment:
-  sdk: '>=3.2.0 <4.0.0'
+  sdk: '>=3.3.0-91.0.dev <4.0.0'
 
 dependencies:
   flutter:
@@ -15,11 +15,11 @@ dependencies:
   vm_service: ^13.0.0
 
   collection: ^1.18.0
-  custom_text: ^1.3.0
-  grab: ^0.4.2
+  custom_text: ^1.4.4
+  grab: ^1.0.0-dev.1
   highlight: ^0.7.0
   pot: 0.7.1
-  two_dimensional_scrollables: ^0.0.5
+  two_dimensional_scrollables: ^0.0.6
 
   pottery:
     path: ../pottery
@@ -29,9 +29,6 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^3.0.1
-
-  custom_lint:
-  grab_lints: ^0.4.0
 
 flutter:
   uses-material-design: true

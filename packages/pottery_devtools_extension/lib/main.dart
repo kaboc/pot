@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
 import 'package:devtools_extensions/devtools_extensions.dart';
+import 'package:grab/grab.dart';
 
 import 'package:pottery_devtools_extension/src/extension_page.dart';
 import 'package:pottery_devtools_extension/src/utils.dart';
 
 void main() {
-  runApp(const FooDevToolsExtension());
+  runApp(
+    const Grab(child: FooDevToolsExtension()),
+  );
 }
 
 class FooDevToolsExtension extends StatelessWidget {

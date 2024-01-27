@@ -12,7 +12,7 @@ import 'package:pottery_devtools_extension/src/widgets/_widgets.dart';
 
 typedef _Selection = ({String id, LocalObject? object});
 
-class LocalPotteryView extends StatefulWidget with Grabful {
+class LocalPotteryView extends StatefulWidget {
   const LocalPotteryView(this.eventHandler);
 
   final PotteryEventHandler eventHandler;
@@ -74,7 +74,7 @@ class _LocalPotteryViewState extends State<LocalPotteryView> {
   }
 }
 
-class _Table extends StatefulWidget with Grabful {
+class _Table extends StatefulWidget {
   const _Table({
     required this.eventHandler,
     required this.horizontalController,
@@ -248,7 +248,7 @@ class _TableState extends State<_Table> {
   }
 }
 
-class _Details extends StatelessWidget with Grab {
+class _Details extends StatelessWidget {
   const _Details({
     required this.selectionNotifier,
     required this.localPotteriesNotifier,
