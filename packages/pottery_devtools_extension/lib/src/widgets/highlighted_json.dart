@@ -88,14 +88,14 @@ Future<List<TextElement>> _buildValueElements(
   String? className,
 ) async {
   final parser = TextParser(matchers: const [UrlMatcher()]);
-  var elements = await parser.parse(text, useIsolate: false);
+  Iterable<TextElement> elements = await parser.parse(text, useIsolate: false);
 
   final matcherType = _mappings[className] ?? TextMatcher;
   if (!elements.containsMatcherType<UrlMatcher>()) {
     return [TextElement(text, matcherType: matcherType, offset: offset)];
   }
 
-  elements = elements.reassignOffsets(startingOffset: offset).toList();
+  elements = elements.reassignOffsets(startingOffset: offset);
   return [
     for (final elm in elements)
       if (elm.matcherType == UrlMatcher)
