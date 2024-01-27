@@ -1,3 +1,8 @@
+## 0.4.2
+
+- Update and improve documentation and examples.
+- Update DevTools extension.
+
 ## 0.4.1
 
 - Improve DevTools extension to show `objectUpdate` events in events view.
