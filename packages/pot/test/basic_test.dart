@@ -445,6 +445,12 @@ void main() {
       expect(pot1.dispose, isNot(throwsA(anything)));
     });
 
+    test('Calling dispose() again after dispose() does not throw', () {
+      final pot1 = Pot(() => Foo(1));
+      pot1.dispose();
+      expect(pot1.dispose, isNot(throwsA(anything)));
+    });
+
     test('Thrown if call() is called after pot is disposed', () {
       final pot1 = Pot(() => Foo(1));
       pot1.dispose();

@@ -184,13 +184,15 @@ class _PotBody<T> {
   /// Once this is called, the pot is no longer in a usable state, and
   /// calls to its members will throw.
   void dispose() {
-    reset();
-    _isDisposed = true;
-    _scope = null;
-    _disposer = null;
-    StaticPot.scopes.removePot(_pot);
-    StaticPot.allInstances.remove(_pot);
-    StaticPot.eventHandler.addEvent(PotEventKind.disposed, pots: [_pot]);
+    if (!_isDisposed) {
+      reset();
+      _isDisposed = true;
+      _scope = null;
+      _disposer = null;
+      StaticPot.scopes.removePot(_pot);
+      StaticPot.allInstances.remove(_pot);
+      StaticPot.eventHandler.addEvent(PotEventKind.disposed, pots: [_pot]);
+    }
   }
 
   /// Discards the object of type [T] that was created by the factory
