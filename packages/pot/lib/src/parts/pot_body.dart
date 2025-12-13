@@ -299,6 +299,10 @@ class _PotBody<T> {
   /// e.g. Refreshing the value shown in the Pottery DevTools extension
   /// page by a notification.
   void notifyObjectUpdate() {
+    if (_isDisposed) {
+      throwStateError();
+    }
+
     StaticPot.eventHandler.addEvent(PotEventKind.objectUpdated, pots: [_pot]);
   }
 }
