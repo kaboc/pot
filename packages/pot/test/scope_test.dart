@@ -14,7 +14,6 @@ void main() {
     StaticPot.warningPrinter = (w) => warning = w;
   });
   tearDown(() {
-    Pot.forTesting = false;
     Pot.resetAll(keepScopes: false);
     StaticPot.allInstances.clear();
     resetFoo();
@@ -480,8 +479,6 @@ void main() {
   });
 
   group('Scope - replaceForTesting()', () {
-    setUp(() => Pot.forTesting = true);
-
     test(
       'replaceForTesting() in new scope replaces object in original scope',
       () {

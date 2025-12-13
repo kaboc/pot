@@ -255,40 +255,26 @@ class _PotBody<T> {
   /// Replaces the factory set in the constructor with a new one, and/or
   /// creates a new object using the new factory, for testing purposes.
   ///
-  /// [ReplaceablePot.replace] is another method for replacements, and
-  /// in fact, it works exactly the same way, but it is not available
-  /// to pots created by the default constructor of [Pot].
-  /// It is because it should be safer to not have access to a feature
-  /// that is not needed usually.
+  /// This method is useful when you want to replace the factory of a
+  /// non-replaceable pot in a test.
   ///
-  /// However, it may be necessary in tests, which are where
-  /// [replaceForTesting] comes in handy. Set [Pot.forTesting] to
-  /// `true` to use the method, but only when it is really necessary.
-  ///
-  /// {@template pot.replaceForTesting.example}
   /// ```dart
   /// final counterPot = Pot(() => Counter(0));
   ///
   /// void main() {
-  ///   Pot.forTesting = true;
-  ///
   ///   test('Counter test', () {
   ///     counterPot.replaceForTesting(() => Counter(100));
   ///   });
   /// }
   /// ```
-  /// {@endtemplate}
   ///
-  /// Note that pots created by [Pot.replaceable] can use this method
-  /// regardless of whether or not [Pot.forTesting] is enabled.
+  /// Note that you will get a warning from static analysis if you use it
+  /// outside of a test.
   ///
-  /// For details on how this method is used and what occurs in the
-  /// process of a replacement, see the document of [ReplaceablePot.replace].
+  /// For details on how to use this method, see the document of
+  /// [ReplaceablePot.replace], which is essentially the same as this method.
+  @visibleForTesting
   void replaceForTesting(PotObjectFactory<T> factory) {
-    if (!Pot.forTesting && this is! ReplaceablePot) {
-      throw PotReplaceError();
-    }
-
     _replace(factory);
   }
 
@@ -329,9 +315,6 @@ class _PotBody<T> {
 /// replaceablePot2.replace(() => SubtypeOfCounter());
 /// ```
 /// {@endtemplate}
-///
-/// [replaceForTesting] is available on this type of Pot regardless
-/// of the flag status of [Pot.forTesting].
 @sealed
 class ReplaceablePot<T> extends Pot<T> {
   ReplaceablePot._(super.factory, {super.disposer, bool isPending = false})
@@ -400,10 +383,11 @@ class ReplaceablePot<T> extends Pot<T> {
   /// }
   /// ```
   ///
-  /// If replacements are only necessary for testing, it is safer to make
-  /// [ReplaceablePot.replace] unavailable by using a non-replaceable pot.
-  /// You can use [replaceForTesting] on a non-replaceable pot instead if
-  /// [Pot.forTesting] is set to `true`.
+  /// If you need to replace the factory only in tests, you may want to
+  /// use a non-replaceable pot and to use [replaceForTesting] instead of
+  /// [replace]. This helps prevent accidentally calling [replace] outside
+  /// of tests in test-only scenarios. The [replaceForTesting] method is
+  /// available even on a non-replaceable pot.
   void replace(PotObjectFactory<T> factory) => _replace(factory);
 
   /// Calls [reset] and also removes the existing factory to switch

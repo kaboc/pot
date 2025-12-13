@@ -1,4 +1,4 @@
-import 'package:meta/meta.dart' show immutable, sealed;
+import 'package:meta/meta.dart' show immutable, sealed, visibleForTesting;
 
 import 'errors.dart';
 import 'event.dart';
@@ -73,15 +73,13 @@ typedef PotListenerRemover = Future<void> Function();
 /// }
 /// ```
 ///
-/// or with [replaceForTesting] if the pot is not the one created by
-/// [Pot.replaceable]:
+/// or with [replaceForTesting] (only in a test) if the pot is not of
+/// type [ReplaceablePot] created by [Pot.replaceable] or [Pot.pending]:
 ///
 /// ```dart
 /// final counterPot = Pot(() => Counter());
 ///
 /// void main() {
-///   Pot.forTesting = true;
-///
 ///   test('Some test', () {
 ///     counterPot.replaceForTesting(() => MockCounter());
 ///   });
@@ -118,17 +116,6 @@ class Pot<T> extends _PotBody<T> {
   ///
   /// {@macro pot.class}
   Pot(super.factory, {super.disposer});
-
-  /// The flag that shows whether [replaceForTesting] is enabled.
-  ///
-  /// Defaults to `false`, which means disabled.
-  /// If this is set to `true`, [replaceForTesting] becomes available
-  /// also on non-replaceable pots.
-  ///
-  /// {@macro pot.replaceForTesting.example}
-  ///
-  /// See [replaceForTesting] for more details.
-  static bool forTesting = false;
 
   /// The index number of the current scope.
   ///

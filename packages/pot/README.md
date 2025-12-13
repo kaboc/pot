@@ -170,9 +170,14 @@ to switch the state of the pot to pending.
 
 ### Replacements for testing
 
-If replacements are only necessary in tests, avoid using [Pot.replaceable][replaceable]
-for safety. Instead, enable the use of [replaceForTesting()][replaceForTesting] by setting
-[Pot.forTesting][forTesting] to `true`.
+If you need to replace the factory function only in tests, you may want to
+use a non-replaceable pot and to use [replaceForTesting()][replaceForTesting]
+instead of [replace()][replace]. This helps prevent accidentally calling
+`replace` outside of tests in test-only scenarios.
+
+The `replaceForTesting` method is available even on a non-replaceable pot.
+Using it outside of a test will be flagged by static analysis.
+
 
 ```dart
 final counterPot = Pot(() => Counter(0));
@@ -180,8 +185,6 @@ final counterPot = Pot(() => Counter(0));
 
 ```dart
 void main() {
-  Pot.forTesting = true;
-
   test('Some test', () {
     counterPot.replaceForTesting(() => Counter(100));
     ...
@@ -360,6 +363,5 @@ discarded manually with [reset()][reset] or other methods that have the same eff
 [pending]: https://pub.dev/documentation/pot/latest/pot/Pot/pending.html
 [resetAsPending]: https://pub.dev/documentation/pot/latest/pot/ReplaceablePot/resetAsPending.html
 [PotNotReadyException]: https://pub.dev/documentation/pot/latest/pot/PotNotReadyException-class.html
-[forTesting]: https://pub.dev/documentation/pot/latest/pot/Pot/forTesting.html
 [replaceForTesting]: https://pub.dev/documentation/pot/latest/pot/Pot/replaceForTesting.html
 [PotEventKind]: https://pub.dev/documentation/pot/latest/pot/PotEventKind.html

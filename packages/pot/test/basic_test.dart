@@ -10,7 +10,6 @@ import 'utils.dart';
 
 void main() {
   tearDown(() {
-    Pot.forTesting = false;
     Pot.resetAll(keepScopes: false);
     StaticPot.allInstances.clear();
     resetFoo();
@@ -287,48 +286,18 @@ void main() {
     });
   });
 
-  group('forTesting / replaceForTesting()', () {
-    test('replaceForTesting() throws if forTesting is false', () {
+  group('replaceForTesting()', () {
+    test('replaceForTesting() works on non-replaceable pot', () {
       final pot = Pot(() => Foo(1));
-      expect(
-        () => pot.replaceForTesting(() => Foo(2)),
-        throwsA(isA<PotReplaceError>()),
-      );
+      expect(pot().value, 1);
+
+      pot.replaceForTesting(() => Foo(2));
+      expect(pot().value, 2);
     });
-
-    test(
-      'replaceForTesting() works on replaceable pot regardless of forTesting',
-      () {
-        expect(Pot.forTesting, isFalse);
-
-        final pot = Pot.replaceable(() => Foo(1));
-        var foo = pot();
-        expect(foo.value, 1);
-
-        pot.replaceForTesting(() => Foo(2));
-        foo = pot();
-        expect(foo.value, 2);
-      },
-    );
-
-    test(
-      'replaceForTesting() works on non-replaceable pot if forTesting is true',
-      () {
-        Pot.forTesting = true;
-        final pot = Pot(() => Foo(1));
-        var foo = pot();
-        expect(foo.value, 1);
-
-        pot.replaceForTesting(() => Foo(2));
-        foo = pot();
-        expect(foo.value, 2);
-      },
-    );
 
     test(
       'replaceForTesting() replaces factory regardless of existence of object',
       () {
-        Pot.forTesting = true;
         final pot = Pot(() => Foo(1));
         expect(pot.hasObject, isFalse);
 
@@ -339,7 +308,6 @@ void main() {
     );
 
     test('replaceForTesting() triggers disposer and creates new object', () {
-      Pot.forTesting = true;
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
       pot.create();
       expect(pot.objectString(), 'Foo(1)');
@@ -353,7 +321,6 @@ void main() {
     test('Disposer triggered by replaceForTesting() is given old object', () {
       var value = 0;
 
-      Pot.forTesting = true;
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => value = f.value);
       pot.create();
 
@@ -364,7 +331,6 @@ void main() {
     test(
       'replaceForTesting() does not trigger disposer if object does not exist',
       () {
-        Pot.forTesting = true;
         final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
         expect(pot.hasObject, isFalse);
 
@@ -376,7 +342,6 @@ void main() {
     test(
       'replaceForTesting() does not call new factory if object does not exist',
       () {
-        Pot.forTesting = true;
         final pot = Pot(() => Foo(1));
 
         pot.replaceForTesting(() => Foo(2));
@@ -472,15 +437,15 @@ void main() {
     test('Thrown if replace() is called after pot is disposed', () {
       final pot1 = Pot.replaceable(() => Foo(1));
       pot1.dispose();
-      expect(() => pot1.replace(() => Foo(2)), throwsA(isA<StateError>()));
-    });
-
-    test('Thrown if replace() is called after pot is disposed', () {
-      Pot.forTesting = true;
-      final pot1 = Pot(() => Foo(1));
-      pot1.dispose();
       expect(
-        () => pot1.replaceForTesting(() => Foo(2)),
+        () => pot1.replace(() => Foo(2)),
+        throwsA(isA<StateError>()),
+      );
+
+      final pot2 = Pot(() => Foo(1));
+      pot2.dispose();
+      expect(
+        () => pot2.replaceForTesting(() => Foo(2)),
         throwsA(isA<StateError>()),
       );
     });
