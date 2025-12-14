@@ -469,9 +469,9 @@ void main() {
           pot.create();
         }
 
-        expect(StaticPot.scopes[0], isEmpty);
+        expect(ScopeState.scopes[0], isEmpty);
         declarePotLocally();
-        expect(StaticPot.scopes[0], hasLength(1));
+        expect(ScopeState.scopes[0], hasLength(1));
       },
     );
   });

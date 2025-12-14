@@ -11,7 +11,7 @@ void main() {
   Object? warning;
 
   setUpAll(() {
-    StaticPot.warningPrinter = (w) => warning = w;
+    PotManager.warningPrinter = (w) => warning = w;
   });
   tearDown(() {
     Pot.resetAll(keepScopes: false);
@@ -28,28 +28,28 @@ void main() {
     });
 
     test('Dimension for new scope is added before object is accessed', () {
-      expect(StaticPot.scopes, hasLength(1));
+      expect(ScopeState.scopes, hasLength(1));
 
       Pot.pushScope();
-      expect(StaticPot.scopes, hasLength(2));
+      expect(ScopeState.scopes, hasLength(2));
     });
 
     test('Pot is not bound to scope before object is accessed', () {
       Pot.pushScope();
       Pot(() => Foo(1));
       expect(Pot.currentScope, 1);
-      expect(StaticPot.scopes, <List<Pot<Object?>>>[[], []]);
+      expect(ScopeState.scopes, <List<Pot<Object?>>>[[], []]);
     });
 
     test('Pot is bound to scope where object in the pot is first accessed', () {
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
       expect(Pot.currentScope, 0);
-      expect(StaticPot.scopes, [<Pot<Object?>>[]]);
+      expect(ScopeState.scopes, [<Pot<Object?>>[]]);
 
       Pot.pushScope();
       pot.create();
       expect(Pot.currentScope, 1);
-      expect(StaticPot.scopes, [
+      expect(ScopeState.scopes, [
         <Pot<Object?>>[],
         [pot],
       ]);
@@ -93,17 +93,17 @@ void main() {
       final pot2 = Pot<Foo>(() => Foo(2), disposer: (f) => f.dispose());
       pot1.create();
       pot2.create();
-      expect(StaticPot.scopes, [
+      expect(ScopeState.scopes, [
         [pot1, pot2],
       ]);
 
       pot2.reset();
-      expect(StaticPot.scopes, [
+      expect(ScopeState.scopes, [
         [pot1],
       ]);
 
       pot1.reset();
-      expect(StaticPot.scopes, <List<Pot<Object?>>>[[]]);
+      expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
     });
 
     test(
@@ -113,18 +113,18 @@ void main() {
         final pot2 = Pot<Foo>(() => Foo(2), disposer: (f) => f.dispose());
         pot1.create();
         pot2.create();
-        expect(StaticPot.scopes, [
+        expect(ScopeState.scopes, [
           [pot1, pot2],
         ]);
 
         Pot.pushScope();
-        expect(StaticPot.scopes, [
+        expect(ScopeState.scopes, [
           [pot1, pot2],
           <Pot<Object?>>[],
         ]);
 
         pot1.reset();
-        expect(StaticPot.scopes, [
+        expect(ScopeState.scopes, [
           [pot2],
           <Pot<Object?>>[],
         ]);
@@ -162,7 +162,7 @@ void main() {
 
         expect(pot3.objectString(), 'Foo(3)');
         expect(pot4.objectString(), 'Foo(4)');
-        expect(StaticPot.scopes, [
+        expect(ScopeState.scopes, [
           [pot1, pot2],
           [pot3, pot4],
         ]);
@@ -171,7 +171,7 @@ void main() {
         Pot.resetAllInScope();
         expect(pot3.hasObject, isFalse);
         expect(pot4.hasObject, isFalse);
-        expect(StaticPot.scopes, [
+        expect(ScopeState.scopes, [
           [pot1, pot2],
           <Pot<Object?>>[],
         ]);
@@ -181,7 +181,7 @@ void main() {
 
     test('resetAllInScope() does not affect number of scopes', () {
       expect(Pot.currentScope, 0);
-      expect(StaticPot.scopes, <List<Pot<Object?>>>[[]]);
+      expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
 
       final pot1 = Pot(() => Foo(1));
       final pot2 = Pot(() => Foo(2));
@@ -195,14 +195,14 @@ void main() {
       pot4.create();
 
       expect(Pot.currentScope, 1);
-      expect(StaticPot.scopes, [
+      expect(ScopeState.scopes, [
         [pot1, pot2],
         [pot3, pot4],
       ]);
 
       Pot.resetAllInScope();
       expect(Pot.currentScope, 1);
-      expect(StaticPot.scopes, [
+      expect(ScopeState.scopes, [
         [pot1, pot2],
         <Pot<Object?>>[],
       ]);
@@ -213,19 +213,19 @@ void main() {
       'remove the scope',
       () {
         expect(Pot.currentScope, 0);
-        expect(StaticPot.scopes, <List<Pot<Object?>>>[[]]);
+        expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
 
         final pot1 = Pot(() => Foo(1));
         final pot2 = Pot(() => Foo(2));
         pot1.create();
         pot2.create();
 
-        expect(StaticPot.scopes, [
+        expect(ScopeState.scopes, [
           [pot1, pot2],
         ]);
 
         Pot.resetAllInScope();
-        expect(StaticPot.scopes, <List<Pot<Object?>>>[[]]);
+        expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
       },
     );
 
@@ -257,7 +257,7 @@ void main() {
 
       expect(pot3.objectString(), 'Foo(3)');
       expect(pot4.objectString(), 'Foo(4)');
-      expect(StaticPot.scopes, [
+      expect(ScopeState.scopes, [
         [pot1, pot2],
         [pot3, pot4],
       ]);
@@ -266,13 +266,13 @@ void main() {
       Pot.resetAll();
       expect(pot3.hasObject, isFalse);
       expect(pot4.hasObject, isFalse);
-      expect(StaticPot.scopes, <List<Pot<Object?>>>[[], []]);
+      expect(ScopeState.scopes, <List<Pot<Object?>>>[[], []]);
       expect(values, [4, 3, 2, 1]);
     });
 
     test('resetAll() does not affect number of scopes', () {
       expect(Pot.currentScope, 0);
-      expect(StaticPot.scopes, <List<Pot<Object?>>>[[]]);
+      expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
 
       final pot1 = Pot(() => Foo(1));
       final pot2 = Pot(() => Foo(2));
@@ -284,14 +284,14 @@ void main() {
       pot3.create();
       pot4.create();
       expect(Pot.currentScope, 1);
-      expect(StaticPot.scopes, [
+      expect(ScopeState.scopes, [
         [pot1, pot2],
         [pot3, pot4],
       ]);
 
       Pot.resetAll();
       expect(Pot.currentScope, 1);
-      expect(StaticPot.scopes, <List<Pot<Object?>>>[[], []]);
+      expect(ScopeState.scopes, <List<Pot<Object?>>>[[], []]);
     });
 
     test(
@@ -299,18 +299,18 @@ void main() {
       'remove the scope',
       () {
         expect(Pot.currentScope, 0);
-        expect(StaticPot.scopes, <List<Pot<Object?>>>[[]]);
+        expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
 
         final pot1 = Pot(() => Foo(1));
         final pot2 = Pot(() => Foo(2));
         pot1.create();
         pot2.create();
-        expect(StaticPot.scopes, [
+        expect(ScopeState.scopes, [
           [pot1, pot2],
         ]);
 
         Pot.resetAll();
-        expect(StaticPot.scopes, <List<Pot<Object?>>>[[]]);
+        expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
       },
     );
 
@@ -325,7 +325,7 @@ void main() {
 
     test('resetAll(keepScopes: false) removes objects and scopes except 0', () {
       expect(Pot.currentScope, 0);
-      expect(StaticPot.scopes, <List<Pot<Object?>>>[[]]);
+      expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
 
       final pot1 = Pot(() => Foo(1));
       pot1.create();
@@ -342,7 +342,7 @@ void main() {
 
       Pot.resetAll(keepScopes: false);
       expect(Pot.currentScope, 0);
-      expect(StaticPot.scopes, <List<Pot<Object?>>>[[]]);
+      expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
       expect(pot1.scope, isNull);
     });
   });
@@ -367,7 +367,7 @@ void main() {
 
         expect(pot3.objectString(), 'Foo(3)');
         expect(pot4.objectString(), 'Foo(4)');
-        expect(StaticPot.scopes, [
+        expect(ScopeState.scopes, [
           [pot1, pot2],
           [pot3, pot4],
         ]);
@@ -376,7 +376,7 @@ void main() {
         Pot.popScope();
         expect(pot3.hasObject, isFalse);
         expect(pot4.hasObject, isFalse);
-        expect(StaticPot.scopes, [
+        expect(ScopeState.scopes, [
           [pot1, pot2],
         ]);
         expect(values, [4, 3]);
@@ -387,25 +387,25 @@ void main() {
       'Calling popScope() in root scope removes pots but the scope remains',
       () {
         expect(Pot.currentScope, 0);
-        expect(StaticPot.scopes, <List<Pot<Object?>>>[[]]);
+        expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
 
         final pot1 = Pot(() => Foo(1));
         final pot2 = Pot(() => Foo(2));
         pot1.create();
         pot2.create();
-        expect(StaticPot.scopes, [
+        expect(ScopeState.scopes, [
           [pot1, pot2],
         ]);
 
         Pot.popScope();
         expect(Pot.currentScope, 0);
-        expect(StaticPot.scopes, <List<Pot<Object?>>>[[]]);
+        expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
       },
     );
 
     test('Calling popScope() in non-root scope removes the scope', () {
       expect(Pot.currentScope, 0);
-      expect(StaticPot.scopes, <List<Pot<Object?>>>[[]]);
+      expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
 
       final pot1 = Pot(() => Foo(1));
       final pot2 = Pot(() => Foo(2));
@@ -419,14 +419,14 @@ void main() {
       pot4.create();
 
       expect(Pot.currentScope, 1);
-      expect(StaticPot.scopes, [
+      expect(ScopeState.scopes, [
         [pot1, pot2],
         [pot3, pot4],
       ]);
 
       Pot.popScope();
       expect(Pot.currentScope, 0);
-      expect(StaticPot.scopes, [
+      expect(ScopeState.scopes, [
         [pot1, pot2],
       ]);
     });
@@ -476,7 +476,7 @@ void main() {
         expect(Pot.currentScope, 0);
         expect(pot.scope, 0);
         expect(pot.objectString(), 'Foo(1)');
-        expect(StaticPot.scopes, [
+        expect(ScopeState.scopes, [
           [pot],
         ]);
         expect(valueOfDisposedObject, -1);
@@ -490,7 +490,7 @@ void main() {
         expect(Pot.currentScope, 1);
         expect(pot.scope, 0);
         expect(pot.objectString(), 'Foo(2)');
-        expect(StaticPot.scopes, [
+        expect(ScopeState.scopes, [
           [pot],
           <Pot<Object?>>[],
         ]);
@@ -504,13 +504,13 @@ void main() {
       () {
         final pot = Pot.replaceable(() => Foo(1));
         expect(Pot.currentScope, 0);
-        expect(StaticPot.scopes, <List<Pot<Object?>>>[[]]);
+        expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
 
         Pot.pushScope();
         pot.replace(() => Foo(2));
         expect(Pot.currentScope, 1);
         expect(pot.hasObject, isFalse);
-        expect(StaticPot.scopes, <List<Pot<Object?>>>[[], []]);
+        expect(ScopeState.scopes, <List<Pot<Object?>>>[[], []]);
       },
     );
 
@@ -522,16 +522,16 @@ void main() {
           disposer: (f) => f.dispose(),
         );
         expect(Pot.currentScope, 0);
-        expect(StaticPot.scopes, <List<Pot<Object?>>>[[]]);
+        expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
 
         Pot.pushScope();
         pot.replace(() => Foo(2));
         expect(Pot.currentScope, 1);
-        expect(StaticPot.scopes, <List<Pot<Object?>>>[[], []]);
+        expect(ScopeState.scopes, <List<Pot<Object?>>>[[], []]);
 
         final foo = pot();
         expect(foo.value, 2);
-        expect(StaticPot.scopes, [
+        expect(ScopeState.scopes, [
           <Pot<Object?>>[],
           [pot],
         ]);
@@ -549,7 +549,7 @@ void main() {
         expect(Pot.currentScope, 0);
         expect(pot.scope, 0);
         expect(pot.objectString(), 'Foo(1)');
-        expect(StaticPot.scopes, [
+        expect(ScopeState.scopes, [
           [pot],
         ]);
         expect(valueOfDisposedObject, -1);
@@ -563,7 +563,7 @@ void main() {
         expect(Pot.currentScope, 1);
         expect(pot.scope, 0);
         expect(pot.objectString(), 'Foo(2)');
-        expect(StaticPot.scopes, [
+        expect(ScopeState.scopes, [
           [pot],
           <Pot<Object?>>[],
         ]);
@@ -577,13 +577,13 @@ void main() {
       () {
         final pot = Pot(() => Foo(1));
         expect(Pot.currentScope, 0);
-        expect(StaticPot.scopes, <List<Pot<Object?>>>[[]]);
+        expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
 
         Pot.pushScope();
         pot.replaceForTesting(() => Foo(2));
         expect(Pot.currentScope, 1);
         expect(pot.hasObject, isFalse);
-        expect(StaticPot.scopes, <List<Pot<Object?>>>[[], []]);
+        expect(ScopeState.scopes, <List<Pot<Object?>>>[[], []]);
       },
     );
 
@@ -593,16 +593,16 @@ void main() {
       () {
         final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
         expect(Pot.currentScope, 0);
-        expect(StaticPot.scopes, <List<Pot<Object?>>>[[]]);
+        expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
 
         Pot.pushScope();
         pot.replaceForTesting(() => Foo(2));
         expect(Pot.currentScope, 1);
-        expect(StaticPot.scopes, <List<Pot<Object?>>>[[], []]);
+        expect(ScopeState.scopes, <List<Pot<Object?>>>[[], []]);
 
         final foo = pot();
         expect(foo.value, 2);
-        expect(StaticPot.scopes, [
+        expect(ScopeState.scopes, [
           <Pot<Object?>>[],
           [pot],
         ]);

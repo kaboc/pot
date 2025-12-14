@@ -2,7 +2,7 @@ import 'package:meta/meta.dart' show immutable, sealed, visibleForTesting;
 
 import 'errors.dart';
 import 'event.dart';
-import 'private/scopes_handler.dart';
+import 'private/scope_controller.dart';
 import 'private/static.dart';
 import 'private/utils.dart';
 
@@ -134,7 +134,7 @@ class Pot<T> extends _PotBody<T> {
   ///   print(Pot.currentScope); // 0
   /// }
   /// ```
-  static int get currentScope => StaticPot.currentScope;
+  static int get currentScope => ScopeState.currentScope;
 
   /// Creates a pot of type [ReplaceablePot] that has the ability
   /// to replace its factory with another one of type [T].
@@ -194,7 +194,7 @@ class Pot<T> extends _PotBody<T> {
   /// }
   /// ```
   static void pushScope() {
-    StaticPot.scopes.createScope();
+    ScopeState.scopes.createScope();
   }
 
   /// Removes the current scope from the stack of scopes.
@@ -225,7 +225,7 @@ class Pot<T> extends _PotBody<T> {
   /// If this is used in the root scope, the index number remains `0`
   /// although every pot in the scope is reset and its disposer is called.
   static void popScope() {
-    StaticPot.scopes.clearScope(StaticPot.currentScope, keepScope: false);
+    ScopeState.scopes.clearScope(ScopeState.currentScope, keepScope: false);
   }
 
   /// Resets all pots in the current scope.
@@ -238,7 +238,7 @@ class Pot<T> extends _PotBody<T> {
   ///
   /// See [reset] for details on a reset of an object.
   static void resetAllInScope() {
-    StaticPot.scopes.clearScope(StaticPot.currentScope, keepScope: true);
+    ScopeState.scopes.clearScope(ScopeState.currentScope, keepScope: true);
   }
 
   /// Resets all pots of all scopes.
@@ -252,9 +252,9 @@ class Pot<T> extends _PotBody<T> {
   ///
   /// See [reset] for details on a reset of an object.
   static void resetAll({bool keepScopes = true}) {
-    final count = StaticPot.currentScope;
+    final count = ScopeState.currentScope;
     for (var i = count; i >= 0; i--) {
-      StaticPot.scopes.clearScope(i, keepScope: keepScopes);
+      ScopeState.scopes.clearScope(i, keepScope: keepScopes);
     }
   }
 
@@ -277,9 +277,9 @@ class Pot<T> extends _PotBody<T> {
   /// subject to change. It is advised not to use this method for
   /// purposes other than debugging.
   static PotListenerRemover listen(void Function(PotEvent event) onData) {
-    return StaticPot.eventHandler.listen(onData);
+    return PotManager.eventHandler.listen(onData);
   }
 
   /// Whether there is a listener of Pot events.
-  static bool get hasListener => StaticPot.eventHandler.hasListener;
+  static bool get hasListener => PotManager.eventHandler.hasListener;
 }

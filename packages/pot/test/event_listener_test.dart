@@ -44,13 +44,13 @@ void main() {
     );
 
     test('StreamController is closed when all listeners are removed', () async {
-      expect(StaticPot.eventHandler.isClosed, isTrue);
+      expect(PotManager.eventHandler.isClosed, isTrue);
 
       final removeListener = Pot.listen((_) {});
-      expect(StaticPot.eventHandler.isClosed, isFalse);
+      expect(PotManager.eventHandler.isClosed, isFalse);
 
       await removeListener();
-      expect(StaticPot.eventHandler.isClosed, isTrue);
+      expect(PotManager.eventHandler.isClosed, isTrue);
     });
   });
 

@@ -13,7 +13,7 @@ void main() {
   final events = <PotEvent>[];
 
   setUp(() {
-    StaticPot.allInstances.clear();
+    PotManager.allInstances.clear();
     controller = StreamController<PotEvent>();
   });
   tearDown(() {
@@ -360,7 +360,7 @@ void main() {
         final pot1 = Pot(() => 1);
         final pot2 = Pot.pending<int?>();
 
-        final pots = StaticPot.allInstances.keys;
+        final pots = PotManager.allInstances.keys;
         expect(pots.length, 2);
 
         final desc1 = PotDescription.fromPot(pots.elementAt(0));

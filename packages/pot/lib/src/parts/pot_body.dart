@@ -6,8 +6,8 @@ class _PotBody<T> {
   _PotBody(PotObjectFactory<T> factory, {PotDisposer<T>? disposer})
       : _factory = factory,
         _disposer = disposer {
-    StaticPot.allInstances[_pot] = DateTime.now();
-    StaticPot.eventHandler.addEvent(PotEventKind.instantiated, pots: [_pot]);
+    PotManager.allInstances[_pot] = DateTime.now();
+    PotManager.eventHandler.addEvent(PotEventKind.instantiated, pots: [_pot]);
   }
 
   PotObjectFactory<T> _factory;
@@ -55,7 +55,7 @@ class _PotBody<T> {
   void _callDisposer() {
     if (_disposer != null) {
       _disposer?.call(_object as T);
-      StaticPot.eventHandler
+      PotManager.eventHandler
           .addEvent(PotEventKind.disposerCalled, pots: [_pot]);
     }
   }
@@ -77,7 +77,7 @@ class _PotBody<T> {
       _object = factory();
     }
 
-    StaticPot.eventHandler.addEvent(
+    PotManager.eventHandler.addEvent(
       asPending ? PotEventKind.markedAsPending : PotEventKind.replaced,
       pots: [_pot],
     );
@@ -138,17 +138,17 @@ class _PotBody<T> {
     if (!_hasObject) {
       debugWarning(suppressWarning: suppressWarning);
 
-      _scope = StaticPot.currentScope;
+      _scope = ScopeState.currentScope;
       _prevScope = _scope;
 
-      StaticPot.scopes
+      ScopeState.scopes
         ..removePot(_pot, excludeCurrentScope: true)
         ..addPot(_pot);
 
       _object = _factory();
       _hasObject = true;
 
-      StaticPot.eventHandler.addEvent(PotEventKind.created, pots: [_pot]);
+      PotManager.eventHandler.addEvent(PotEventKind.created, pots: [_pot]);
     }
     return _object as T;
   }
@@ -189,9 +189,9 @@ class _PotBody<T> {
       _isDisposed = true;
       _scope = null;
       _disposer = null;
-      StaticPot.scopes.removePot(_pot);
-      StaticPot.allInstances.remove(_pot);
-      StaticPot.eventHandler.addEvent(PotEventKind.disposed, pots: [_pot]);
+      ScopeState.scopes.removePot(_pot);
+      PotManager.allInstances.remove(_pot);
+      PotManager.eventHandler.addEvent(PotEventKind.disposed, pots: [_pot]);
     }
   }
 
@@ -247,8 +247,8 @@ class _PotBody<T> {
       _object = null;
       _hasObject = false;
       _scope = null;
-      StaticPot.scopes.removePot(_pot);
-      StaticPot.eventHandler.addEvent(PotEventKind.reset, pots: [_pot]);
+      ScopeState.scopes.removePot(_pot);
+      PotManager.eventHandler.addEvent(PotEventKind.reset, pots: [_pot]);
     }
   }
 
@@ -291,7 +291,7 @@ class _PotBody<T> {
       throwStateError();
     }
 
-    StaticPot.eventHandler.addEvent(PotEventKind.objectUpdated, pots: [_pot]);
+    PotManager.eventHandler.addEvent(PotEventKind.objectUpdated, pots: [_pot]);
   }
 }
 
