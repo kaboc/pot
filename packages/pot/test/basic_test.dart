@@ -11,7 +11,6 @@ import 'utils.dart';
 void main() {
   tearDown(() {
     Pot.resetAll(keepScopes: false);
-    StaticPot.allInstances.clear();
     resetFoo();
   });
 
@@ -34,16 +33,20 @@ void main() {
       expect(pot.hasObject, isFalse);
     });
 
-    test('hasObject is true after create() whether object is null or not', () {
-      final pot = Pot(() => null);
-      expect(pot.hasObject, isFalse);
+    test(
+      'hasObject is true after create() regardless of whether value of '
+      'object is null or not',
+      () {
+        final pot = Pot(() => null);
+        expect(pot.hasObject, isFalse);
 
-      pot.create();
-      expect(pot.hasObject, isTrue);
+        pot.create();
+        expect(pot.hasObject, isTrue);
 
-      pot.reset();
-      expect(pot.hasObject, isFalse);
-    });
+        pot.reset();
+        expect(pot.hasObject, isFalse);
+      },
+    );
 
     test('replace() does not affect hasObject', () {
       final pot = Pot.replaceable<Foo?>(() => Foo(1));
@@ -61,11 +64,14 @@ void main() {
   });
 
   group('call() / create()', () {
-    test('Object is not created right away', () {
-      final pot = Pot(() => Foo(1));
-      expect(pot.hasObject, isFalse);
-      expect(isInitialized, isFalse);
-    });
+    test(
+      'Object is not created in pot immediately when the pot is created',
+      () {
+        final pot = Pot(() => Foo(1));
+        expect(pot.hasObject, isFalse);
+        expect(isInitialized, isFalse);
+      },
+    );
 
     test('call() creates and returns object', () {
       final pot = Pot(() => Foo(1));
@@ -78,7 +84,7 @@ void main() {
       expect(foo.value, 1);
     });
 
-    test('call() returns same object', () {
+    test('Multiple calls to call() return same instance of object', () {
       final pot = Pot(() => Foo(1));
       final hashCode1 = pot().hashCode;
       final hashCode2 = pot().hashCode;
@@ -97,32 +103,18 @@ void main() {
   });
 
   group('reset()', () {
-    test('reset() resets object to null', () {
-      final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
-      pot.create();
-      expect(pot.hasObject, isTrue);
+    test('reset() removes object from pot, whether it has disposer or not', () {
+      final pot1 = Pot(() => Foo(1));
+      final pot2 = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
+      pot1.create();
+      pot2.create();
+      expect(pot1.hasObject, isTrue);
+      expect(pot2.hasObject, isTrue);
 
-      pot.reset();
-      expect(pot.hasObject, isFalse);
-    });
-
-    test('Pot has a new object created after reset', () {
-      final pot = Pot(() => Foo(1));
-      final hashCode1 = pot().hashCode;
-
-      pot.reset();
-      final hashCode2 = pot().hashCode;
-
-      expect(hashCode2, isNot(hashCode1));
-    });
-
-    test('reset() resets object to null even if disposer() is not set', () {
-      final pot = Pot(() => Foo(1));
-      pot.create();
-      expect(pot.hasObject, isTrue);
-
-      pot.reset();
-      expect(pot.hasObject, isFalse);
+      pot1.reset();
+      pot2.reset();
+      expect(pot1.hasObject, isFalse);
+      expect(pot1.hasObject, isFalse);
     });
 
     test('reset() triggers disposer', () {
@@ -134,7 +126,7 @@ void main() {
       expect(isDisposed, isTrue);
     });
 
-    test('reset() does not trigger disposer if object does not exist', () {
+    test('reset() does not trigger disposer if the pot has no object', () {
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
       expect(pot.hasObject, isFalse);
       expect(isDisposed, isFalse);
@@ -143,7 +135,7 @@ void main() {
       expect(isDisposed, isFalse);
     });
 
-    test('reset() triggers disposer with null if object is null', () {
+    test('reset() triggers disposer with null if value of object is null', () {
       Foo? object;
       var called = false;
 
@@ -166,7 +158,7 @@ void main() {
       expect(pot.hasObject, isFalse);
     });
 
-    test('Object is created again when it is needed after reset', () {
+    test('Object is created again when it is needed after removed', () {
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
       pot.create();
       expect(pot.hasObject, isTrue);
@@ -183,12 +175,10 @@ void main() {
   group('replace()', () {
     test('replace() replaces factory', () {
       final pot = Pot.replaceable(() => Foo(1));
-      var foo = pot();
-      expect(foo.value, 1);
+      expect(pot().value, 1);
 
       pot.replace(() => Foo(2));
-      foo = pot();
-      expect(foo.value, 2);
+      expect(pot().value, 2);
     });
 
     test('replace() replaces factory regardless of existence of object', () {
@@ -196,8 +186,7 @@ void main() {
       expect(pot.hasObject, isFalse);
 
       pot.replace(() => Foo(2));
-      final foo = pot();
-      expect(foo.value, 2);
+      expect(pot().value, 2);
     });
 
     test('replace() triggers disposer and creates new object', () {
@@ -266,9 +255,7 @@ void main() {
 
       pot.replace(() => Foo(2));
       expect(pot.hasObject, isFalse);
-
-      final foo = pot();
-      expect(foo.value, 2);
+      expect(pot().value, 2);
     });
   });
 
@@ -281,8 +268,7 @@ void main() {
     test('Factory of pot created with Pot.pending() can be replaced', () {
       final pot = Pot.pending<Foo>();
       pot.replace(() => Foo(1));
-      final foo = pot();
-      expect(foo.value, 1);
+      expect(pot().value, 1);
     });
   });
 
@@ -302,8 +288,7 @@ void main() {
         expect(pot.hasObject, isFalse);
 
         pot.replaceForTesting(() => Foo(2));
-        final foo = pot();
-        expect(foo.value, 2);
+        expect(pot().value, 2);
       },
     );
 
@@ -346,9 +331,7 @@ void main() {
 
         pot.replaceForTesting(() => Foo(2));
         expect(pot.hasObject, isFalse);
-
-        final foo = pot();
-        expect(foo.value, 2);
+        expect(pot().value, 2);
       },
     );
   });
@@ -406,35 +389,35 @@ void main() {
 
   group('Disposing', () {
     test('Calling dispose() does not throw', () {
-      final pot1 = Pot(() => Foo(1));
-      expect(pot1.dispose, isNot(throwsA(anything)));
+      final pot = Pot(() => Foo(1));
+      expect(pot.dispose, isNot(throwsA(anything)));
     });
 
     test('Calling dispose() again after dispose() does not throw', () {
-      final pot1 = Pot(() => Foo(1));
-      pot1.dispose();
-      expect(pot1.dispose, isNot(throwsA(anything)));
+      final pot = Pot(() => Foo(1));
+      pot.dispose();
+      expect(pot.dispose, isNot(throwsA(anything)));
     });
 
-    test('Thrown if call() is called after pot is disposed', () {
-      final pot1 = Pot(() => Foo(1));
-      pot1.dispose();
-      expect(pot1.call, throwsA(isA<StateError>()));
+    test('Calling call() after dispose() throws', () {
+      final pot = Pot(() => Foo(1));
+      pot.dispose();
+      expect(pot.call, throwsA(isA<StateError>()));
     });
 
-    test('Thrown if create() is called after pot is disposed', () {
-      final pot1 = Pot(() => Foo(1));
-      pot1.dispose();
-      expect(pot1.create, throwsA(isA<StateError>()));
+    test('Calling create() after dispose() throws', () {
+      final pot = Pot(() => Foo(1));
+      pot.dispose();
+      expect(pot.create, throwsA(isA<StateError>()));
     });
 
-    test('Thrown if reset() is called after pot is disposed', () {
-      final pot1 = Pot(() => Foo(1));
-      pot1.dispose();
-      expect(pot1.reset, throwsA(isA<StateError>()));
+    test('Calling reset() after dispose() throws', () {
+      final pot = Pot(() => Foo(1));
+      pot.dispose();
+      expect(pot.reset, throwsA(isA<StateError>()));
     });
 
-    test('Thrown if replace() is called after pot is disposed', () {
+    test('Calling replace() after dispose() throws', () {
       final pot1 = Pot.replaceable(() => Foo(1));
       pot1.dispose();
       expect(
@@ -451,30 +434,30 @@ void main() {
     });
 
     test('pushScope() after one of pots is disposed does not throw', () {
-      final pot1 = Pot(() => Foo(1));
-      pot1.create();
-      pot1.dispose();
+      final pot = Pot(() => Foo(1));
+      pot.create();
+      pot.dispose();
       expect(Pot.pushScope, isNot(throwsA(anything)));
     });
 
     test('popScope() after one of pots is disposed does not throw', () {
-      final pot1 = Pot(() => Foo(1));
-      pot1.create();
-      pot1.dispose();
+      final pot = Pot(() => Foo(1));
+      pot.create();
+      pot.dispose();
       expect(Pot.popScope, isNot(throwsA(anything)));
     });
 
     test('resetAllInScope() after one of pots is disposed does not throw', () {
-      final pot1 = Pot(() => Foo(1));
-      pot1.create();
-      pot1.dispose();
+      final pot = Pot(() => Foo(1));
+      pot.create();
+      pot.dispose();
       expect(Pot.resetAllInScope, isNot(throwsA(anything)));
     });
 
     test('resetAll() after one of pots is disposed does not throw', () {
-      final pot1 = Pot(() => Foo(1));
-      pot1.create();
-      pot1.dispose();
+      final pot = Pot(() => Foo(1));
+      pot.create();
+      pot.dispose();
       expect(Pot.resetAll, isNot(throwsA(anything)));
     });
 
@@ -482,13 +465,13 @@ void main() {
       'Globally stored data for local pot is not discarded automatically',
       () {
         void declarePotLocally() {
-          final pot1 = Pot(() => Foo(1));
-          pot1.create();
+          final pot = Pot(() => Foo(1));
+          pot.create();
         }
 
-        expect(StaticPot.resetters[0], isEmpty);
+        expect(StaticPot.scopes[0], isEmpty);
         declarePotLocally();
-        expect(StaticPot.resetters[0], hasLength(1));
+        expect(StaticPot.scopes[0], hasLength(1));
       },
     );
   });

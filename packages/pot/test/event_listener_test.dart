@@ -21,7 +21,6 @@ void main() {
     controller = null;
     eventsCount = 0;
     Pot.resetAll(keepScopes: false);
-    StaticPot.allInstances.clear();
   });
 
   void listener(PotEvent event) {
@@ -31,7 +30,8 @@ void main() {
 
   group('hasListener and isClosed', () {
     test(
-      'Listening started and ended by listen() and returned callback',
+      'Calling listen() adds listener and calling returned callback '
+      'removes listener',
       () async {
         expect(Pot.hasListener, isFalse);
 
@@ -55,11 +55,11 @@ void main() {
   });
 
   group('Methods other than those for scoping', () {
-    test('dispose() without create()', () async {
+    test('Calling dispose() without creating object', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot = Pot(() => 10, disposer: (_) {});
+      final pot = Pot(() => 1, disposer: (_) {});
       pot.dispose();
 
       await expectLater(
@@ -72,11 +72,11 @@ void main() {
       expect(eventsCount, 2);
     });
 
-    test('create() and dispose() when pot has no disposer', () async {
+    test('Calling create() and dispose() when pot has no disposer', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot = Pot(() => 10);
+      final pot = Pot(() => 1);
       pot.create();
       pot.dispose();
 
@@ -94,11 +94,11 @@ void main() {
       expect(eventsCount, 6);
     });
 
-    test('create() and dispose() when pot has disposer', () async {
+    test('Calling create() and dispose() when pot has disposer', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot = Pot(() => 10, disposer: (_) {});
+      final pot = Pot(() => 1, disposer: (_) {});
       pot.create();
       pot.dispose();
 
@@ -117,11 +117,11 @@ void main() {
       expect(eventsCount, 7);
     });
 
-    test('reset() without create()', () async {
+    test('Calling reset() without creating object', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot = Pot(() => 10, disposer: (_) {});
+      final pot = Pot(() => 1, disposer: (_) {});
       pot.reset();
 
       await expectLater(
@@ -133,11 +133,11 @@ void main() {
       expect(eventsCount, 1);
     });
 
-    test('create() and reset() when pot has no disposer', () async {
+    test('Calling create() and reset() when pot has no disposer', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot = Pot(() => 10);
+      final pot = Pot(() => 1);
       pot.create();
       pot.reset();
 
@@ -154,11 +154,11 @@ void main() {
       expect(eventsCount, 5);
     });
 
-    test('create() and reset() when pot has disposer', () async {
+    test('Calling create() and reset() when pot has disposer', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot = Pot(() => 10, disposer: (_) {});
+      final pot = Pot(() => 1, disposer: (_) {});
       pot.create();
       pot.reset();
 
@@ -176,12 +176,12 @@ void main() {
       expect(eventsCount, 6);
     });
 
-    test('replace() without create()', () async {
+    test('Calling replace() without creating object', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot = Pot.replaceable(() => 10, disposer: (_) {});
-      pot.replace(() => 20);
+      final pot = Pot.replaceable(() => 1, disposer: (_) {});
+      pot.replace(() => 2);
 
       await expectLater(
         controller?.stream,
@@ -193,13 +193,13 @@ void main() {
       expect(eventsCount, 2);
     });
 
-    test('replace() when pot has no disposer', () async {
+    test('Calling replace() when pot has no disposer', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot = Pot.replaceable(() => 10);
+      final pot = Pot.replaceable(() => 1);
       pot.create();
-      pot.replace(() => 20);
+      pot.replace(() => 2);
 
       await expectLater(
         controller?.stream,
@@ -213,13 +213,13 @@ void main() {
       expect(eventsCount, 4);
     });
 
-    test('replace() when pot has disposer', () async {
+    test('Calling replace() when pot has disposer', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot = Pot.replaceable(() => 10, disposer: (_) {});
+      final pot = Pot.replaceable(() => 1, disposer: (_) {});
       pot.create();
-      pot.replace(() => 20);
+      pot.replace(() => 2);
 
       await expectLater(
         controller?.stream,
@@ -234,11 +234,11 @@ void main() {
       expect(eventsCount, 5);
     });
 
-    test('resetAsPending() without create()', () async {
+    test('Calling resetAsPending() without creating object', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot = Pot.replaceable(() => 10, disposer: (_) {});
+      final pot = Pot.replaceable(() => 1, disposer: (_) {});
       pot.resetAsPending();
 
       await expectLater(
@@ -251,11 +251,11 @@ void main() {
       expect(eventsCount, 2);
     });
 
-    test('resetAsPending() when pot has no disposer', () async {
+    test('Calling resetAsPending() when pot has no disposer', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot = Pot.replaceable(() => 10);
+      final pot = Pot.replaceable(() => 1);
       pot.create();
       pot.resetAsPending();
 
@@ -273,11 +273,11 @@ void main() {
       expect(eventsCount, 6);
     });
 
-    test('resetAsPending() when pot has disposer', () async {
+    test('Calling resetAsPending() when pot has disposer', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot = Pot.replaceable(() => 10, disposer: (_) {});
+      final pot = Pot.replaceable(() => 1, disposer: (_) {});
       pot.create();
       pot.resetAsPending();
 
@@ -298,11 +298,11 @@ void main() {
   });
 
   group('Scoping', () {
-    test('pushScope() without create()', () async {
+    test('Calling pushScope() without creating object', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      Pot(() => 10);
+      Pot(() => 1);
       Pot.pushScope();
 
       await expectLater(
@@ -315,11 +315,11 @@ void main() {
       expect(eventsCount, 2);
     });
 
-    test('create() and pushScope()', () async {
+    test('Calling create() and pushScope()', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot = Pot(() => 10);
+      final pot = Pot(() => 1);
       pot.create();
       Pot.pushScope();
 
@@ -335,11 +335,11 @@ void main() {
       expect(eventsCount, 4);
     });
 
-    test('pushScope() and create()', () async {
+    test('Calling pushScope() and create()', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot = Pot(() => 10);
+      final pot = Pot(() => 1);
       Pot.pushScope();
       pot.create();
 
@@ -355,11 +355,11 @@ void main() {
       expect(eventsCount, 4);
     });
 
-    test('popScope() without create()', () async {
+    test('Calling popScope() without creating object', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      Pot(() => 10);
+      Pot(() => 1);
       Pot.popScope();
 
       await expectLater(
@@ -372,11 +372,11 @@ void main() {
       expect(eventsCount, 2);
     });
 
-    test('create() and popScope()', () async {
+    test('Calling create() and popScope()', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot = Pot(() => 10);
+      final pot = Pot(() => 1);
       pot.create();
       Pot.popScope();
 
@@ -394,11 +394,11 @@ void main() {
       expect(eventsCount, 6);
     });
 
-    test('pushScope(), create() and then popScope()', () async {
+    test('Calling pushScope(), create() and then popScope()', () async {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot = Pot(() => 10);
+      final pot = Pot(() => 1);
       Pot.pushScope();
       pot.create();
       Pot.popScope();
@@ -424,7 +424,7 @@ void main() {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot = Pot.replaceable(() => 10, disposer: (_) {});
+      final pot = Pot.replaceable(() => 1, disposer: (_) {});
       pot.notifyObjectUpdate();
 
       await expectLater(

@@ -13,6 +13,7 @@ void main() {
   final events = <PotEvent>[];
 
   setUp(() {
+    StaticPot.allInstances.clear();
     controller = StreamController<PotEvent>();
   });
   tearDown(() {
@@ -22,7 +23,6 @@ void main() {
     controller = null;
     events.clear();
     Pot.resetAll(keepScopes: false);
-    StaticPot.allInstances.clear();
   });
 
   void listener(PotEvent event) {
@@ -186,12 +186,12 @@ void main() {
 
   group('Equality and hash code', () {
     test('Two PotDescriptions with same values are equal', () {
-      final pot1 = Pot(() => 10);
+      final pot1 = Pot(() => 1);
       expect(PotDescription.fromPot(pot1), PotDescription.fromPot(pot1));
     });
 
     test('Two PotDescriptions with same values have same hash code', () {
-      final pot1 = Pot(() => 10);
+      final pot1 = Pot(() => 1);
       expect(
         PotDescription.fromPot(pot1).hashCode,
         PotDescription.fromPot(pot1).hashCode,
@@ -205,7 +205,7 @@ void main() {
       addTearDown(removeListener);
 
       final time1 = DateTime.now();
-      Pot(() => 10);
+      Pot(() => 1);
 
       await Future<void>.delayed(const Duration(milliseconds: 10));
       final time2 = DateTime.now();
@@ -250,7 +250,7 @@ void main() {
         final removeListener = Pot.listen(listener);
         addTearDown(removeListener);
 
-        final pot = Pot(() => 10);
+        final pot = Pot(() => 1);
 
         await expectLater(
           controller?.stream,
@@ -269,7 +269,7 @@ void main() {
         addTearDown(removeListener);
 
         final pot = Pot.pending<int>();
-        pot.replace(() => 10);
+        pot.replace(() => 1);
         pot.resetAsPending();
 
         await expectLater(
@@ -291,7 +291,7 @@ void main() {
         final removeListener = Pot.listen(listener);
         addTearDown(removeListener);
 
-        Pot(() => 10);
+        Pot(() => 1);
 
         await expectLater(
           controller?.stream,
@@ -308,7 +308,7 @@ void main() {
         final removeListener = Pot.listen(listener);
         addTearDown(removeListener);
 
-        final pot = Pot(() => 10);
+        final pot = Pot(() => 1);
         pot.dispose();
 
         await expectLater(
@@ -328,7 +328,7 @@ void main() {
         final removeListener = Pot.listen(listener);
         addTearDown(removeListener);
 
-        final pot = Pot(() => 10);
+        final pot = Pot(() => 1);
         pot.create();
         pot.reset();
 
@@ -349,7 +349,7 @@ void main() {
         expect(events[1].potDescriptions[0].hasObject, false);
         expect(events[1].potDescriptions[0].object, 'null');
         expect(events[2].potDescriptions[0].hasObject, true);
-        expect(events[2].potDescriptions[0].object, '10');
+        expect(events[2].potDescriptions[0].object, '1');
         expect(events[3].potDescriptions[0].hasObject, false);
         expect(events[3].potDescriptions[0].object, 'null');
         expect(events[4].potDescriptions[0].hasObject, false);
@@ -357,7 +357,7 @@ void main() {
       });
 
       test('allPotDescriptions returns descriptions of all pots', () {
-        final pot1 = Pot(() => 10);
+        final pot1 = Pot(() => 1);
         final pot2 = Pot.pending<int?>();
 
         final pots = StaticPot.allInstances.keys;
@@ -376,9 +376,9 @@ void main() {
       final removeListener = Pot.listen(listener);
       addTearDown(removeListener);
 
-      final pot1 = Pot(() => 10);
-      final pot2 = Pot(() => 10);
-      final pot3 = Pot(() => 10);
+      final pot1 = Pot(() => 1);
+      final pot2 = Pot(() => 1);
+      final pot3 = Pot(() => 1);
       pot1.create();
       Pot.pushScope();
       pot2.create();

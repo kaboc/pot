@@ -2,8 +2,6 @@ import 'package:meta/meta.dart' show immutable;
 
 import 'package:pot/pot.dart';
 
-typedef Resetter = void Function();
-
 extension PotObjectString<T> on Pot<T> {
   String objectString() {
     final desc = PotDescription.fromPot(this);

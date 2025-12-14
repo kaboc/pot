@@ -17,11 +17,6 @@ class StaticPot {
   // For Pottery DevTools extension
   static final eventHandler = PotEventHandler();
 
-  // For tests
-  static List<List<void Function()>> get resetters => [
-        for (final pots in scopes) [for (final pot in pots) pot.reset],
-      ];
-
   // Mainly for tests
   static void Function(Object?) warningPrinter = print;
 }
