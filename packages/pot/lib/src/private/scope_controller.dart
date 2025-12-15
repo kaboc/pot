@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs
 
-import '../event.dart';
-import '../pot.dart';
+import '../event.dart' show PotEventKind;
+import '../pot.dart' show Pot;
 import 'static.dart';
 
 extension ScopeController on Scopes {

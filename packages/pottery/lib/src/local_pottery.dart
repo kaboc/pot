@@ -177,6 +177,8 @@ class LocalPottery extends StatefulWidget {
 
 class _LocalPotteryState extends State<LocalPottery> {
   late final LocalPotteryObjects _objects;
+
+  // Only used in debug mode
   PotteryExtensionManager? _extensionManager;
 
   @override

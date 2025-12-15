@@ -106,6 +106,7 @@ void main() {
     test('reset() removes object from pot, whether it has disposer or not', () {
       final pot1 = Pot(() => Foo(1));
       final pot2 = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
+
       pot1.create();
       pot2.create();
       expect(pot1.hasObject, isTrue);
@@ -119,6 +120,7 @@ void main() {
 
     test('reset() triggers disposer', () {
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
+
       pot.create();
       expect(isDisposed, isFalse);
 
@@ -160,6 +162,7 @@ void main() {
 
     test('Object is created again when it is needed after removed', () {
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
+
       pot.create();
       expect(pot.hasObject, isTrue);
 
@@ -194,6 +197,7 @@ void main() {
         () => Foo(1),
         disposer: (f) => f.dispose(),
       );
+
       pot.create();
       expect(pot.objectString(), 'Foo(1)');
       expect(isDisposed, isFalse);
@@ -210,8 +214,8 @@ void main() {
         () => Foo(1),
         disposer: (f) => value = f.value,
       );
-      pot.create();
 
+      pot.create();
       pot.replace(() => Foo(2));
       expect(value, 1);
     });
@@ -294,6 +298,7 @@ void main() {
 
     test('replaceForTesting() triggers disposer and creates new object', () {
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
+
       pot.create();
       expect(pot.objectString(), 'Foo(1)');
       expect(isDisposed, isFalse);
@@ -366,8 +371,8 @@ void main() {
   group('toString()', () {
     test('toString() on pot of type Pot', () {
       final pot = Pot(() => Foo(10), disposer: (_) {});
-      pot.create();
 
+      pot.create();
       expect(
         pot.toString(),
         'Pot<Foo>#${pot.shortHash()}(isPending: false, isDisposed: false, '
@@ -419,13 +424,14 @@ void main() {
 
     test('Calling replace() after dispose() throws', () {
       final pot1 = Pot.replaceable(() => Foo(1));
+      final pot2 = Pot(() => Foo(1));
+
       pot1.dispose();
       expect(
         () => pot1.replace(() => Foo(2)),
         throwsA(isA<StateError>()),
       );
 
-      final pot2 = Pot(() => Foo(1));
       pot2.dispose();
       expect(
         () => pot2.replaceForTesting(() => Foo(2)),

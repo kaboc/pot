@@ -1,6 +1,6 @@
 // ignore_for_file: public_member_api_docs
 
-import '../pot.dart';
+import '../pot.dart' show Pot;
 
 extension ObjectIdentity<T> on Pot<T> {
   String shortHash() {

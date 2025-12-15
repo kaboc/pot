@@ -379,6 +379,7 @@ void main() {
       final pot1 = Pot(() => 1);
       final pot2 = Pot(() => 1);
       final pot3 = Pot(() => 1);
+
       pot1.create();
       Pot.pushScope();
       pot2.create();

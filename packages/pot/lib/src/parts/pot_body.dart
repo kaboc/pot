@@ -176,8 +176,9 @@ class _PotBody<T> {
   ///
   /// Note that calling this method has no effect if the object has
   /// already been created.
-  void create({bool suppressWarning = false}) =>
-      call(suppressWarning: suppressWarning);
+  void create({bool suppressWarning = false}) {
+    call(suppressWarning: suppressWarning);
+  }
 
   /// Discards resources in the pot.
   ///

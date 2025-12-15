@@ -1,4 +1,4 @@
-import 'pot.dart';
+import 'pot.dart' show Pot, PotDescription;
 
 /// The types of events that can occur in relation to [Pot].
 enum PotEventKind {
