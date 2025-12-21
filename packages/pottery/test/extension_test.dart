@@ -39,11 +39,9 @@ void main() {
     communicator.dispose();
 
     pot1?.dispose();
-    pot1 = null;
     pot2?.dispose();
-    pot2 = null;
     fooPot?.dispose();
-    fooPot = null;
+    pot1 = pot2 = fooPot = null;
   });
 
   group('Initialization', () {

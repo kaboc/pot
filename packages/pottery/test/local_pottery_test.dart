@@ -21,19 +21,16 @@ void main() {
   ReplaceablePot<Object?>? nullablePot;
 
   tearDown(() {
-    fooPot?.dispose();
-    fooPot = null;
-    barPot?.dispose();
-    barPot = null;
-    nullablePot?.dispose();
-    nullablePot = null;
+    Pot.resetAll(keepScopes: false);
+    fooPot = barPot = nullablePot = null;
   });
 
   testWidgets(
-    'Pots provided by nearest LocalPottery are obtained with `of()`',
+    'Calling of() on a map returns the associated object provided by nearest '
+    'LocalPottery ancestor that contains the pot in its pots map.',
     (tester) async {
-      fooPot = Pot.pending<Foo>();
-      barPot = Pot.pending<Bar>();
+      fooPot = Pot.pending();
+      barPot = Pot.pending();
 
       expect(fooPot?.create, throwsA(isA<PotNotReadyException>()));
       expect(barPot?.create, throwsA(isA<PotNotReadyException>()));
@@ -90,7 +87,7 @@ void main() {
   );
 
   testWidgets('Factory returning null causes no issue', (tester) async {
-    nullablePot = Pot.pending<Object?>();
+    nullablePot = Pot.pending();
     expect(nullablePot?.create, throwsA(isA<PotNotReadyException>()));
 
     var isNullObtained = false;
@@ -110,14 +107,14 @@ void main() {
 
   testWidgets(
     'Disposer of pot is not called when LocalPottery is removed, '
-    'while disposer of LocalPottery is called with correct map',
+    'while disposer of LocalPottery is called with map holding objects',
     (tester) async {
       var globallyDisposed = false;
       fooPot = Pot.replaceable(
         () => const Foo(10),
         disposer: (_) => globallyDisposed = true,
       );
-      barPot = Pot.pending<Bar>();
+      barPot = Pot.pending();
 
       fooPot?.create();
 
@@ -147,8 +144,8 @@ void main() {
     },
   );
 
-  testWidgets('Multiple LocalPottery as siblings', (tester) async {
-    fooPot = Pot.pending<Foo>();
+  testWidgets('Multiple LocalPotteries as siblings', (tester) async {
+    fooPot = Pot.pending();
 
     Foo? foo1;
     Foo? foo2;
@@ -195,9 +192,9 @@ void main() {
     expect(foo4?.value, 20);
   });
 
-  testWidgets('Nested LocalPottery', (tester) async {
-    fooPot = Pot.pending<Foo>();
-    barPot = Pot.pending<Bar>();
+  testWidgets('Nested LocalPotteries', (tester) async {
+    fooPot = Pot.pending();
+    barPot = Pot.pending();
 
     Foo? foo1;
     Foo? foo2;
@@ -237,8 +234,8 @@ void main() {
   });
 
   testWidgets('debugFillProperties()', (tester) async {
-    fooPot = Pot.pending<Foo>();
-    barPot = Pot.pending<Bar>(disposer: (_) => fooPot?.call());
+    fooPot = Pot.pending();
+    barPot = Pot.pending(disposer: (_) => fooPot?.call());
 
     const foo = Foo(10);
     const bar = Bar();
@@ -256,11 +253,10 @@ void main() {
 
     final builder = DiagnosticPropertiesBuilder();
     key.currentState?.debugFillProperties(builder);
-    final props = {
-      for (final prop in builder.properties)
-        if (prop.name != null) prop.name: prop.value,
-    };
 
-    expect(props['objects'], equals({fooPot: foo, barPot: bar}));
+    expect(
+      builder.properties.firstWhere((v) => v.name == 'objects').value,
+      equals({fooPot: foo, barPot: bar}),
+    );
   });
 }

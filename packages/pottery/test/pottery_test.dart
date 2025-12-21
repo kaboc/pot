@@ -21,21 +21,18 @@ void main() {
   ReplaceablePot<Object?>? nullablePot;
 
   tearDown(() {
-    fooPot?.dispose();
-    fooPot = null;
-    barPot?.dispose();
-    barPot = null;
-    nullablePot?.dispose();
-    nullablePot = null;
+    Pot.resetAll(keepScopes: false);
+    fooPot = barPot = nullablePot = null;
   });
 
   testWidgets(
-    'Pots become available by Pottery and unavailable again by removal',
+    'Using Pottery makes pots available and removing it makes pots '
+    'unavailable again',
     (tester) async {
       var fooDisposed = false;
       var barDisposed = false;
-      fooPot = Pot.pending<Foo>(disposer: (_) => fooDisposed = true);
-      barPot = Pot.pending<Bar>(disposer: (_) => barDisposed = true);
+      fooPot = Pot.pending(disposer: (_) => fooDisposed = true);
+      barPot = Pot.pending(disposer: (_) => barDisposed = true);
 
       expect(fooPot?.create, throwsA(isA<PotNotReadyException>()));
       expect(barPot?.create, throwsA(isA<PotNotReadyException>()));
@@ -90,7 +87,7 @@ void main() {
   );
 
   testWidgets('Factory returning null causes no issue', (tester) async {
-    nullablePot = Pot.pending<Object?>();
+    nullablePot = Pot.pending();
     expect(nullablePot?.create, throwsA(isA<PotNotReadyException>()));
 
     await tester.pumpWidget(
@@ -107,8 +104,8 @@ void main() {
     'PotNotReadyException is thrown when Pottery calls reset() '
     'of a pot that depends on a pot located later in the pots map',
     (tester) async {
-      fooPot = Pot.pending<Foo>(disposer: (_) => barPot?.call());
-      barPot = Pot.pending<Bar>();
+      fooPot = Pot.pending(disposer: (_) => barPot?.call());
+      barPot = Pot.pending();
 
       addTearDown(() {
         // A factory must be set so that dispose does not
@@ -140,8 +137,8 @@ void main() {
     'PotNotReadyException is thrown when Pottery calls reset() '
     'of a pot that depends on a pot located earlier in the map',
     (tester) async {
-      fooPot = Pot.pending<Foo>();
-      barPot = Pot.pending<Bar>(disposer: (_) => fooPot?.call());
+      fooPot = Pot.pending();
+      barPot = Pot.pending(disposer: (_) => fooPot?.call());
 
       await tester.pumpWidget(
         TestPottery(
@@ -167,8 +164,8 @@ void main() {
   );
 
   testWidgets('debugFillProperties()', (tester) async {
-    fooPot = Pot.pending<Foo>();
-    barPot = Pot.pending<Bar>(disposer: (_) => fooPot?.call());
+    fooPot = Pot.pending();
+    barPot = Pot.pending(disposer: (_) => fooPot?.call());
 
     // ignore: prefer_function_declarations_over_variables
     final fooFactory = () => const Foo(10);
@@ -188,11 +185,10 @@ void main() {
 
     final builder = DiagnosticPropertiesBuilder();
     key.currentState?.debugFillProperties(builder);
-    final props = {
-      for (final prop in builder.properties)
-        if (prop.name != null) prop.name: prop.value,
-    };
 
-    expect(props['pots'], equals({fooPot: fooFactory, barPot: barFactory}));
+    expect(
+      builder.properties.firstWhere((v) => v.name == 'pots').value,
+      {fooPot: fooFactory, barPot: barFactory},
+    );
   });
 }
