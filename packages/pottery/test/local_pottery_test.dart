@@ -197,11 +197,12 @@ void main() {
 
   testWidgets('Nested LocalPottery', (tester) async {
     fooPot = Pot.pending<Foo>();
+    barPot = Pot.pending<Bar>();
 
     Foo? foo1;
     Foo? foo2;
     Foo? foo3;
-    Foo? foo4;
+
     await tester.pumpWidget(
       TestLocalPottery(
         pots: {
@@ -209,21 +210,19 @@ void main() {
         },
         builder: (context1) {
           foo1 = fooPot?.of(context1);
-          return Descendant(
+          return TestLocalPottery(
+            pots: {
+              fooPot!: () => const Foo(20),
+            },
             builder: (context2) {
               foo2 = fooPot?.of(context2);
               return TestLocalPottery(
                 pots: {
-                  fooPot!: () => const Foo(20),
+                  barPot!: () => const Bar(),
                 },
                 builder: (context3) {
                   foo3 = fooPot?.of(context3);
-                  return Descendant(
-                    builder: (context4) {
-                      foo4 = fooPot?.of(context4);
-                      return const SizedBox.shrink();
-                    },
-                  );
+                  return const SizedBox.shrink();
                 },
               );
             },
@@ -233,9 +232,8 @@ void main() {
     );
 
     expect(foo1?.value, 10);
-    expect(foo2?.value, 10);
+    expect(foo2?.value, 20);
     expect(foo3?.value, 20);
-    expect(foo4?.value, 20);
   });
 
   testWidgets('debugFillProperties()', (tester) async {

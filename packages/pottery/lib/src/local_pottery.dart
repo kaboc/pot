@@ -20,6 +20,17 @@ typedef PotOverrides = Map<Pot<Object?>, PotObjectFactory<Object?>>;
 /// The signature of a map consisting of pots and the objects they hold.
 typedef LocalPotteryObjects = Map<Pot<Object?>, Object?>;
 
+class _InheritedLocalPottery extends InheritedWidget {
+  const _InheritedLocalPottery({required this.objects, required super.child});
+
+  final LocalPotteryObjects objects;
+
+  @override
+  bool updateShouldNotify(_InheritedLocalPottery oldWidget) {
+    return false;
+  }
+}
+
 /// A widget that associates existing pots with new values and makes
 /// them accessible from descendants in the tree via the pots.
 ///
@@ -205,7 +216,14 @@ class _LocalPotteryState extends State<LocalPottery> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.builder(context);
+    return _InheritedLocalPottery(
+      objects: _objects,
+      child: Builder(
+        builder: (context) {
+          return widget.builder(context);
+        },
+      ),
+    );
   }
 
   @override
@@ -219,41 +237,39 @@ class _LocalPotteryState extends State<LocalPottery> {
 /// Extension on [Pot] used in relation to [LocalPottery].
 extension NearestPotOf<T> on Pot<T> {
   ({Object? object, bool found}) _findObject(BuildContext context) {
-    if (context.widget is LocalPottery) {
-      final state = (context as StatefulElement).state;
-      final pots = (state as _LocalPotteryState)._objects;
+    // Apparently, this lookup returns the current element
+    // if no matching ancestor is found.
+    final element = context
+        .getElementForInheritedWidgetOfExactType<_InheritedLocalPottery>();
 
-      for (final (pot, object) in pots.records) {
-        if (pot == this) {
-          // `found` flag is necessary because it is impossible
-          // to distinguish `null` in object from "not found"
-          // when T is nullable.
-          return (object: object, found: true);
-        }
+    if (element == null || element == context) {
+      return (object: null, found: false);
+    }
+
+    final inheritedLocalPottery = element.widget as _InheritedLocalPottery;
+    for (final (pot, object) in inheritedLocalPottery.objects.records) {
+      if (pot == this) {
+        // `found` flag is necessary because it is impossible
+        // to distinguish `null` in object from "not found"
+        // when T is nullable.
+        return (object: object, found: true);
       }
     }
 
-    return (object: null, found: false);
+    return _findObject(element);
   }
 
-  /// An extension method of [Pot] that recursively visits ancestors
-  /// to find the nearest [LocalPottery] and obtains the object bound
-  /// locally to the pot.
+  /// Returns the object provided by the nearest [LocalPottery] ancestor
+  /// that contains this [Pot] in its 'overrides' list.
   ///
-  /// If the pot which this method is called on is contained as a key
-  /// in the `pots` map of a [LocalPottery] located up in the tree,
-  /// the value corresponding to the key is obtained from there.
+  /// This method efficiently looks up the widget tree to find a localized
+  /// instance of the object associated with this pot.
   ///
   /// If no such `LocalPottery` is found, the object held in the global
   /// pot is returned, in which case, the return value is the same as
   /// that of the [Pot.call] method.
   ///
   /// See the document of [LocalPottery] for usage.
-  ///
-  /// Note that calling this method is relatively expensive (O(N) in
-  /// the depth of the tree). Only call it if the distance from the
-  /// widget associated with the [BuildContext] to the desired ancestor
-  /// is known to be small and bounded.
   T of(BuildContext context) {
     // Targets the current BuildContext too so that the local objects
     // become available from within the builder callback.
