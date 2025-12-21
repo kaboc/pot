@@ -1,3 +1,17 @@
+## 0.8.0
+
+- Add `Pot.uninitialize()`.
+- Deprecate `Pot.resetAll()` in favor of `Pot.uninitialize()`.
+- Annotate `replaceForTesting()` with `@VisibleForTesting`.
+- Improve behaviors related to `dispose()`:
+    - Fix issue where `notifyObjectUpdate()` did not throw when called after `dispose()`.
+    - Allow calling `dispose()` on already disposed pot.
+- Perform internal refactoring.
+- **Breaking**:
+    - Remove `forTesting` and `PotReplaceError`.
+        - To migrate, remove usage of `forTesting`.
+        - `replaceForTesting()` is now always available in tests.
+
 ## 0.7.1
 
 - Fix the `fromMap` constructor and `toString()` of `PotDescription`.

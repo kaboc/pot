@@ -104,15 +104,15 @@ class _PotBody<T> {
   /// // An object is created.
   /// var counter = counterPot();
   ///
-  /// // The object is discarded.
+  /// // The object is removed from the pot.
   /// counterPot.reset();
   ///
   /// // A new object is created again.
   /// counter = counterPot();
   /// ```
   ///
-  /// The object exists while the scope where it was created exists,
-  /// so it is discarded when the scope is removed.
+  /// The object exists only while the scope where it was created exists,
+  /// so it is removed when the scope is removed.
   ///
   /// ```dart
   /// final counterPot = Pot(() => Counter(0));
@@ -122,14 +122,21 @@ class _PotBody<T> {
   ///   // The object is not bound to the scope yet because it hasn't created.
   ///   Pot.pushScope();
   ///
-  ///   // An object is created and set in the current scope 1.
+  ///   // The pot is bound to the current scope 1 and an object is created.
   ///   final counter = counterPot();
   ///
-  ///   // The object is discarded.
   ///   // The scope 1 is removed and the `currentScope` turns 0.
+  ///   // The pot is unbound and the object is removed from the pot.
   ///   Pot.popScope();
   /// }
   /// ```
+  ///
+  /// {@template pot.suppressWarning}
+  /// The `suppressWarning` flag disables the printing of misuse warnings
+  /// to the console when set to `true`. Omitting the setting or specifying
+  /// `false` keeps warnings active, but they are automatically suppressed
+  /// in production.
+  /// {@endtemplate}
   T call({bool suppressWarning = false}) {
     if (_isDisposed) {
       throwStateError();
@@ -170,12 +177,14 @@ class _PotBody<T> {
   /// }
   /// ```
   ///
-  /// [create] is almost the same as [call], only with the difference
-  /// that this does not return the object while `call()` does, so
-  /// `call()` can also be used for the same purpose instead.
+  /// This method is essentially the same as [call], with only the difference
+  /// that this does not return the object while `call()` does, so `call()`
+  /// can also be used to create an object.
   ///
-  /// Note that calling this method has no effect if the object has
-  /// already been created.
+  /// {@macro pot.suppressWarning}
+  ///
+  /// > [!NOTE]
+  /// > Calling this method has no effect if the pot already has an object.
   void create({bool suppressWarning = false}) {
     call(suppressWarning: suppressWarning);
   }
@@ -183,7 +192,11 @@ class _PotBody<T> {
   /// Discards resources in the pot.
   ///
   /// Once this is called, the pot is no longer in a usable state, and
-  /// calls to its members will throw.
+  /// subsequent calls to most of its members will throw.
+  ///
+  /// > [!NOTE]
+  /// > This method internally calls the [reset] method, which triggers
+  /// > the disposer.
   void dispose() {
     if (!_isDisposed) {
       reset();
@@ -196,20 +209,20 @@ class _PotBody<T> {
     }
   }
 
-  /// Discards the object of type [T] that was created by the factory
+  /// Remove the object of type [T] that was created by the factory
   /// and has been held in the pot.
   ///
   /// This method triggers the disposer, which was set in the constructor
   /// of [Pot], if an object exists.
   ///
-  /// This does not discard the pot itself, so a new object is created
+  /// This does not dispose of the pot itself, so a new object is created
   /// again when it is need. Use this when the object is not used any more
   /// for now, and get a new object when it is necessary again.
   ///
   /// ```dart
   /// final counterPot = Pot<Counter>(
   ///   () => Counter(0),
-  ///   disposer: (counter) => print('Discarded'),
+  ///   disposer: (counter) => print('Object removed'),
   /// );
   ///
   /// void main() {
@@ -217,8 +230,8 @@ class _PotBody<T> {
   ///   counter.increment();
   ///   print(counter.value); // 1
   ///
-  ///   // Discards the existing object that has been held in the pot,
-  ///   // and calls the disposer, printing "Discarded".
+  ///   // Removes the existing object from the pot,
+  ///   // and calls the disposer, printing "Object removed".
   ///   counterPot.reset();
   ///
   ///   // A new object is created if it is accessed.
@@ -227,16 +240,16 @@ class _PotBody<T> {
   /// }
   /// ```
   ///
-  /// Note that calling this method has no effect if the object has
-  /// not been created.
-  ///
-  /// ```dart
-  /// final counterPot = Pot(() => Counter(0));
-  ///
-  /// void main() {
-  ///   // The disposer is not triggered because there is no object yet.
-  ///   counterPot.reset();
-  /// }
+  /// > [!NOTE]
+  /// > Calling this method has no effect if the pot does not have an object.
+  /// >
+  /// > ```dart
+  /// > final counterPot = Pot(() => Counter(0));
+  /// >
+  /// > void main() {
+  /// >   // The disposer is not triggered because there is no object yet.
+  /// >   counterPot.reset();
+  /// > }
   /// ```
   void reset() {
     if (_isDisposed) {
@@ -253,11 +266,8 @@ class _PotBody<T> {
     }
   }
 
-  /// Replaces the factory set in the constructor with a new one, and/or
-  /// creates a new object using the new factory, for testing purposes.
-  ///
-  /// This method is useful when you want to replace the factory of a
-  /// non-replaceable pot in a test.
+  /// Overrides the factory function and refreshes the existing object using
+  /// the new factory, if any, specifically for testing purposes.
   ///
   /// ```dart
   /// final counterPot = Pot(() => Counter(0));
@@ -269,24 +279,38 @@ class _PotBody<T> {
   /// }
   /// ```
   ///
-  /// Note that you will get a warning from static analysis if you use it
-  /// outside of a test.
+  /// This method is available even on non-replaceable pots. Using it instead
+  /// of `replace()` ensures that factory replacement is restricted to testing
+  /// and prevents accidental misuse in application logic.
   ///
-  /// For details on how to use this method, see the document of
-  /// [ReplaceablePot.replace], which is essentially the same as this method.
+  /// > [!NOTE]
+  /// > You will get a warning from static analysis if you use it outside
+  /// > of a test.
+  ///
+  /// See also:
+  /// * [ReplaceablePot.replace], the standard method for replacing factories
+  ///   in non-test scenarios.
   @visibleForTesting
   void replaceForTesting(PotObjectFactory<T> factory) {
     _replace(factory);
   }
 
-  /// Notifies the listeners of an update of the object in the pot.
+  /// Notifies listeners that the object inside the pot has been updated.
   ///
-  /// Events of pot itself are automatically notified, but changes in
-  /// the object held in the pot are not. This method is for manually
-  /// notifying those events.
+  /// The pot automatically notifies listeners only about changes to the
+  /// pot itself (e.g., created, reset). It does not automatically notify
+  /// listeners when the object it holds changes or when the object's
+  /// internal state changes.
   ///
-  /// e.g. Refreshing the value shown in the Pottery DevTools extension
-  /// page by a notification.
+  /// Call this method when you need to notify listeners about changes that
+  /// happen within the held object.
+  ///
+  /// > [!NOTE]
+  /// > This notification affects not only the listeners you add via
+  /// > [Pot.listen], but also the Pottery DevTools extension. For example,
+  /// > if a pot holds a `ValueNotifier`, neither changes to the notifier
+  /// > nor changes in its value are reflected in the extension page unless
+  /// > you call this method.
   void notifyObjectUpdate() {
     if (_isDisposed) {
       throwStateError();
@@ -338,8 +362,8 @@ class ReplaceablePot<T> extends Pot<T> {
   /// or since an existing factory was removed by [resetAsPending].
   bool get isPending => _isPending;
 
-  /// Replaces the factory in a replaceable pot with a new one, and/or
-  /// creates a new object using the new factory.
+  /// Overrides the factory function and refreshes the existing object
+  /// using the new factory, if any.
   ///
   /// This behaves differently depending on the existence of the object.
   ///
@@ -365,7 +389,7 @@ class ReplaceablePot<T> extends Pot<T> {
   ///
   /// If the pot has an object:
   /// * Both the factory and the object are replaced.
-  /// * The disposer of the old object is triggered.
+  /// * The disposer is triggered for the old object.
   ///
   /// ```dart
   /// final pot = Pot.replaceable<User>(
@@ -378,17 +402,19 @@ class ReplaceablePot<T> extends Pot<T> {
   ///   pot.create();
   ///
   ///   // The factory is replaced.
-  ///   // The existing object is discarded and the disposer is triggered.
+  ///   // The existing object is removed and the disposer is triggered.
   ///   // A new object is immediately created by the new factory.
   ///   pot.replace(() => User(id: 200));
   /// }
   /// ```
   ///
-  /// If you need to replace the factory only in tests, you may want to
-  /// use a non-replaceable pot and to use [replaceForTesting] instead of
-  /// [replace]. This helps prevent accidentally calling [replace] outside
-  /// of tests in test-only scenarios. The [replaceForTesting] method is
-  /// available even on a non-replaceable pot.
+  /// > [!TIP]
+  /// > If you need to replace the factory only in tests, you may want
+  /// > to use a non-replaceable pot and to use
+  /// > [replaceForTesting()][replaceForTesting] instead of this method.
+  /// > It ensures that factory replacement is restricted to testing
+  /// > and prevents its misuse in application logic. Conveniently,
+  /// > `replaceForTesting()` is available even on a non-replaceable pot.
   void replace(PotObjectFactory<T> factory) => _replace(factory);
 
   /// Calls [reset] and also removes the existing factory to switch

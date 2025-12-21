@@ -14,6 +14,9 @@ extension ScopeController on Scopes {
   void clearScope(int index, {required bool keepScope}) {
     final pots = this[index];
     for (var i = pots.length - 1; i >= 0; i--) {
+      // reset() removes the pot from the list of pots.
+      // The list needs to be iterated backwards so removals don't
+      // shift indexes and some elements are not skipped.
       pots[i].reset();
     }
 

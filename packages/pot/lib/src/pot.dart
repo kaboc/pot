@@ -15,7 +15,7 @@ part 'parts/pot_body.dart';
 typedef PotObjectFactory<T> = T Function();
 
 /// The signature of a callback that receives an object of type [T]
-/// to be disposed of.
+/// to clean up resources associated with it.
 typedef PotDisposer<T> = void Function(T);
 
 /// The signature of a function that removes the listener added
@@ -23,7 +23,7 @@ typedef PotDisposer<T> = void Function(T);
 typedef PotListenerRemover = Future<void> Function();
 
 /// A class that instantiates and caches an object of type [T] until
-/// it is discarded.
+/// it is removed.
 ///
 /// {@template pot.class}
 /// A [Pot] is a holder that keeps an object instance.
@@ -34,8 +34,8 @@ typedef PotListenerRemover = Future<void> Function();
 /// created, a new one is not created unless the pot is reset or the
 /// factory is replaced.
 ///
-/// The `disposer` is triggered when the object is disposed by
-/// methods such as [reset] and [ReplaceablePot.replace].
+/// The `disposer` is triggered when the object is removed by methods
+/// such as [reset] and [ReplaceablePot.replace].
 ///
 /// ```dart
 /// final counterPot = Pot<Counter>(
@@ -51,7 +51,7 @@ typedef PotListenerRemover = Future<void> Function();
 ///   final counter = counterPot();
 ///   ...
 ///
-///   // The object is discarded and the disposer function is called.
+///   // The object is removed and the disposer function is called.
 ///   counterPot.reset();
 /// }
 /// ```
@@ -62,8 +62,8 @@ typedef PotListenerRemover = Future<void> Function();
 /// final counter = Counter();
 /// ```
 ///
-/// It is possible to replace the factory and/or the object with
-/// [ReplaceablePot.replace].
+/// It is possible to replace the factory and the object (if existing)
+/// using [ReplaceablePot.replace]:
 ///
 /// ```dart
 /// final counterPot = Pot.replaceable<User>(() => User.none());
@@ -73,7 +73,7 @@ typedef PotListenerRemover = Future<void> Function();
 /// }
 /// ```
 ///
-/// or with [replaceForTesting] (only in a test) if the pot is not of
+/// or with [replaceForTesting] (only in tests) if the pot is not of
 /// type [ReplaceablePot] created by [Pot.replaceable] or [Pot.pending]:
 ///
 /// ```dart
@@ -86,7 +86,7 @@ typedef PotListenerRemover = Future<void> Function();
 /// }
 /// ```
 ///
-/// It is easy to discard the object when it becomes no longer necessary.
+/// It is easy to remove the object when it becomes no longer necessary.
 ///
 /// ```dart
 /// final counter = counterPot();
@@ -106,17 +106,18 @@ typedef PotListenerRemover = Future<void> Function();
 /// // The index of the current scope changes from 0 to 1.
 /// Pot.pushScope();
 ///
-/// // A counter object is created in the scope 1.
+/// // The pot is bound to the scope 1 and a Counter is created in the pot.
 /// counterPot.create();
 ///
-/// // The object is discarded when the scope 1 is removed.
+/// // The pot is reset and the object is removed automatically
+/// // when the scope 1 is removed.
 /// Pot.popScope();
 /// ```
 /// {@endtemplate}
 @sealed
 class Pot<T> extends _PotBody<T> {
-  /// Creates a Pot that instantiates and caches an object of type [T]
-  /// until it is discarded.
+  /// Creates a [Pot] that instantiates and caches an object of type [T]
+  /// until it is removed.
   ///
   /// {@macro pot.class}
   Pot(super.factory, {super.disposer});
@@ -147,7 +148,8 @@ class Pot<T> extends _PotBody<T> {
   ///
   /// Replacements are only available for this type of pots.
   ///
-  /// See [ReplaceablePot.replace] for more details.
+  /// See also:
+  /// * [ReplaceablePot.replace], which replaces the factory function.
   static ReplaceablePot<T> replaceable<T>(
     PotObjectFactory<T> factory, {
     PotDisposer<T>? disposer,
@@ -177,8 +179,8 @@ class Pot<T> extends _PotBody<T> {
   /// For example, if the index number of the current scope is 2 and
   /// the factory set in the constructor is triggered for the first time,
   /// an object is created by the factory and gets bound to the scope 2.
-  /// The object exists while the current scope is 2 or newer, so it is
-  /// discarded when the scope 2 is removed.
+  /// The object exists only while the current scope is 2 or newer, so
+  /// it is removed when the scope 2 is removed.
   /// {@endtemplate}
   ///
   /// ```dart
@@ -192,7 +194,7 @@ class Pot<T> extends _PotBody<T> {
   ///   // An object is created and set in the current scope.
   ///   final counter = counterPot();
   ///
-  ///   // The object is discarded.
+  ///   // The object is removed.
   ///   // The scope 1 is removed and the `currentScope` turns 0.
   ///   Pot.popScope();
   /// }
@@ -212,16 +214,16 @@ class Pot<T> extends _PotBody<T> {
   ///
   /// void main() {
   ///   // A new scope is added, and the `currentScope` turns 1.
-  ///   // The objects are not bound to the scope yet because
-  ///   // they haven't created.
+  ///   // The pots are not bound to the scope at this point because
+  ///   // objects haven't been created yet.
   ///   Pot.pushScope();
   ///
-  ///   // Object are created and set in the current scope 1.
+  ///   // Pots are bound to the current scope 1 and objects are created.
   ///   final counter1 = counterPot1();
   ///   final counter2 = counterPot2();
   ///
-  ///   // The scope 1 is removed, and the objects in both
-  ///   // of the two pots are discarded.
+  ///   // The scope 1 is removed.
+  ///   // The pots are unbound and the objects are removed from both pots.
   ///   Pot.popScope();
   /// }
   /// ```
@@ -234,21 +236,22 @@ class Pot<T> extends _PotBody<T> {
 
   /// Resets all pots in the current scope.
   ///
-  /// This discards all the objects bound to the current scope, and
-  /// triggers the disposer of each pot.
+  /// This removes all objects in the pots bound to the current scope,
+  /// and triggers the disposer of each pot.
   ///
   /// Calling this does not affect the scope itself. The index number
   /// of the current scope stays the same.
   ///
-  /// See [reset] for details on a reset of an object.
+  /// See also:
+  /// * [reset], which resets a single pot..
   static void resetAllInScope() {
     ScopeState.scopes.clearScope(ScopeState.currentScope, keepScope: true);
   }
 
   /// Resets all pots of all scopes.
   ///
-  /// This discards all the objects bound to any scopes, and triggers
-  /// the disposer of each pot.
+  /// This removes all objects in the pots bound to any scopes, and
+  /// triggers the disposer of each pot.
   ///
   /// If `keepScopes` is `true` or not specified, calling this method
   /// does not affect the scopes themselves; the index number of the
