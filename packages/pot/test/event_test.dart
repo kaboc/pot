@@ -22,7 +22,7 @@ void main() {
     controller?.close();
     controller = null;
     events.clear();
-    Pot.resetAll(keepScopes: false);
+    Pot.uninitialize();
   });
 
   void listener(PotEvent event) {

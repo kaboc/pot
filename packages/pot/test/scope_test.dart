@@ -14,7 +14,7 @@ void main() {
     PotManager.warningPrinter = (w) => warning = w;
   });
   tearDown(() {
-    Pot.resetAll(keepScopes: false);
+    Pot.uninitialize();
     resetFoo();
     warning = null;
   });
@@ -270,6 +270,7 @@ void main() {
       ]);
       expect(values, <int>[]);
 
+      // ignore: deprecated_member_use_from_same_package
       Pot.resetAll();
 
       expect(pot3.hasObject, isFalse);
@@ -299,6 +300,7 @@ void main() {
         [pot3, pot4],
       ]);
 
+      // ignore: deprecated_member_use_from_same_package
       Pot.resetAll();
 
       expect(Pot.currentScope, 1);
@@ -320,6 +322,7 @@ void main() {
           [pot1, pot2],
         ]);
 
+        // ignore: deprecated_member_use_from_same_package
         Pot.resetAll();
         expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
       },
@@ -331,32 +334,96 @@ void main() {
       pot.create();
       expect(pot.scope, 0);
 
+      // ignore: deprecated_member_use_from_same_package
       Pot.resetAll();
       expect(pot.scope, isNull);
     });
+  });
 
-    test('resetAll(keepScopes: false) removes objects and scopes except 0', () {
-      expect(Pot.currentScope, 0);
-      expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
+  group('Scope - uninitialize()', () {
+    test(
+      'uninitialize() removes non-root scopes and resets pot in reverse order',
+      () {
+        final values = <int>[];
+        void disposer(Foo foo) => values.add(foo.value);
 
-      final pot1 = Pot(() => Foo(1));
-      final pot2 = Pot(() => Foo(2));
-      final pot3 = Pot(() => Foo(3));
+        final pot1 = Pot<Foo>(() => Foo(1), disposer: disposer);
+        final pot2 = Pot<Foo>(() => Foo(2), disposer: disposer);
+        final pot3 = Pot<Foo>(() => Foo(3), disposer: disposer);
+        final pot4 = Pot<Foo>(() => Foo(4), disposer: disposer);
+        final pot5 = Pot<Foo>(() => Foo(5), disposer: disposer);
+        final pot6 = Pot<Foo>(() => Foo(6), disposer: disposer);
 
-      pot1.create();
-      Pot.pushScope();
-      pot2.create();
-      Pot.pushScope();
-      pot3.create();
+        pot1.create();
+        pot2.create();
+        Pot.pushScope();
+        pot3.create();
+        pot4.create();
+        Pot.pushScope();
+        pot5.create();
+        pot6.create();
 
-      expect(Pot.currentScope, 2);
+        expect(pot1.objectString(), 'Foo(1)');
+        expect(pot2.objectString(), 'Foo(2)');
+        expect(pot3.objectString(), 'Foo(3)');
+        expect(pot4.objectString(), 'Foo(4)');
+        expect(pot5.objectString(), 'Foo(5)');
+        expect(pot6.objectString(), 'Foo(6)');
+        expect(pot1.scope, 0);
+        expect(pot2.scope, 0);
+        expect(pot3.scope, 1);
+        expect(pot4.scope, 1);
+        expect(pot5.scope, 2);
+        expect(pot6.scope, 2);
+        expect(ScopeState.scopes, [
+          [pot1, pot2],
+          [pot3, pot4],
+          [pot5, pot6],
+        ]);
+        expect(Pot.currentScope, 2);
+        expect(values, isEmpty);
 
-      Pot.resetAll(keepScopes: false);
+        Pot.uninitialize();
 
-      expect(Pot.currentScope, 0);
-      expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
-      expect(pot1.scope, isNull);
-    });
+        expect(pot1.hasObject, isFalse);
+        expect(pot2.hasObject, isFalse);
+        expect(pot3.hasObject, isFalse);
+        expect(pot4.hasObject, isFalse);
+        expect(pot5.hasObject, isFalse);
+        expect(pot6.hasObject, isFalse);
+        expect(pot1.scope, isNull);
+        expect(pot2.scope, isNull);
+        expect(pot3.scope, isNull);
+        expect(pot4.scope, isNull);
+        expect(pot5.scope, isNull);
+        expect(pot6.scope, isNull);
+        expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
+        expect(Pot.currentScope, 0);
+        expect(values, [6, 5, 4, 3, 2, 1]);
+      },
+    );
+
+    test(
+      'When only root scope exists, uninitialize() only resets and clears pots',
+      () {
+        expect(Pot.currentScope, 0);
+        expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
+
+        final values = <int>[];
+        void disposer(Foo foo) => values.add(foo.value);
+
+        final pot = Pot(() => Foo(1), disposer: disposer);
+        pot.create();
+        expect(ScopeState.scopes, [
+          [pot]
+        ]);
+        expect(values, isEmpty);
+
+        Pot.uninitialize();
+        expect(ScopeState.scopes, <List<Pot<Object?>>>[[]]);
+        expect(values, [1]);
+      },
+    );
   });
 
   group('Scope - popScope()', () {

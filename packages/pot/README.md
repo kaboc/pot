@@ -118,9 +118,9 @@ void main() {
 }
 ```
 
-[replace()][replace], [Pot.popScope()][popScope], [Pot.resetAllInScope()][resetAllInScope]
-and [Pot.resetAll()][resetAll] also discard existing object(s). These will be explained in
-later sections of this document.
+The [replace()][replace], [Pot.popScope()][popScope], [Pot.resetAllInScope()][resetAllInScope]
+and [Pot.uninitialize()][uninitialize] methods also remove existing objects.
+These will be explained in later sections of this document.
 
 ## Advanced usage
 
@@ -300,12 +300,10 @@ triggered in the same way.
 
 ### Resetting objects in all scopes
 
-[Pot.resetAll()][resetAll] discards all the objects that are bound to any scope. This is
-useful to reset all for testing.
 
-By default, this method does not remove scopes themselves. If you want both objects and scopes
-to be reset, call it with `keepScopes: false`. It may be used for clearing the state to make
-the app behave as if it has restarted.
+[Pot.uninitialize()][uninitialize] removes all scopes and resets all pots.
+This is useful to reset all pots and scopes to the initial state for testing.
+It may also be used to make the app behave as if it has restarted.
 
 ## Caveats
 
@@ -358,7 +356,7 @@ discarded manually with [reset()][reset] or other methods that have the same eff
 [replace]: https://pub.dev/documentation/pot/latest/pot/ReplaceablePot/replace.html
 [popScope]: https://pub.dev/documentation/pot/latest/pot/Pot/popScope.html
 [resetAllInScope]: https://pub.dev/documentation/pot/latest/pot/Pot/resetAllInScope.html
-[resetAll]: https://pub.dev/documentation/pot/latest/pot/Pot/resetAll.html
+[uninitialize]: https://pub.dev/documentation/pot/latest/pot/Pot/uninitialize.html
 [replaceable]: https://pub.dev/documentation/pot/latest/pot/Pot/replaceable.html
 [pending]: https://pub.dev/documentation/pot/latest/pot/Pot/pending.html
 [resetAsPending]: https://pub.dev/documentation/pot/latest/pot/ReplaceablePot/resetAsPending.html

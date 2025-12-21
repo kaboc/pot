@@ -20,7 +20,7 @@ void main() {
     controller?.close();
     controller = null;
     eventsCount = 0;
-    Pot.resetAll(keepScopes: false);
+    Pot.uninitialize();
   });
 
   void listener(PotEvent event) {

@@ -10,7 +10,7 @@ import 'utils.dart';
 
 void main() {
   tearDown(() {
-    Pot.resetAll(keepScopes: false);
+    Pot.uninitialize();
     resetFoo();
   });
 
@@ -460,11 +460,11 @@ void main() {
       expect(Pot.resetAllInScope, isNot(throwsA(anything)));
     });
 
-    test('resetAll() after one of pots is disposed does not throw', () {
+    test('uninitialize() after one of pots is disposed does not throw', () {
       final pot = Pot(() => Foo(1));
       pot.create();
       pot.dispose();
-      expect(Pot.resetAll, isNot(throwsA(anything)));
+      expect(Pot.uninitialize, isNot(throwsA(anything)));
     });
 
     test(

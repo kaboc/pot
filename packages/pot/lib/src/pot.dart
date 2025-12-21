@@ -91,8 +91,12 @@ typedef PotListenerRemover = Future<void> Function();
 /// ```dart
 /// final counter = counterPot();
 /// final repository = repositoryPot();
-/// ...
-/// Pot.resetAll();
+///
+/// // Resetting a particular pot to remove the factory and the held object.
+/// counterPot.reset();
+///
+/// // Or resetting all pots (and also scopes) to the initial state.
+/// Pot.uninitialize();
 /// ```
 ///
 /// The [Pot] class also provides the feature of scoping the range
@@ -251,10 +255,30 @@ class Pot<T> extends _PotBody<T> {
   /// current scope stays the same. Otherwise, the index is reset to 0.
   ///
   /// See [reset] for details on a reset of an object.
+  @Deprecated(
+    'Use uninitialize instead. '
+    'This feature was deprecated after v0.8.0.',
+  )
   static void resetAll({bool keepScopes = true}) {
     final count = ScopeState.currentScope;
     for (var i = count; i >= 0; i--) {
       ScopeState.scopes.clearScope(i, keepScope: keepScopes);
+    }
+  }
+
+  /// Resets the state of all pots and scopes to their initial state.
+  ///
+  /// This removes all existing scopes and resets the scope index back to 0.
+  /// It causes all pots to be reset. For any pot that holds an object,
+  /// the disposer is called to allow for manual cleanup when the object is
+  /// removed from the pot.
+  ///
+  /// See also:
+  /// * [resetAllInScope], which only resets pots within the current scope.
+  static void uninitialize() {
+    final count = ScopeState.currentScope;
+    for (var i = count; i >= 0; i--) {
+      ScopeState.scopes.clearScope(i, keepScope: false);
     }
   }
 
