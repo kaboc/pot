@@ -14,43 +14,35 @@ of widgets in Flutter.
 [Pot] itself from package:pot has the feature of scoping, but it is a package
 for Dart, not specific to Flutter.
 
-Pottery is a utility that makes up for it. It makes use of the widget lifecycle
-to limit the scope of Pots. It is more natural in Flutter and less error-prone.
+`Pottery` is a utility that makes up for it. It makes use of the widget lifecycle
+to limit the scope of pots. It is more natural in Flutter and less error-prone.
 
 ### How will this make things better?
 
-While it is convenient that you can access a [Pot] stored in a global variable
-from anywhere, it gives you too much freedom, making you wonder how Pots should
+While it is convenient that you can access a pot stored in a global variable
+from anywhere, it gives you too much freedom, making you wonder how pots should
 be managed in a Flutter app. For example, you may easily lose track of from
-where in your app code a particular Pot is used.
+where in your app code a particular pot is used.
 
-Pottery makes it possible to manage Pots in a similar manner to using package:provider.
-See the example described later in this document.
+`Pottery` makes it possible to manage pots in a similar manner to using package:provider.
 
 ## Examples
 
 - [Counters](https://github.com/kaboc/pot/blob/main/packages/pottery/example) - simple
 - [pub.dev explorer](https://github.com/kaboc/pubdev-explorer) - advanced
 
-## Getting started
-
-```yaml
-dependencies:
-  pottery: ^x.x.x
-```
-
 ## Usage
 
 ### Pottery
 
 Create a [Pot] as "pending" first if it is not necessary yet at the start of
-your app. The Pot should usually be assigned to a global variable.
+your app. The pot should usually be assigned to a global variable.
 
 ```dart
 final counterNotifierPot = Pot.pending<CounterNotifier>();
 ```
 
-Use [Pottery] and specify a factory right before you need to start using the Pot.
+Use [Pottery] and specify a factory when you are about to start using the pot.
 
 ```dart
 Widget build(BuildContext context) {
@@ -79,36 +71,36 @@ Widget build(BuildContext context) {
 `pots` is a Map with key-value pairs of a Pot and a factory. Each of the factories
 becomes available for a corresponding Pot thereafter.
 
-It is easier to understand how to use Pottery by imagining it as something similar to
-`MultiProvider` of the provider package, although they internally work quite differently.
+> [!NOTE]
+> It is easier to understand how to use `Pottery` by imagining it as something
+> similar to `MultiProvider` of the provider package, although they internally
+> work quite differently:
+>
+> - MultiProvider
+>     - Creates objects and provides them so that they are available in the subtree.
+> - Pottery
+>     - Replaces factories to make pots ready so that they are available after
+>       that point. The widget tree is only used to manage the lifetime of
+>       factories and objects in pots, so pots are still available outside the
+>       tree.
 
-- MultiProvider
-    - Creates objects and provides them so that they are available down the tree.
-- Pottery
-    - Replaces factories to make Pots ready so that they are available after that point.
-      The widget tree is only used to manage the lifespan of factories and objects in
-      Pots, so Pots are still available outside the tree. 
-      
+Removing `Pottery` from the tree (e.g. navigating back from the page where
+`Pottery` is used) resets all pots in the `pots` map and replaces their
+factories to throw an [PotNotReadyException].
 
-Removing Pottery from the tree (e.g. navigating back from the page where Pottery is used)
-resets all Pots in the `pots` map and replaces their factories to throw an
-[PotNotReadyException].
-
-**Note:**
-
-If a target Pot is not pending and an object already exists in it when Pottery
-is created, Pottery replaces the object as well as the factory immediately. 
+> [!NOTE]
+> If a target pot is not pending and an object already exists in it when `Pottery`
+> is created, `Pottery` immediately replaces the object as well as the factory.
 
 ### LocalPottery
 
-This widget defines new factories for existing Pots to create objects that are
+This widget defines new factories for existing pots to create objects that are
 available only in the subtree.
 
-An important fact is that the factories of the existing Pots are not replaced,
-but new separate factories are associated with those Pots for local use only.
-Therefore, calling a Pot still returns the object held globally in the Pot.
-Use [of()] instead to obtain the local object. The example below illustrates
-the behaviour.
+An important fact is that the existing pots remain unchanged. The factories and
+objects are associated with those pots and stored in [LocalPottery] for local
+use. Therefore, calling `yourPot()` still returns the globally accessible object
+stored in the pot itself. Use [of()][of] instead to obtain the local object.
 
 ```dart
 final fooPot = Pot(() => Foo(111));
@@ -142,19 +134,21 @@ class ChildWidget extends StatelessWidget {
 }
 ```
 
-See the examples in [main2.dart] and in the document of [LocalPottery] for usage in
-more practical use cases.
+For usage in more practical use cases, see the examples in [main2.dart] and in
+the document of `LocalPottery`.
 
-Note that there are several important differences between `LocalPottery` and [Pottery]:
+#### Important differences in [LocalPottery] compared to [Pottery]:
 
 - Objects are created immediately when `LocalPottery` is created, not when objects
-  in Pots are accessed for the first time.
-- As already mentioned, objects created with `LocalPottery` are only accessible with
-  [of()].
-- Objects created with `LocalPottery` are not automatically disposed when the
-  `LocalPottery` is removed from the tree. Use `disposer` to specify a callback
-  function to clean them up. Below is an example where the disposer function
-  disposes all ChangeNotifier subtypes.
+  in pots are accessed for the first time.
+- Objects created with `LocalPottery` are only accessible with [of()][of].
+- Objects created within `LocalPottery` are not automatically disposed when
+  the `LocalPottery` is removed from the tree. Use the `disposer` argument
+  of `LocalPottery` (instead of the disposer in each pot) to define a custom
+  clean-up function.
+
+Below is an example of a disposer function that disposes of all ChangeNotifiers
+and subtypes:
 
 ```dart
 LocalPottery(
@@ -201,10 +195,13 @@ DevTools.
 The extension starts when either [Pottery] or [LocalPottery] is first used.
 It is also possible to start it earlier by calling `Pottery.startExtension()`.
 
-Note that updates of objects in Pot are not automatically reflected in the
-table view until an event of either `Pot`, `Pottery` or `LocalPottery` happens.
-Press the refresh icon button if you want to see the changes quickly, or use
-`notifyObjectUpdate()` on a Pot to manually emit an event to cause a refresh.
+> [!NOTE]
+> Updates of the object in a pot caused by external factors (e.g. the object is
+> a `ValueNotifier` and its value is reassigned) are not automatically reflected
+> in the table view until an event of either `Pot`, `Pottery` or `LocalPottery`
+> happens. Press the refresh icon button if you want to see the changes quickly,
+> or use [notifyObjectUpdate()][notifyObjectUpdate] on a pot to emit an event
+> to cause a refresh.
 
 <img src="https://github.com/kaboc/pot/assets/20254485/3e5aa399-8189-4e80-a9f4-d7e35c083f15">
 
@@ -212,7 +209,8 @@ Press the refresh icon button if you want to see the changes quickly, or use
 
 [Pottery]: https://pub.dev/documentation/pottery/latest/pottery/Pottery-class.html
 [LocalPottery]: https://pub.dev/documentation/pottery/latest/pottery/LocalPottery-class.html
-[of()]: https://pub.dev/documentation/pottery/latest/pottery/NearestPotOf/of.html
+[of]: https://pub.dev/documentation/pottery/latest/pottery/NearestPotOf/of.html
 [Pot]: https://pub.dev/packages/pot
 [PotNotReadyException]: https://pub.dev/documentation/pot/latest/pot/PotNotReadyException-class.html
+[notifyObjectUpdate]: https://pub.dev/documentation/pottery/latest/pottery/Pot/notifyObjectUpdate.html
 [main2.dart]: https://github.com/kaboc/pot/blob/main/packages/pottery/example/lib/main2.dart

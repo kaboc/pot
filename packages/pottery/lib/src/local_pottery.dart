@@ -31,7 +31,7 @@ class _InheritedLocalPottery extends InheritedWidget {
   }
 }
 
-/// A widget that associates existing pots with new values and makes
+/// A widget that associates existing [Pot]s with new values and makes
 /// them accessible from descendants in the tree via the pots.
 ///
 /// {@template localPottery.class}
@@ -39,11 +39,15 @@ class _InheritedLocalPottery extends InheritedWidget {
 /// objects created by them to the pots so that those objects are made
 /// available to descendants.
 ///
-/// An important fact is that the factories of the existing pots are
-/// not actually replaced, therefore calling the [Pot.call] method
-/// still returns the object held in the global pot. Use [NearestPotOf.of]
-/// instead to obtain the local object from the nearest `LocalPottery`
-/// ancestor. The example below illustrates the behaviour.
+/// An important fact is that `LocalPottery`, unlike 'Pottery`, does
+/// not replace or override the factories stored in pots. Calling the
+/// [Pot.call] method still returns the object held in the pot.
+/// Use `of()` instead to obtain the associated object from the nearest
+/// `LocalPottery` ancestor that provides it.
+///
+/// > [!NOTE]
+/// > Unlike with [Pottery], pots used in [LocalPottery] are not required
+/// > to be of type [ReplaceablePot].
 ///
 /// ```dart
 /// final fooPot = Pot(() => Foo(111));
@@ -77,8 +81,8 @@ class _InheritedLocalPottery extends InheritedWidget {
 /// }
 /// ```
 ///
-/// This is useful when you need in descendants some objects that are
-/// different from the ones held in global pots but of the same type.
+/// This is useful when you need to use some object locally in a subtree
+/// instead of the globally accessible one stored in a pot itself.
 ///
 /// In the following example, a `LocalPottery` provides its descendant
 /// (TodoListPage) with a notifier for a specific category. It allows
@@ -131,27 +135,22 @@ class _InheritedLocalPottery extends InheritedWidget {
 /// Note that there are several important differences between
 /// `LocalPottery` and [Pottery]:
 ///
-/// * `LocalPottery` creates an object immediately, whereas
-///   `Pottery` creates (replaces, more precisely) an object only
-///   if the relevant Pot already have one.
-/// * As already mentioned, objects created by `LocalPottery` are
-///   only accessible with [NearestPotOf.of].
-/// * Objects created by `LocalPottery` are not automatically
-///   discarded when the `LocalPottery` is removed from the tree.
-///   Use [disposer] to do clean-up.
+/// * [LocalPottery] creates objects immediately and stores them locally,
+///   whereas [Pottery] replaces the factories of the pots, and the objects
+///   are created by the new factories only when they are accessed.
+/// * An object stored by `LocalPottery` is accessible only by calling
+///   `of()` on a pot, where the pot acts as the key for the object.
+/// * Objects created by `LocalPottery` are not automatically disposed
+///   when the `LocalPottery` is removed from the tree. Use
+///   the [disposer] provided to [LocalPottery] for clean-up.
 ///
 /// Also note that an error arises only at runtime if the map
 /// contains wrong pairs of pot and factory. Make sure to specify
 /// a correct factory creating an object of the correct type.
-///
-/// It is advised that `LocalPottery` be used only where it is
-/// absolutely necessary. Using it too much may make it harder to
-/// follow the code of your app.
 /// {@endtemplate}
 class LocalPottery extends StatefulWidget {
-  /// Creates a [LocalPottery] widget that associates existing pots
-  /// with new values and makes them accessible from descendants in
-  /// the tree via the pots.
+  /// Creates a [LocalPottery] widget that associates pots with new values
+  /// and makes them accessible from the widget subtree via the pots.
   ///
   /// {@macro localPottery.class}
   const LocalPottery({
@@ -161,12 +160,11 @@ class LocalPottery extends StatefulWidget {
     this.disposer,
   });
 
-  /// A map of pots and factories.
+  /// Pairs of a [Pot] and its factory.
   ///
-  /// The factories are called immediately to create objects when
-  /// the [LocalPottery] is created. The objects are accessible
-  /// with [NearestPotOf.of] (not with [Pot.call]) from the
-  /// descendants.
+  /// The factories are called immediately to create objects when the
+  /// [LocalPottery] is created. The object is accessible by calling
+  /// `of()` (not [Pot.call]) on a pot from the widget subtree.
   final PotOverrides pots;
 
   /// A function called to obtain the child widget.
@@ -175,11 +173,11 @@ class LocalPottery extends StatefulWidget {
   /// A function called when this [LocalPottery] is removed from
   /// the tree permanently.
   ///
-  /// [LocalPottery], unlike [Pottery], does not automatically
-  /// discard the objects that were created by the factories passed
-  /// to the [pots] argument. Use this disposer to specify a callback
-  /// function to clean up the objects like ValueNotifiers, which are
-  /// supposed to be disposed of when no longer used.
+  /// [LocalPottery], unlike [Pottery], does not automatically call
+  /// the disposer of each pot. Use this [disposer] to define a custom
+  /// clean-up function (e.g. disposing of a `ValueNotifier`).
+  /// It receives the objects created within this `LocalPottery` so
+  /// that they can be disposed of manually.
   final void Function(LocalPotteryObjects)? disposer;
 
   @override
@@ -234,7 +232,7 @@ class _LocalPotteryState extends State<LocalPottery> {
   }
 }
 
-/// Extension on [Pot] used in relation to [LocalPottery].
+/// An extension on [Pot] to integrate with [LocalPottery].
 extension NearestPotOf<T> on Pot<T> {
   ({Object? object, bool found}) _findObject(BuildContext context) {
     // Apparently, this lookup returns the current element
@@ -269,7 +267,8 @@ extension NearestPotOf<T> on Pot<T> {
   /// pot is returned, in which case, the return value is the same as
   /// that of the [Pot.call] method.
   ///
-  /// See the document of [LocalPottery] for usage.
+  /// See also:
+  /// * [LocalPottery], which provides the object the `of()` method obtains.
   T of(BuildContext context) {
     // Targets the current BuildContext too so that the local objects
     // become available from within the builder callback.

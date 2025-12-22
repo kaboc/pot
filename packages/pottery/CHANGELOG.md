@@ -1,3 +1,9 @@
+## 0.4.3
+
+- Improve performance of `of()` by reducing lookup costs.
+- Bump pot version to 0.8.0.
+- Sync with pot internal API update.
+
 ## 0.4.2
 
 - Update and improve documentation and examples.

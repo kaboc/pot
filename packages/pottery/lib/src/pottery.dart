@@ -11,20 +11,20 @@ import 'utils.dart';
 typedef PotReplacements
     = Map<ReplaceablePot<Object?>, PotObjectFactory<Object?>>;
 
-/// A widget that controls the availability of particular pots
+/// A widget that controls the availability of particular [Pot]s
 /// according to the widget lifecycle.
 ///
 /// {@template pottery.class}
-/// The factory of the [ReplaceablePot] specified as the key in the
-/// map ([pots]) is replaced with the [PotObjectFactory] specified
-/// as its value. An existing object is also replaced immediately
-/// with a new one created by the new factory if one has already
-/// existed. If there was no object, a new one is not created soon
-/// but only when it is accessed for the first time.
+/// This widget replaces the factories of [ReplaceablePot]s with new
+/// factories as specified in [pots]. For any pot that already holds
+/// an object, the object is immediately replaced with a new one created
+/// by the new factory. If a pot has no object, a new one is not created
+/// until the pot is accessed for the first time.
 ///
-/// If the pottery is removed from the tree permanently, the object
-/// is discarded and the factory is removed. After the removal,
-/// trying to access the object throws [PotNotReadyException].
+/// If the `Pottery` is removed from the tree permanently, the objects
+/// held in the pots are disposed, and the pots are reset to the pending
+/// state with no factory. After the removal, trying to access the objects
+/// throws a [PotNotReadyException].
 ///
 /// ```dart
 /// final notesNotifierPot = Pot.pending<NotesNotifier>(
@@ -49,7 +49,7 @@ typedef PotReplacements
 ///
 /// Note that [Pottery] does not bind pots to the widget tree.
 /// It only uses the lifecycle of itself in the tree to control
-/// the lifespan of pots' content, which is an important difference
+/// the lifetime of pots' content, which is an important difference
 /// from [LocalPottery].
 ///
 /// Also note that an error arises only at runtime if the map
@@ -68,7 +68,7 @@ class Pottery extends StatefulWidget {
     required this.builder,
   });
 
-  /// A map of replaceable pots and factories.
+  /// Pairs of a replaceable [Pot] and its new factory.
   final PotReplacements pots;
 
   /// A function called to obtain the child widget.

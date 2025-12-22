@@ -54,9 +54,10 @@ class CounterPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Pottery(
       pots: {
-        // counterNotifierPot should be prepared here because it is not used
-        // before this page,
-        // The notifier is disposed automatically when this page is disposed.
+        // counterNotifierPot should be prepared here because
+        // it is not used before this page.
+        // The notifier is disposed and the factory is removed
+        // automatically when this page is disposed.
         counterNotifierPot: () => CounterNotifier(showMessage: true),
       },
       builder: (context) {
