@@ -74,7 +74,9 @@ class CounterPage extends StatelessWidget {
                   style: const TextStyle(fontSize: 32.0),
                 ),
                 const SizedBox(width: 16.0),
-                IncrementButton(onPressed: notifier.increment),
+                IncrementButton(
+                  onPressed: notifier.increment,
+                ),
               ],
             ),
           ),

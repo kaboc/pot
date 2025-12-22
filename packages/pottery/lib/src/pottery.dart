@@ -103,8 +103,8 @@ class _PotteryState extends State<Pottery> {
 
   @override
   void dispose() {
-    // Some pots may depend on other pots located earlier
-    // in the map, so they must be reset in reverse order.
+    // Some pots may depend on other pots located earlier in
+    // the collection, so they must be reset in reverse order.
     widget.pots.keys.toList().reversed.forEach((pot) {
       pot.resetAsPending();
     });
