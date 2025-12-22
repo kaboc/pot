@@ -124,11 +124,11 @@ void main() {
             'ext.pottery.getPots',
             jsonEncode({
               pot1!.identity(): {
-                'time': StaticPot.allInstances[pot1]!.microsecondsSinceEpoch,
+                'time': PotManager.allInstances[pot1]!.microsecondsSinceEpoch,
                 'potDescription': PotDescription.fromPot(pot1!).toMap(),
               },
               pot2!.identity(): {
-                'time': StaticPot.allInstances[pot2]!.microsecondsSinceEpoch,
+                'time': PotManager.allInstances[pot2]!.microsecondsSinceEpoch,
                 'potDescription': PotDescription.fromPot(pot2!).toMap(),
               },
             }),

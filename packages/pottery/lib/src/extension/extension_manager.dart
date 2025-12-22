@@ -86,7 +86,7 @@ class PotteryExtensionManager {
       _communicator
         ?..onRequest('ext.pottery.getPots', () {
           return {
-            for (final (pot, time) in StaticPot.allInstances.records)
+            for (final (pot, time) in PotManager.allInstances.records)
               pot.identity(): {
                 'time': time.microsecondsSinceEpoch,
                 'potDescription': PotDescription.fromPot(pot).toMap(),
@@ -126,7 +126,7 @@ class PotteryExtensionManager {
 
   void onPotteryCreated(State<Pottery> state, _Pots pots) {
     _runIfDebugAndInitialized(() {
-      StaticPot.eventHandler.addEvent(
+      PotManager.eventHandler.addEvent(
         PotEventKind.potteryCreated,
         pots: pots,
       );
@@ -137,7 +137,7 @@ class PotteryExtensionManager {
 
   void onPotteryRemoved(State<Pottery> state, _Pots pots) {
     _runIfDebugAndInitialized(() {
-      StaticPot.eventHandler.addEvent(
+      PotManager.eventHandler.addEvent(
         PotEventKind.potteryRemoved,
         pots: pots,
       );
@@ -151,7 +151,7 @@ class PotteryExtensionManager {
     LocalPotteryObjects objects,
   ) {
     _runIfDebugAndInitialized(() {
-      StaticPot.eventHandler.addEvent(
+      PotManager.eventHandler.addEvent(
         PotEventKind.localPotteryCreated,
         pots: objects.keys,
       );
@@ -174,7 +174,7 @@ class PotteryExtensionManager {
     LocalPotteryObjects objects,
   ) {
     _runIfDebugAndInitialized(() {
-      StaticPot.eventHandler.addEvent(
+      PotManager.eventHandler.addEvent(
         PotEventKind.localPotteryRemoved,
         pots: objects.keys,
       );
