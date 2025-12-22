@@ -21,7 +21,7 @@ void main() {
   ReplaceablePot<Object?>? nullablePot;
 
   tearDown(() {
-    Pot.resetAll(keepScopes: false);
+    Pot.uninitialize();
     fooPot = barPot = nullablePot = null;
   });
 
