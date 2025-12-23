@@ -6,14 +6,14 @@ import 'event_handler.dart';
 typedef Scopes = List<List<Pot<Object?>>>;
 
 // ignore: avoid_classes_with_only_static_members
-class ScopeState {
+abstract final class ScopeState {
   static final Scopes scopes = [[]];
 
   static int currentScope = 0;
 }
 
 // ignore: avoid_classes_with_only_static_members
-class PotManager {
+abstract final class PotManager {
   static final eventHandler = PotEventHandler();
 
   // For debugging and testing

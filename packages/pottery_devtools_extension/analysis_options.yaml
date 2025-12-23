@@ -16,6 +16,7 @@ linter:
     use_key_in_widget_constructors: false
 
     # For Flutter (enabled)
+#    diagnostic_describe_all_properties: true
     sized_box_shrink_expand: true
     use_colored_box: true
     use_decorated_box: true
@@ -38,9 +39,11 @@ linter:
     avoid_escaping_inner_quotes: true
     avoid_field_initializers_in_const_classes: true
     avoid_final_parameters: true
+    avoid_futureor_void: true
     avoid_implementing_value_types: true
     avoid_js_rounded_ints: true
     avoid_multiple_declarations_per_line: true
+    avoid_null_checks_in_equality_operators: true
     avoid_positional_boolean_parameters: true
     avoid_private_typedef_functions: true
     avoid_redundant_argument_values: true
@@ -63,14 +66,15 @@ linter:
 #    directives_ordering: true
 #    discarded_futures: true
     do_not_use_environment: true
+#    document_ignores: true
     eol_at_end_of_file: true
     implicit_reopen: true
     invalid_case_patterns: true
     join_return_with_assignment: true
     leading_newlines_in_multiline_strings: true
-    library_annotations: true
     lines_longer_than_80_chars: true
     literal_only_boolean_expressions: true
+    missing_code_block_language_in_doc_comment: true
     missing_whitespace_between_adjacent_strings: true
     no_adjacent_strings_in_list: true
     no_default_cases: true
@@ -78,12 +82,16 @@ linter:
     no_self_assignments: true
     noop_primitive_operations: true
     omit_local_variable_types: true
+#    omit_obvious_local_variable_types: true
     one_member_abstracts: true
     only_throw_errors: true
 #    package_api_docs: true
     parameter_assignments: true
     prefer_asserts_in_initializer_lists: true
     prefer_asserts_with_message: true
+    prefer_const_constructors: true
+    prefer_const_declarations: true
+    prefer_const_literals_to_create_immutables: true
     prefer_constructors_over_static_methods: true
 #    prefer_expression_function_bodies: true
     prefer_final_in_for_each: true
@@ -93,6 +101,7 @@ linter:
 #    prefer_int_literals: true
     prefer_mixin: true
     prefer_null_aware_method_calls: true
+#    prefer_relative_imports: true
     prefer_single_quotes: true
     prefer_void_to_null: true
 #    public_member_api_docs: true
@@ -100,11 +109,13 @@ linter:
     sort_constructors_first: true
 #    sort_pub_dependencies: true
     sort_unnamed_constructors_first: true
+#    specify_nonobvious_local_variable_types: true
     test_types_in_equals: true
     throw_in_finally: true
     tighten_type_of_initializing_formals: true
     type_annotate_public_apis: true
     unawaited_futures: true
+    unintended_html_in_doc_comment: true
     unnecessary_await_in_return: true
     unnecessary_breaks: true
     unnecessary_lambdas: true
@@ -126,3 +137,4 @@ linter:
     use_string_buffers: true
     use_test_throws_matchers: true
     use_to_and_as_if_applicable: true
+    use_truncating_division: true

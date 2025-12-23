@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart' show ValueNotifier;
 
+// ignore: depend_on_referenced_packages
 import 'package:pot/pot.dart' show PotDescription, PotEvent;
 
 typedef LocalObject = ({String potIdentity, String object});

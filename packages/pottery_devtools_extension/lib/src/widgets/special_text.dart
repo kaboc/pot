@@ -30,7 +30,7 @@ class IdentityText extends StatelessWidget {
             TextDefinition(
               matcher: const PatternMatcher('#.+'),
               matchStyle: context.textTheme.bodySmall?.copyWith(
-                color: context.colorScheme.outline.withOpacity(0.7),
+                color: context.colorScheme.outline.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -66,7 +66,7 @@ class TappableText extends StatelessWidget {
       ],
       style: linkStyle,
       hoverStyle: linkStyle?.copyWith(
-        color: linkStyle.color?.withOpacity(0.7),
+        color: linkStyle.color?.withValues(alpha: 0.7),
       ),
       overflow: TextOverflow.ellipsis,
       onTap: (_) => onTap(),

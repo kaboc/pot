@@ -2,11 +2,11 @@ name: pot_example
 description: An example of Pot.
 
 environment:
-  sdk: ">=2.19.0 <4.0.0"
+  sdk: ^3.6.2
 
 dependencies:
   pot:
     path: ../
 
 dev_dependencies:
-  lints: ^2.0.1
+  lints: ^5.1.1

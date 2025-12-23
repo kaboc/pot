@@ -21,29 +21,25 @@ class DetailsViewer extends StatelessWidget {
         : LayoutBuilder(
             builder: (context, constraints) {
               return SelectionArea(
-                child: SizedBox(
-                  // Workaround for https://github.com/flutter/flutter/issues/121053
-                  height: constraints.maxHeight,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        if (title != null)
-                          Text(
-                            title!,
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (title != null)
+                        Text(
+                          title!,
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
                           ),
-                        if (time != null) ...[
-                          const SizedBox(height: 4.0),
-                          Text('$time'),
-                        ],
-                        const SizedBox(height: 16.0),
-                        HighlightedJson(json!),
+                        ),
+                      if (time != null) ...[
+                        const SizedBox(height: 4.0),
+                        Text('$time'),
                       ],
-                    ),
+                      const SizedBox(height: 16.0),
+                      HighlightedJson(json!),
+                    ],
                   ),
                 ),
               );

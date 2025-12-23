@@ -39,7 +39,7 @@ class _PotteryExtensionPageState extends State<PotteryExtensionPage> {
     final potEventsNotifier = _eventHandler.potEventsNotifier;
 
     return Scaffold(
-      body: Split(
+      body: SplitPane(
         axis: Axis.horizontal,
         minSizes: const [140.0, 240.0],
         initialFractions: const [0.1, 0.9],

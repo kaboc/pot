@@ -37,7 +37,7 @@ class _LocalPotteryViewState extends State<LocalPotteryView> {
     final length = widget.eventHandler.localPotteriesNotifier
         .grabAt(context, (s) => s.length);
 
-    return Split(
+    return SplitPane(
       axis: Axis.vertical,
       minSizes: const [200.0, 100.0],
       initialFractions: const [0.75, 0.25],

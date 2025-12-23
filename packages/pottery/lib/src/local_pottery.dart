@@ -276,8 +276,6 @@ extension NearestPotOf<T> on Pot<T> {
 
     if (!found) {
       context.visitAncestorElements((element) {
-        // Suppresses false positive warning
-        // ignore: unnecessary_statements
         (:object, :found) = _findObject(element);
         return !found;
       });

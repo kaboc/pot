@@ -36,7 +36,7 @@ class HighlightedJson extends StatelessWidget {
           matcher: const UrlMatcher(),
           matchStyle: TextStyle(
             color: context.colorScheme.tertiary,
-            backgroundColor: context.colorScheme.outline.withOpacity(0.2),
+            backgroundColor: context.colorScheme.outline.withValues(alpha: 0.2),
           ),
         ),
       ],

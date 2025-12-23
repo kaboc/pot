@@ -117,7 +117,7 @@ class Cell extends StatelessWidget {
     final color = rowNumber == null
         ? (backgroundColor ?? Colors.transparent)
         : rowNumber!.isEven
-            ? context.colorScheme.surfaceVariant.withOpacity(0.5)
+            ? context.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
             : Colors.transparent;
 
     return Column(
@@ -182,10 +182,10 @@ class BoldCell extends StatelessWidget {
         fontWeight: FontWeight.bold,
       ),
       backgroundColor: rowNumber.isEven
-          ? context.colorScheme.surfaceVariant
+          ? context.colorScheme.surfaceContainerHighest
           : context.isDark
               ? Colors.white10
-              : context.colorScheme.secondary.withOpacity(0.06),
+              : context.colorScheme.secondary.withValues(alpha: 0.06),
     );
   }
 }

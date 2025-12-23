@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+// ignore: depend_on_referenced_packages
 import 'package:pot/src/private/utils.dart';
 import 'package:pottery/pottery.dart';
 import 'package:pottery/src/extension/extension_manager.dart';

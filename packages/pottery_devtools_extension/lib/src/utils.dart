@@ -10,8 +10,8 @@ extension ThemeGetter on BuildContext {
   Color get baseColor => Colors.cyan;
 
   ThemeData get theme => Theme.of(this);
-  ColorScheme get colorScheme => theme.colorScheme;
-  TextTheme get textTheme => theme.textTheme;
+  ColorScheme get colorScheme => ColorScheme.of(this);
+  TextTheme get textTheme => TextTheme.of(this);
 
   bool get isDark => theme.brightness == Brightness.dark;
 }

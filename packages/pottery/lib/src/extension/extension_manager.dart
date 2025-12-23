@@ -114,7 +114,6 @@ class PotteryExtensionManager {
                 'objects': [
                   for (final v in data.list)
                     {
-                      // ignore: invalid_use_of_internal_member
                       'potIdentity': v.pot.identity(),
                       'object': '${v.localObject}',
                     },
