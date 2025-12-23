@@ -201,9 +201,7 @@ class _PotBody<T> {
     if (!_isDisposed) {
       reset();
       _isDisposed = true;
-      _scope = null;
       _disposer = null;
-      ScopeState.scopes.removePot(_pot);
       PotManager.allInstances.remove(_pot);
       PotManager.eventHandler.addEvent(PotEventKind.disposed, pots: [_pot]);
     }
