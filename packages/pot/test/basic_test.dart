@@ -467,6 +467,28 @@ void main() {
       expect(Pot.uninitialize, isNot(throwsA(anything)));
     });
 
+    test('uninitialize() clears static data', () {
+      final pot1 = Pot(() => Foo(1));
+      final pot2 = Pot(() => Foo(2));
+      final pot3 = Pot(() => Foo(3));
+
+      pot1.create();
+      Pot.pushScope();
+      pot2.create();
+      pot3.create();
+      expect(ScopeState.currentScope, 1);
+      expect(ScopeState.scopes, [
+        [pot1],
+        [pot2, pot3],
+      ]);
+      expect(PotManager.allInstances.keys, [pot1, pot2, pot3]);
+
+      Pot.uninitialize();
+      expect(ScopeState.currentScope, 0);
+      expect(ScopeState.scopes, [isEmpty]);
+      expect(PotManager.allInstances.keys, isEmpty);
+    });
+
     test(
       'Globally stored data for local pot is not discarded automatically',
       () {

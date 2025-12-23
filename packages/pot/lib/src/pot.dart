@@ -283,6 +283,7 @@ class Pot<T> extends _PotBody<T> {
     for (var i = count; i >= 0; i--) {
       ScopeState.scopes.clearScope(i, keepScope: false);
     }
+    PotManager.allInstances.clear();
   }
 
   /// Starts listening for events related to pots.
