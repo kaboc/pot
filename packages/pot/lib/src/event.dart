@@ -1,4 +1,4 @@
-import 'pot.dart' show Pot, PotDescription;
+import 'pot.dart';
 
 /// The types of events that can occur in relation to [Pot].
 enum PotEventKind {
@@ -83,6 +83,7 @@ class PotEvent {
   });
 
   /// Creates a PotEvent from a Map.
+  // Used also by pottery and pottery_devtools_extension.
   factory PotEvent.fromMap(Map<String, Object?> map) {
     final kindName = map['kind'] as String? ?? '';
     final descriptions = map['potDescriptions'] as List<Object?>? ?? [];

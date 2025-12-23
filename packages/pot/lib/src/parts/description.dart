@@ -14,6 +14,7 @@ class PotDescription {
   });
 
   /// Creates a [PotDescription] from a Map.
+  // Used also by pottery and pottery_devtools_extension.
   factory PotDescription.fromMap(Map<String, Object?> map) {
     return PotDescription(
       identity: map['identity'] as String? ?? '',
@@ -26,6 +27,7 @@ class PotDescription {
   }
 
   /// Creates a [PotDescription] from a Pot.
+  // Used also by pottery and pottery_devtools_extension.
   factory PotDescription.fromPot(Pot<Object?> pot) {
     return PotDescription(
       identity: pot.identity(),

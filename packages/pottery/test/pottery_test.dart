@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show DiagnosticPropertiesBuilder;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -34,8 +34,8 @@ void main() {
       fooPot = Pot.pending(disposer: (_) => fooDisposed = true);
       barPot = Pot.pending(disposer: (_) => barDisposed = true);
 
-      expect(fooPot?.create, throwsA(isA<PotNotReadyException>()));
-      expect(barPot?.create, throwsA(isA<PotNotReadyException>()));
+      expect(fooPot!.create, throwsA(isA<PotNotReadyException>()));
+      expect(barPot!.create, throwsA(isA<PotNotReadyException>()));
 
       await tester.pumpWidget(
         TestPottery(
@@ -46,10 +46,10 @@ void main() {
         ),
       );
 
-      expect(fooPot?.call(), isA<Foo>());
-      expect(barPot?.call(), isA<Bar>());
-      expect(fooPot?.hasObject, isTrue);
-      expect(barPot?.hasObject, isTrue);
+      expect(fooPot!(), isA<Foo>());
+      expect(barPot!(), isA<Bar>());
+      expect(fooPot!.hasObject, isTrue);
+      expect(barPot!.hasObject, isTrue);
 
       final buttonFinder = find.byType(RemovePotteryButton);
       await tester.tap(buttonFinder);
@@ -57,10 +57,10 @@ void main() {
 
       expect(fooDisposed, isTrue);
       expect(barDisposed, isTrue);
-      expect(fooPot?.create, throwsA(isA<PotNotReadyException>()));
-      expect(barPot?.create, throwsA(isA<PotNotReadyException>()));
-      expect(fooPot?.hasObject, isFalse);
-      expect(barPot?.hasObject, isFalse);
+      expect(fooPot!.create, throwsA(isA<PotNotReadyException>()));
+      expect(barPot!.create, throwsA(isA<PotNotReadyException>()));
+      expect(fooPot!.hasObject, isFalse);
+      expect(barPot!.hasObject, isFalse);
     },
   );
 
@@ -68,7 +68,7 @@ void main() {
     'Pots are immediately available in the builder function',
     (tester) async {
       fooPot = Pot.replaceable(() => const Foo(10));
-      expect(fooPot?.call().value, 10);
+      expect(fooPot!().value, 10);
 
       Foo? foo;
       await tester.pumpWidget(
@@ -77,18 +77,18 @@ void main() {
             fooPot!: () => const Foo(20),
           },
           builder: (_) {
-            foo ??= fooPot?.call();
+            foo ??= fooPot!();
             return const SizedBox.shrink();
           },
         ),
       );
-      expect(foo?.value, 20);
+      expect(foo!.value, 20);
     },
   );
 
   testWidgets('Factory returning null causes no issue', (tester) async {
     nullablePot = Pot.pending();
-    expect(nullablePot?.create, throwsA(isA<PotNotReadyException>()));
+    expect(nullablePot!.create, throwsA(isA<PotNotReadyException>()));
 
     await tester.pumpWidget(
       TestPottery(
@@ -97,20 +97,20 @@ void main() {
         },
       ),
     );
-    expect(nullablePot?.call(), isNull);
+    expect(nullablePot!(), isNull);
   });
 
   testWidgets(
     'PotNotReadyException is thrown when Pottery calls reset() '
     'of a pot that depends on a pot located later in the pots map',
     (tester) async {
-      fooPot = Pot.pending(disposer: (_) => barPot?.call());
+      fooPot = Pot.pending(disposer: (_) => barPot!());
       barPot = Pot.pending();
 
       addTearDown(() {
         // A factory must be set so that dispose does not
         // throw when clean-up runs at the end of the test.
-        barPot?.replace(Bar.new);
+        barPot!.replace(Bar.new);
       });
 
       await tester.pumpWidget(
@@ -122,8 +122,8 @@ void main() {
         ),
       );
 
-      expect(fooPot?.call(), isA<Foo>());
-      expect(barPot?.call(), isA<Bar>());
+      expect(fooPot!(), isA<Foo>());
+      expect(barPot!(), isA<Bar>());
 
       final buttonFinder = find.byType(RemovePotteryButton);
       await tester.tap(buttonFinder);
@@ -138,7 +138,7 @@ void main() {
     'of a pot that depends on a pot located earlier in the map',
     (tester) async {
       fooPot = Pot.pending();
-      barPot = Pot.pending(disposer: (_) => fooPot?.call());
+      barPot = Pot.pending(disposer: (_) => fooPot!());
 
       await tester.pumpWidget(
         TestPottery(
@@ -149,11 +149,11 @@ void main() {
         ),
       );
 
-      fooPot?.create();
-      barPot?.create();
+      fooPot!.create();
+      barPot!.create();
 
-      expect(fooPot?.call(), isA<Foo>());
-      expect(barPot?.call(), isA<Bar>());
+      expect(fooPot!(), isA<Foo>());
+      expect(barPot!(), isA<Bar>());
 
       final buttonFinder = find.byType(RemovePotteryButton);
       await tester.tap(buttonFinder);
@@ -165,7 +165,7 @@ void main() {
 
   testWidgets('debugFillProperties()', (tester) async {
     fooPot = Pot.pending();
-    barPot = Pot.pending(disposer: (_) => fooPot?.call());
+    barPot = Pot.pending(disposer: (_) => fooPot!());
 
     // ignore: prefer_function_declarations_over_variables
     final fooFactory = () => const Foo(10);
@@ -184,7 +184,7 @@ void main() {
     );
 
     final builder = DiagnosticPropertiesBuilder();
-    key.currentState?.debugFillProperties(builder);
+    key.currentState!.debugFillProperties(builder);
 
     expect(
       builder.properties.firstWhere((v) => v.name == 'pots').value,

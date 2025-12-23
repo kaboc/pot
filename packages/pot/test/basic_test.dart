@@ -1,10 +1,10 @@
 // ignore_for_file: cascade_invocations
 
-import 'package:pot/src/private/utils.dart';
 import 'package:test/test.dart';
 
 import 'package:pot/pot.dart';
 import 'package:pot/src/private/static.dart';
+import 'package:pot/src/private/utils.dart';
 
 import 'utils.dart';
 
@@ -199,11 +199,11 @@ void main() {
       );
 
       pot.create();
-      expect(pot.objectString(), 'Foo(1)');
+      expect(PotDescription.fromPot(pot).object, 'Foo(1)');
       expect(isDisposed, isFalse);
 
       pot.replace(() => Foo(2));
-      expect(pot.objectString(), 'Foo(2)');
+      expect(PotDescription.fromPot(pot).object, 'Foo(2)');
       expect(isDisposed, isTrue);
     });
 
@@ -300,11 +300,11 @@ void main() {
       final pot = Pot<Foo>(() => Foo(1), disposer: (f) => f.dispose());
 
       pot.create();
-      expect(pot.objectString(), 'Foo(1)');
+      expect(PotDescription.fromPot(pot).object, 'Foo(1)');
       expect(isDisposed, isFalse);
 
       pot.replaceForTesting(() => Foo(2));
-      expect(pot.objectString(), 'Foo(2)');
+      expect(PotDescription.fromPot(pot).object, 'Foo(2)');
       expect(isDisposed, isTrue);
     });
 

@@ -1,13 +1,12 @@
-// ignore_for_file: library_private_types_in_public_api, public_member_api_docs
+// ignore: lines_longer_than_80_chars
+// ignore_for_file: implementation_imports, library_private_types_in_public_api, public_member_api_docs
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/widgets.dart' show State;
 
 import 'package:pot/pot.dart';
-// ignore: implementation_imports
-import 'package:pot/src/private/static.dart';
-// ignore: implementation_imports
-import 'package:pot/src/private/utils.dart';
+import 'package:pot/src/private/static.dart' show PotManager;
+import 'package:pot/src/private/utils.dart' show ObjectIdentity;
 
 import '../local_pottery.dart';
 import '../pottery.dart';

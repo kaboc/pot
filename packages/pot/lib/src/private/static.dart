@@ -1,6 +1,6 @@
 // ignore_for_file: public_member_api_docs
 
-import '../pot.dart' show Pot;
+import '../pot.dart';
 import 'event_handler.dart';
 
 typedef Scopes = List<List<Pot<Object?>>>;

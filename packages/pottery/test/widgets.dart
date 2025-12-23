@@ -85,17 +85,6 @@ class _TestLocalPotteryState extends State<TestLocalPottery> {
   }
 }
 
-class Descendant extends StatelessWidget {
-  const Descendant({required this.builder});
-
-  final WidgetBuilder builder;
-
-  @override
-  Widget build(BuildContext context) {
-    return builder(context);
-  }
-}
-
 class RemovePotteryButton extends StatelessWidget {
   const RemovePotteryButton({required this.onPressed});
 

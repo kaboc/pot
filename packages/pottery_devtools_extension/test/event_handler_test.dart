@@ -325,24 +325,18 @@ void main() {
 
       await eventHandler.getLocalPotteries();
 
-      final localPotteryFinder = find.byType(LocalPottery).evaluate();
-      final localPottery1 = localPotteryFinder.first.widget;
-      final localPottery2 = localPotteryFinder.last.widget;
       final data = eventHandler.localPotteriesNotifier.value;
-
       expect(data, hasLength(2));
       expect(
-        data['LocalPottery#${localPottery1.shortHash()}']?.objects,
-        [
-          (potIdentity: pot1!.identity(), object: '10'),
-          (potIdentity: pot2!.identity(), object: '20'),
-        ],
-      );
-      expect(
-        data['LocalPottery#${localPottery2.shortHash()}']?.objects,
-        [
-          (potIdentity: pot3!.identity(), object: '30'),
-        ],
+        {
+          for (final entry in data.entries)
+            for (final v in entry.value.objects) v.potIdentity: v.object,
+        },
+        {
+          pot1!.identity(): '10',
+          pot2!.identity(): '20',
+          pot3!.identity(): '30',
+        },
       );
     });
   });

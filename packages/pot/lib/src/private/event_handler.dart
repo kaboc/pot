@@ -3,7 +3,7 @@
 import 'dart:async' show StreamController;
 
 import '../event.dart';
-import '../pot.dart' show Pot, PotDescription, PotListenerRemover;
+import '../pot.dart';
 
 class PotEventHandler {
   StreamController<PotEvent>? _streamController;

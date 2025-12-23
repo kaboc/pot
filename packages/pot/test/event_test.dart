@@ -344,15 +344,15 @@ void main() {
         );
 
         expect(events, hasLength(5));
-        expect(events[0].potDescriptions[0].hasObject, false);
+        expect(events[0].potDescriptions[0].hasObject, isFalse);
         expect(events[0].potDescriptions[0].object, 'null');
-        expect(events[1].potDescriptions[0].hasObject, false);
+        expect(events[1].potDescriptions[0].hasObject, isFalse);
         expect(events[1].potDescriptions[0].object, 'null');
-        expect(events[2].potDescriptions[0].hasObject, true);
+        expect(events[2].potDescriptions[0].hasObject, isTrue);
         expect(events[2].potDescriptions[0].object, '1');
-        expect(events[3].potDescriptions[0].hasObject, false);
+        expect(events[3].potDescriptions[0].hasObject, isFalse);
         expect(events[3].potDescriptions[0].object, 'null');
-        expect(events[4].potDescriptions[0].hasObject, false);
+        expect(events[4].potDescriptions[0].hasObject, isFalse);
         expect(events[4].potDescriptions[0].object, 'null');
       });
 
@@ -414,9 +414,9 @@ void main() {
       );
 
       expect(events, hasLength(19));
-      expect(events[0].potDescriptions[0].scope, null);
-      expect(events[1].potDescriptions[0].scope, null);
-      expect(events[2].potDescriptions[0].scope, null);
+      expect(events[0].potDescriptions[0].scope, isNull);
+      expect(events[1].potDescriptions[0].scope, isNull);
+      expect(events[2].potDescriptions[0].scope, isNull);
       expect(events[3].potDescriptions[0].scope, 0);
       expect(events[4].potDescriptions[0].scope, 0);
       expect(events[5].potDescriptions, isEmpty);
@@ -424,14 +424,14 @@ void main() {
       expect(events[7].potDescriptions[0].scope, 1);
       expect(events[8].potDescriptions[0].scope, 1);
       expect(events[9].potDescriptions[0].scope, 1);
-      expect(events[10].potDescriptions[0].scope, null);
-      expect(events[11].potDescriptions[0].scope, null);
-      expect(events[12].potDescriptions[0].scope, null);
-      expect(events[13].potDescriptions[0].scope, null);
+      expect(events[10].potDescriptions[0].scope, isNull);
+      expect(events[11].potDescriptions[0].scope, isNull);
+      expect(events[12].potDescriptions[0].scope, isNull);
+      expect(events[13].potDescriptions[0].scope, isNull);
       expect(events[14].potDescriptions, isEmpty);
       expect(events[15].potDescriptions, isEmpty);
-      expect(events[16].potDescriptions[0].scope, null);
-      expect(events[17].potDescriptions[0].scope, null);
+      expect(events[16].potDescriptions[0].scope, isNull);
+      expect(events[17].potDescriptions[0].scope, isNull);
       expect(events[18].potDescriptions, isEmpty);
     });
   });

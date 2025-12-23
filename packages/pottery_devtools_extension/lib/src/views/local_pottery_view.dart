@@ -175,8 +175,8 @@ class _TableState extends State<_Table> {
           };
         }
 
-        final (id, (:objects, :time)) =
-            potteries.records.elementAt(vicinity.row - 1);
+        final MapEntry(key: id, value: (:objects, :time)) =
+            potteries.entries.elementAt(vicinity.row - 1);
 
         final prevObjects = _prevPotteries?[id]?.objects;
         final isNew = prevObjects == null;

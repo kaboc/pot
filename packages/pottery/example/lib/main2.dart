@@ -49,11 +49,8 @@ class App extends StatelessWidget {
                         // The object created by the factory specified
                         // above is immediately accessible here using the
                         // given BuildContext.
-                        final index = indexPot.of(context);
-                        final notifier = counterPot.of(context);
-                        final count = notifier.grab(context);
-
-                        debugPrint('$index: $count');
+                        //
+                        // final index = indexPot.of(context);
 
                         return const _Item();
                       },

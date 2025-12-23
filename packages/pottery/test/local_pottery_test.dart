@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show DiagnosticPropertiesBuilder;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -26,34 +26,30 @@ void main() {
   });
 
   testWidgets(
-    'Calling of() on a map returns the associated object provided by nearest '
-    'LocalPottery ancestor that contains the pot in its pots map.',
+    'of() returns the associated object provided by nearest LocalPottery '
+    'ancestor that contains the pot in pots map.',
     (tester) async {
       fooPot = Pot.pending();
       barPot = Pot.pending();
 
-      expect(fooPot?.create, throwsA(isA<PotNotReadyException>()));
-      expect(barPot?.create, throwsA(isA<PotNotReadyException>()));
+      expect(fooPot!.create, throwsA(isA<PotNotReadyException>()));
+      expect(barPot!.create, throwsA(isA<PotNotReadyException>()));
 
       var called = false;
       await tester.pumpWidget(
         TestLocalPottery(
           pots: {
-            fooPot!: Foo.new,
+            fooPot!: () => const Foo(1),
           },
           builder: (context) {
-            return Descendant(
-              builder: (context) {
-                expect(fooPot?.create, throwsA(isA<PotNotReadyException>()));
-                expect(fooPot?.of(context), isA<Foo>());
-                expect(
-                  () => barPot?.of(context),
-                  throwsA(isA<PotNotReadyException>()),
-                );
-                called = true;
-                return const SizedBox.shrink();
-              },
+            expect(fooPot!.create, throwsA(isA<PotNotReadyException>()));
+            expect(fooPot!.of(context), const Foo(1));
+            expect(
+              () => barPot!.of(context),
+              throwsA(isA<PotNotReadyException>()),
             );
+            called = true;
+            return const SizedBox.shrink();
           },
         ),
       );
@@ -65,7 +61,7 @@ void main() {
     'Pots are immediately available in the builder function',
     (tester) async {
       fooPot = Pot.replaceable(() => const Foo(10));
-      expect(fooPot?.call().value, 10);
+      expect(fooPot!().value, 10);
 
       Foo? foo1;
       Foo? foo2;
@@ -75,20 +71,20 @@ void main() {
             fooPot!: () => const Foo(20),
           },
           builder: (context) {
-            foo1 ??= fooPot?.call();
-            foo2 ??= fooPot?.of(context);
+            foo1 ??= fooPot!();
+            foo2 ??= fooPot!.of(context);
             return const SizedBox.shrink();
           },
         ),
       );
-      expect(foo1?.value, 10);
-      expect(foo2?.value, 20);
+      expect(foo1!.value, 10);
+      expect(foo2!.value, 20);
     },
   );
 
   testWidgets('Factory returning null causes no issue', (tester) async {
     nullablePot = Pot.pending();
-    expect(nullablePot?.create, throwsA(isA<PotNotReadyException>()));
+    expect(nullablePot!.create, throwsA(isA<PotNotReadyException>()));
 
     var isNullObtained = false;
     await tester.pumpWidget(
@@ -97,7 +93,7 @@ void main() {
           nullablePot!: () => null,
         },
         builder: (context) {
-          isNullObtained = nullablePot?.of(context) == null;
+          isNullObtained = nullablePot!.of(context) == null;
           return const SizedBox.shrink();
         },
       ),
@@ -116,7 +112,7 @@ void main() {
       );
       barPot = Pot.pending();
 
-      fooPot?.create();
+      fooPot!.create();
 
       LocalPotteryObjects? map;
       await tester.pumpWidget(
@@ -125,9 +121,7 @@ void main() {
             fooPot!: () => const Foo(20),
             barPot!: () => const Bar(),
           },
-          disposer: (pots) {
-            map = pots;
-          },
+          disposer: (pots) => map = pots,
         ),
       );
       expect(map, isNull);
@@ -140,102 +134,113 @@ void main() {
 
       // Global pot is still available.
       expect(globallyDisposed, isFalse);
-      expect(fooPot?.hasObject, isTrue);
+      expect(fooPot!.hasObject, isTrue);
     },
   );
 
-  testWidgets('Multiple LocalPotteries as siblings', (tester) async {
-    fooPot = Pot.pending();
+  testWidgets(
+    'of() returns the correct object for each LocalPottery sibling and '
+    'its descendants',
+    (tester) async {
+      fooPot = Pot.pending();
 
-    Foo? foo1;
-    Foo? foo2;
-    Foo? foo3;
-    Foo? foo4;
-    await tester.pumpWidget(
-      Column(
-        children: [
-          TestLocalPottery(
-            pots: {
-              fooPot!: () => const Foo(10),
-            },
-            builder: (context1) {
-              foo1 = fooPot?.of(context1);
-              return Descendant(
-                builder: (context2) {
-                  foo2 = fooPot?.of(context2);
-                  return const SizedBox.shrink();
-                },
-              );
-            },
-          ),
-          TestLocalPottery(
-            pots: {
-              fooPot!: () => const Foo(20),
-            },
-            builder: (context3) {
-              foo3 = fooPot?.of(context3);
-              return Descendant(
-                builder: (context4) {
-                  foo4 = fooPot?.of(context4);
-                  return const SizedBox.shrink();
-                },
-              );
-            },
-          ),
-        ],
-      ),
-    );
+      Foo? foo1;
+      Foo? foo2;
+      Foo? foo3;
+      Foo? foo4;
+      await tester.pumpWidget(
+        Column(
+          children: [
+            TestLocalPottery(
+              pots: {
+                fooPot!: () => const Foo(10),
+              },
+              builder: (context1) {
+                foo1 = fooPot!.of(context1);
+                return Builder(
+                  builder: (context2) {
+                    foo2 = fooPot!.of(context2);
+                    return const SizedBox.shrink();
+                  },
+                );
+              },
+            ),
+            TestLocalPottery(
+              pots: {
+                fooPot!: () => const Foo(20),
+              },
+              builder: (context3) {
+                foo3 = fooPot!.of(context3);
+                return Builder(
+                  builder: (context4) {
+                    foo4 = fooPot!.of(context4);
+                    return const SizedBox.shrink();
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+      );
 
-    expect(foo1?.value, 10);
-    expect(foo2?.value, 10);
-    expect(foo3?.value, 20);
-    expect(foo4?.value, 20);
-  });
+      expect(foo1!.value, 10);
+      expect(foo2!.value, 10);
+      expect(foo3!.value, 20);
+      expect(foo4!.value, 20);
+    },
+  );
 
-  testWidgets('Nested LocalPotteries', (tester) async {
-    fooPot = Pot.pending();
-    barPot = Pot.pending();
+  testWidgets(
+    'When LocalPotteries are nested, of() returns the object from the '
+    'nearest ancestor that has the pot in pots map',
+    (tester) async {
+      fooPot = Pot.pending();
+      barPot = Pot.pending();
 
-    Foo? foo1;
-    Foo? foo2;
-    Foo? foo3;
+      Foo? foo1;
+      Foo? foo2;
+      Foo? foo3;
+      Bar? bar;
 
-    await tester.pumpWidget(
-      TestLocalPottery(
-        pots: {
-          fooPot!: () => const Foo(10),
-        },
-        builder: (context1) {
-          foo1 = fooPot?.of(context1);
-          return TestLocalPottery(
-            pots: {
-              fooPot!: () => const Foo(20),
-            },
-            builder: (context2) {
-              foo2 = fooPot?.of(context2);
-              return TestLocalPottery(
-                pots: {
-                  barPot!: () => const Bar(),
-                },
-                builder: (context3) {
-                  foo3 = fooPot?.of(context3);
-                  return const SizedBox.shrink();
-                },
-              );
-            },
-          );
-        },
-      ),
-    );
+      await tester.pumpWidget(
+        TestLocalPottery(
+          pots: {
+            fooPot!: () => const Foo(10),
+          },
+          builder: (context1) {
+            foo1 = fooPot!.of(context1);
+            return TestLocalPottery(
+              pots: {
+                fooPot!: () => const Foo(20),
+              },
+              builder: (context2) {
+                foo2 = fooPot!.of(context2);
+                return TestLocalPottery(
+                  pots: {
+                    barPot!: () => const Bar(),
+                  },
+                  builder: (context3) {
+                    foo3 = fooPot!.of(context3);
+                    bar = barPot!.of(context3);
+                    return const SizedBox.shrink();
+                  },
+                );
+              },
+            );
+          },
+        ),
+      );
 
-    expect(foo1?.value, 10);
-    expect(foo2?.value, 20);
-    expect(foo3?.value, 20);
-  });
+      expect(foo1!.value, 10);
+      expect(foo2!.value, 20);
+      expect(foo3!.value, 20);
+      expect(bar, const Bar());
+    },
+  );
 
   testWidgets('debugFillProperties()', (tester) async {
     fooPot = Pot.pending();
-    barPot = Pot.pending(disposer: (_) => fooPot?.call());
+    barPot = Pot.pending(disposer: (_) => fooPot!());
 
     const foo = Foo(10);
     const bar = Bar();
@@ -252,7 +257,7 @@ void main() {
     );
 
     final builder = DiagnosticPropertiesBuilder();
-    key.currentState?.debugFillProperties(builder);
+    key.currentState!.debugFillProperties(builder);
 
     expect(
       builder.properties.firstWhere((v) => v.name == 'objects').value,

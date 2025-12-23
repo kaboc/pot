@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart'
+    show DiagnosticPropertiesBuilder, DiagnosticsProperty;
 import 'package:flutter/widgets.dart';
 
 import 'package:pot/pot.dart';
@@ -247,9 +248,8 @@ extension NearestPotOf<T> on Pot<T> {
     final inheritedLocalPottery = element.widget as _InheritedLocalPottery;
     for (final (pot, object) in inheritedLocalPottery.objects.records) {
       if (pot == this) {
-        // `found` flag is necessary because it is impossible
-        // to distinguish `null` in object from "not found"
-        // when T is nullable.
+        // The `found` flag is necessary as a null value cannot
+        // be distinguished from "not found" when T is nullable.
         return (object: object, found: true);
       }
     }
@@ -258,17 +258,18 @@ extension NearestPotOf<T> on Pot<T> {
   }
 
   /// Returns the object provided by the nearest [LocalPottery] ancestor
-  /// that contains this [Pot] in its 'overrides' list.
-  ///
-  /// This method efficiently looks up the widget tree to find a localized
-  /// instance of the object associated with this pot.
+  /// that has this [Pot] in its 'pots' map.
   ///
   /// If no such `LocalPottery` is found, the object held in the global
   /// pot is returned, in which case, the return value is the same as
   /// that of the [Pot.call] method.
   ///
+  /// This method efficiently looks up the widget tree to find a localized
+  /// instance of the object associated with this pot.
+  ///
   /// See also:
-  /// * [LocalPottery], which provides the object the `of()` method obtains.
+  /// * [LocalPottery], which provides the object that the `of()`
+  ///   method obtains.
   T of(BuildContext context) {
     // Targets the current BuildContext too so that the local objects
     // become available from within the builder callback.

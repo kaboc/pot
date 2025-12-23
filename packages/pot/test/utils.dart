@@ -1,14 +1,5 @@
 import 'package:meta/meta.dart' show immutable;
 
-import 'package:pot/pot.dart';
-
-extension PotObjectString<T> on Pot<T> {
-  String objectString() {
-    final desc = PotDescription.fromPot(this);
-    return desc.object;
-  }
-}
-
 bool isInitialized = false;
 bool isDisposed = false;
 int valueOfDisposedObject = -1;

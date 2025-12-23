@@ -16,11 +16,6 @@ extension ThemeGetter on BuildContext {
   bool get isDark => theme.brightness == Brightness.dark;
 }
 
-extension MapToRecord<K, V> on Map<K, V> {
-  Iterable<(K, V)> get records =>
-      entries.map((entry) => (entry.key, entry.value));
-}
-
 extension IterableComparison<S, T> on Iterable<S> {
   bool same(int index, Iterable<S>? other, T Function(S?) propSelector) {
     return propSelector(elementAtOrNull(index)) ==

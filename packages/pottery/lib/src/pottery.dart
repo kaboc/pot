@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart'
+    show DiagnosticPropertiesBuilder, DiagnosticsProperty;
 import 'package:flutter/widgets.dart';
 
 import 'package:pot/pot.dart';

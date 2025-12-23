@@ -98,10 +98,10 @@ class PotteryEventHandler {
     final response = await serviceManager
         .callServiceExtensionOnMainIsolate('ext.pottery.getPots');
 
-    final list = response.json?.records ?? [];
+    final entries = response.json?.entries ?? [];
 
     potsNotifier.value = {
-      for (final (identity, desc) in list)
+      for (final MapEntry(key: identity, value: desc) in entries)
         if (desc is Map<String, Object?>)
           identity: (
             time: (desc['time'] as int? ?? 0).toDateTime(),
@@ -133,36 +133,48 @@ class PotteryEventHandler {
 
 extension on Map<String, Object?>? {
   Potteries _toPotteries() {
-    final records = (this ?? <String, Object>{}).records;
+    final entries = (this ?? <String, Object>{}).entries;
 
     return {
-      for (final (id, data) in records)
-        if (data is Map<String, Object?>)
+      for (final MapEntry(key: id, value: data) in entries)
+        if (data
+            case {
+              'time': final int? time,
+              'potDescriptions': final List<Object?>? descs,
+            })
           id: (
-            time: (data['time'] as int?).toDateTime(),
+            time: time.toDateTime(),
             potDescriptions: [
-              for (final desc in data['potDescriptions'] as List? ?? [])
-                if (desc is Map<String, Object?>) PotDescription.fromMap(desc),
+              if (descs != null)
+                for (final desc in descs)
+                  if (desc is Map<String, Object?>)
+                    PotDescription.fromMap(desc),
             ],
           ),
     };
   }
 
   LocalPotteries _toLocalPotteries() {
-    final records = (this ?? <String, Object>{}).records;
+    final entries = (this ?? <String, Object>{}).entries;
 
     return {
-      for (final (id, data) in records)
-        if (data is Map<String, Object?>)
+      for (final MapEntry(key: id, value: data) in entries)
+        if (data
+            case {
+              'time': final int? time,
+              'objects': final List<Object?>? objects,
+            })
           id: (
-            time: (data['time'] as int?).toDateTime(),
+            time: time.toDateTime(),
             objects: [
-              for (final object in data['objects'] as List? ?? [])
-                if (object is Map<String, Object?>)
-                  (
-                    potIdentity: object['potIdentity'] as String? ?? '',
-                    object: object['object'] as String? ?? '',
-                  ),
+              if (objects != null)
+                for (final object in objects)
+                  if (object
+                      case {
+                        'potIdentity': final String? potIdentity,
+                        'object': final String? object,
+                      })
+                    (potIdentity: potIdentity ?? '', object: object ?? ''),
             ],
           ),
     };

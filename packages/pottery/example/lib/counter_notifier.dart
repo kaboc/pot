@@ -12,7 +12,7 @@ class CounterNotifier extends ValueNotifier<int> {
   @override
   void dispose() {
     if (showMessage) {
-      _showMessage('CounterNotifier was discarded.');
+      _showMessage('CounterNotifier was disposed.');
     }
     super.dispose();
   }
