@@ -157,15 +157,15 @@ class _TableState extends State<_Table> {
       cellBuilder: (context, vicinity) {
         if (vicinity.row == 0) {
           return switch (vicinity.column) {
-            0 => const HeadingCell('Event'),
-            1 => const HeadingCell('Occurred at'),
-            2 => const HeadingCell('Pot type'),
-            3 => const HeadingCell('Generic type'),
-            4 => const HeadingCell('isPending'),
-            5 => const HeadingCell('isDisposed'),
-            6 => const HeadingCell('hasObject'),
-            7 => const HeadingCell('object'),
-            _ => const SizedBox.shrink(),
+            0 => const TableViewCell(child: HeadingCell('Event')),
+            1 => const TableViewCell(child: HeadingCell('Occurred at')),
+            2 => const TableViewCell(child: HeadingCell('Pot type')),
+            3 => const TableViewCell(child: HeadingCell('Generic type')),
+            4 => const TableViewCell(child: HeadingCell('isPending')),
+            5 => const TableViewCell(child: HeadingCell('isDisposed')),
+            6 => const TableViewCell(child: HeadingCell('hasObject')),
+            7 => const TableViewCell(child: HeadingCell('object')),
+            _ => const TableViewCell(child: SizedBox.shrink()),
           };
         }
 
@@ -177,93 +177,109 @@ class _TableState extends State<_Table> {
             event.kind == PotEventKind.localPotteryRemoved;
 
         return switch (vicinity.column) {
-          0 => BoldCell(
-              [
-                CellConfig(
-                  event.kind.name,
-                  highlight: isNew,
-                ),
-              ],
-              rowNumber: vicinity.row,
-              lineSpan: descs.length,
-            ),
-          1 => Cell.center(
-              [
-                CellConfig(
-                  event.time,
-                  highlight: isNew,
-                ),
-              ],
-              rowNumber: vicinity.row,
-              lineSpan: descs.length,
-            ),
-          2 => Cell(
-              [
-                for (final desc in descs)
+          0 => TableViewCell(
+              child: BoldCell(
+                [
                   CellConfig(
-                    desc.identity,
+                    event.kind.name,
                     highlight: isNew,
                   ),
-              ],
-              rowNumber: vicinity.row,
-              specialTextType: SpecialTextType.identity,
+                ],
+                rowNumber: vicinity.row,
+                lineSpan: descs.length,
+              ),
             ),
-          3 => Cell(
-              [
-                for (final desc in descs)
+          1 => TableViewCell(
+              child: Cell.center(
+                [
                   CellConfig(
-                    desc.identity,
+                    event.time,
                     highlight: isNew,
                   ),
-              ],
-              rowNumber: vicinity.row,
-              specialTextType: SpecialTextType.genericType,
+                ],
+                rowNumber: vicinity.row,
+                lineSpan: descs.length,
+              ),
             ),
-          4 => Cell.center(
-              [
-                for (final desc in descs)
-                  CellConfig(
-                    isLocalPottery ? '--' : desc.isPending ?? '--',
-                    highlight: isNew,
-                  ),
-              ],
-              rowNumber: vicinity.row,
+          2 => TableViewCell(
+              child: Cell(
+                [
+                  for (final desc in descs)
+                    CellConfig(
+                      desc.identity,
+                      highlight: isNew,
+                    ),
+                ],
+                rowNumber: vicinity.row,
+                specialTextType: SpecialTextType.identity,
+              ),
             ),
-          5 => Cell.center(
-              [
-                for (final desc in descs)
-                  CellConfig(
-                    isLocalPottery ? '--' : desc.isDisposed,
-                    highlight: isNew,
-                  ),
-              ],
-              rowNumber: vicinity.row,
+          3 => TableViewCell(
+              child: Cell(
+                [
+                  for (final desc in descs)
+                    CellConfig(
+                      desc.identity,
+                      highlight: isNew,
+                    ),
+                ],
+                rowNumber: vicinity.row,
+                specialTextType: SpecialTextType.genericType,
+              ),
             ),
-          6 => Cell.center(
-              [
-                for (final desc in descs)
-                  CellConfig(
-                    isLocalPottery ? '--' : desc.hasObject,
-                    highlight: isNew,
-                  ),
-              ],
-              rowNumber: vicinity.row,
+          4 => TableViewCell(
+              child: Cell.center(
+                [
+                  for (final desc in descs)
+                    CellConfig(
+                      isLocalPottery ? '--' : desc.isPending ?? '--',
+                      highlight: isNew,
+                    ),
+                ],
+                rowNumber: vicinity.row,
+              ),
             ),
-          7 => Cell(
-              [
-                for (final desc in descs)
-                  CellConfig(
-                    isLocalPottery ? '--' : desc.object,
-                    highlight: isNew,
-                    onTap: isLocalPottery
-                        ? null
-                        : () => widget.selectionNotifier.value =
-                            (event: event, potDescription: desc),
-                  ),
-              ],
-              rowNumber: vicinity.row,
+          5 => TableViewCell(
+              child: Cell.center(
+                [
+                  for (final desc in descs)
+                    CellConfig(
+                      isLocalPottery ? '--' : desc.isDisposed,
+                      highlight: isNew,
+                    ),
+                ],
+                rowNumber: vicinity.row,
+              ),
             ),
-          _ => const SizedBox.shrink(),
+          6 => TableViewCell(
+              child: Cell.center(
+                [
+                  for (final desc in descs)
+                    CellConfig(
+                      isLocalPottery ? '--' : desc.hasObject,
+                      highlight: isNew,
+                    ),
+                ],
+                rowNumber: vicinity.row,
+              ),
+            ),
+          7 => TableViewCell(
+              child: Cell(
+                [
+                  for (final desc in descs)
+                    CellConfig(
+                      isLocalPottery ? '--' : desc.object,
+                      highlight: isNew,
+                      onTap: isLocalPottery
+                          ? null
+                          : () => widget.selectionNotifier.value =
+                              (event: event, potDescription: desc),
+                    ),
+                ],
+                rowNumber: vicinity.row,
+              ),
+            ),
+          _ => const TableViewCell(child: SizedBox.shrink()),
         };
       },
     );

@@ -159,14 +159,14 @@ class _TableState extends State<_Table> {
       cellBuilder: (context, vicinity) {
         if (vicinity.row == 0) {
           return switch (vicinity.column) {
-            0 => const HeadingCell('Pot type'),
-            1 => const HeadingCell('Created at'),
-            2 => const HeadingCell('Generic type'),
-            3 => const HeadingCell('isPending'),
-            4 => const HeadingCell('isDisposed'),
-            5 => const HeadingCell('hasObject'),
-            6 => const HeadingCell('object'),
-            _ => const SizedBox.shrink(),
+            0 => const TableViewCell(child: HeadingCell('Pot type')),
+            1 => const TableViewCell(child: HeadingCell('Created at')),
+            2 => const TableViewCell(child: HeadingCell('Generic type')),
+            3 => const TableViewCell(child: HeadingCell('isPending')),
+            4 => const TableViewCell(child: HeadingCell('isDisposed')),
+            5 => const TableViewCell(child: HeadingCell('hasObject')),
+            6 => const TableViewCell(child: HeadingCell('object')),
+            _ => const TableViewCell(child: SizedBox.shrink()),
           };
         }
 
@@ -178,77 +178,91 @@ class _TableState extends State<_Table> {
         final prevDesc = prevPot?.description;
 
         return switch (vicinity.column) {
-          0 => BoldCell(
-              [
-                CellConfig(
-                  desc.identity,
-                  highlight: _initialFetchCompleted && isNew,
-                ),
-              ],
-              rowNumber: vicinity.row,
-              specialTextType: SpecialTextType.identity,
+          0 => TableViewCell(
+              child: BoldCell(
+                [
+                  CellConfig(
+                    desc.identity,
+                    highlight: _initialFetchCompleted && isNew,
+                  ),
+                ],
+                rowNumber: vicinity.row,
+                specialTextType: SpecialTextType.identity,
+              ),
             ),
-          1 => Cell.center(
-              [
-                CellConfig(
-                  pot.time,
-                  highlight: _initialFetchCompleted && isNew,
-                ),
-              ],
-              rowNumber: vicinity.row,
+          1 => TableViewCell(
+              child: Cell.center(
+                [
+                  CellConfig(
+                    pot.time,
+                    highlight: _initialFetchCompleted && isNew,
+                  ),
+                ],
+                rowNumber: vicinity.row,
+              ),
             ),
-          2 => Cell(
-              [
-                CellConfig(
-                  desc.identity,
-                  highlight: _initialFetchCompleted && isNew,
-                ),
-              ],
-              rowNumber: vicinity.row,
-              specialTextType: SpecialTextType.genericType,
+          2 => TableViewCell(
+              child: Cell(
+                [
+                  CellConfig(
+                    desc.identity,
+                    highlight: _initialFetchCompleted && isNew,
+                  ),
+                ],
+                rowNumber: vicinity.row,
+                specialTextType: SpecialTextType.genericType,
+              ),
             ),
-          3 => Cell.center(
-              [
-                CellConfig(
-                  desc.isPending ?? '--',
-                  highlight: _initialFetchCompleted &&
-                      (isNew || desc.isPending != prevDesc?.isPending),
-                ),
-              ],
-              rowNumber: vicinity.row,
+          3 => TableViewCell(
+              child: Cell.center(
+                [
+                  CellConfig(
+                    desc.isPending ?? '--',
+                    highlight: _initialFetchCompleted &&
+                        (isNew || desc.isPending != prevDesc?.isPending),
+                  ),
+                ],
+                rowNumber: vicinity.row,
+              ),
             ),
-          4 => Cell.center(
-              [
-                CellConfig(
-                  desc.isDisposed,
-                  highlight: _initialFetchCompleted &&
-                      desc.isDisposed != prevDesc?.isDisposed,
-                ),
-              ],
-              rowNumber: vicinity.row,
+          4 => TableViewCell(
+              child: Cell.center(
+                [
+                  CellConfig(
+                    desc.isDisposed,
+                    highlight: _initialFetchCompleted &&
+                        desc.isDisposed != prevDesc?.isDisposed,
+                  ),
+                ],
+                rowNumber: vicinity.row,
+              ),
             ),
-          5 => Cell.center(
-              [
-                CellConfig(
-                  desc.hasObject,
-                  highlight: _initialFetchCompleted &&
-                      desc.hasObject != prevDesc?.hasObject,
-                ),
-              ],
-              rowNumber: vicinity.row,
+          5 => TableViewCell(
+              child: Cell.center(
+                [
+                  CellConfig(
+                    desc.hasObject,
+                    highlight: _initialFetchCompleted &&
+                        desc.hasObject != prevDesc?.hasObject,
+                  ),
+                ],
+                rowNumber: vicinity.row,
+              ),
             ),
-          6 => Cell(
-              [
-                CellConfig(
-                  desc.object,
-                  highlight: _initialFetchCompleted &&
-                      (isNew || desc.object != prevDesc?.object),
-                  onTap: () => widget.selectionNotifier.value = desc,
-                ),
-              ],
-              rowNumber: vicinity.row,
+          6 => TableViewCell(
+              child: Cell(
+                [
+                  CellConfig(
+                    desc.object,
+                    highlight: _initialFetchCompleted &&
+                        (isNew || desc.object != prevDesc?.object),
+                    onTap: () => widget.selectionNotifier.value = desc,
+                  ),
+                ],
+                rowNumber: vicinity.row,
+              ),
             ),
-          _ => const SizedBox.shrink(),
+          _ => const TableViewCell(child: SizedBox.shrink()),
         };
       },
     );

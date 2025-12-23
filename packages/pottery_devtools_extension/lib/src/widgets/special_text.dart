@@ -25,7 +25,7 @@ class IdentityText extends StatelessWidget {
         SpecialTextType.identity => [
             SelectiveDefinition(
               matcher: const PatternMatcher('(.+?)(<.+>|(?=#.+))'),
-              shownText: (groups) => '${groups.first!} ',
+              shownText: (element) => '${element.groups.first!} ',
             ),
             TextDefinition(
               matcher: const PatternMatcher('#.+'),
@@ -37,7 +37,7 @@ class IdentityText extends StatelessWidget {
         SpecialTextType.genericType => [
             SelectiveDefinition(
               matcher: const PatternMatcher('(?:.+?)<(.+)>(?:.+)'),
-              shownText: (groups) => groups.first!,
+              shownText: (element) => element.groups.first!,
             ),
           ],
       },

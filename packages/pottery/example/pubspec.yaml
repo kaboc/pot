@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  grab: ^1.0.0-dev.1
+  grab: ^1.0.2
   pottery:
     path: ..
 

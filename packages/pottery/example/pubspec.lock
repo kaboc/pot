@@ -71,10 +71,10 @@ packages:
     dependency: "direct main"
     description:
       name: grab
-      sha256: "0dce3258548cfa800f2442e06b54b04198a2f3bdfbb2aed7bc34fbec2bff182f"
+      sha256: "9bb3cabd130d0a55951e70673f4578bac8bd8b5d8601d1c7d29b8611352c4576"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0-dev.1"
+    version: "1.0.2"
   leak_tracker:
     dependency: transitive
     description:

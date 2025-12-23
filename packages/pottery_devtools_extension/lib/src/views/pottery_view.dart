@@ -169,15 +169,15 @@ class _TableState extends State<_Table> {
       cellBuilder: (context, vicinity) {
         if (vicinity.row == 0) {
           return switch (vicinity.column) {
-            0 => const HeadingCell('Identity'),
-            1 => const HeadingCell('Created at'),
-            2 => const HeadingCell('Pot type'),
-            3 => const HeadingCell('Generic type'),
-            4 => const HeadingCell('isPending'),
-            5 => const HeadingCell('isDisposed'),
-            6 => const HeadingCell('hasObject'),
-            7 => const HeadingCell('object'),
-            _ => const SizedBox.shrink(),
+            0 => const TableViewCell(child: HeadingCell('Identity')),
+            1 => const TableViewCell(child: HeadingCell('Created at')),
+            2 => const TableViewCell(child: HeadingCell('Pot type')),
+            3 => const TableViewCell(child: HeadingCell('Generic type')),
+            4 => const TableViewCell(child: HeadingCell('isPending')),
+            5 => const TableViewCell(child: HeadingCell('isDisposed')),
+            6 => const TableViewCell(child: HeadingCell('hasObject')),
+            7 => const TableViewCell(child: HeadingCell('object')),
+            _ => const TableViewCell(child: SizedBox.shrink()),
           };
         }
 
@@ -188,99 +188,115 @@ class _TableState extends State<_Table> {
         final isNew = prevDescs == null;
 
         return switch (vicinity.column) {
-          0 => BoldCell(
-              [
-                CellConfig(
-                  id,
-                  highlight: _initialFetchCompleted && isNew,
-                ),
-              ],
-              rowNumber: vicinity.row,
-              lineSpan: descs.length,
-              specialTextType: SpecialTextType.identity,
-            ),
-          1 => Cell.center(
-              [
-                CellConfig(
-                  time,
-                  highlight: _initialFetchCompleted && isNew,
-                ),
-              ],
-              rowNumber: vicinity.row,
-              lineSpan: descs.length,
-            ),
-          2 => Cell(
-              [
-                for (final (i, desc) in descs.indexed)
+          0 => TableViewCell(
+              child: BoldCell(
+                [
                   CellConfig(
-                    desc.identity,
-                    highlight: _initialFetchCompleted &&
-                        !descs.same(i, prevDescs, (v) => v?.identity),
+                    id,
+                    highlight: _initialFetchCompleted && isNew,
                   ),
-              ],
-              rowNumber: vicinity.row,
-              specialTextType: SpecialTextType.identity,
+                ],
+                rowNumber: vicinity.row,
+                lineSpan: descs.length,
+                specialTextType: SpecialTextType.identity,
+              ),
             ),
-          3 => Cell(
-              [
-                for (final (i, desc) in descs.indexed)
+          1 => TableViewCell(
+              child: Cell.center(
+                [
                   CellConfig(
-                    desc.identity,
-                    highlight: _initialFetchCompleted &&
-                        !descs.same(i, prevDescs, (v) => v?.identity),
+                    time,
+                    highlight: _initialFetchCompleted && isNew,
                   ),
-              ],
-              rowNumber: vicinity.row,
-              specialTextType: SpecialTextType.genericType,
+                ],
+                rowNumber: vicinity.row,
+                lineSpan: descs.length,
+              ),
             ),
-          4 => Cell.center(
-              [
-                for (final (i, desc) in descs.indexed)
-                  CellConfig(
-                    desc.isPending,
-                    highlight: _initialFetchCompleted &&
-                        !descs.same(i, prevDescs, (v) => v?.isPending),
-                  ),
-              ],
-              rowNumber: vicinity.row,
+          2 => TableViewCell(
+              child: Cell(
+                [
+                  for (final (i, desc) in descs.indexed)
+                    CellConfig(
+                      desc.identity,
+                      highlight: _initialFetchCompleted &&
+                          !descs.same(i, prevDescs, (v) => v?.identity),
+                    ),
+                ],
+                rowNumber: vicinity.row,
+                specialTextType: SpecialTextType.identity,
+              ),
             ),
-          5 => Cell.center(
-              [
-                for (final (i, desc) in descs.indexed)
-                  CellConfig(
-                    desc.isDisposed,
-                    highlight: _initialFetchCompleted &&
-                        !descs.same(i, prevDescs, (v) => v?.isDisposed),
-                  ),
-              ],
-              rowNumber: vicinity.row,
+          3 => TableViewCell(
+              child: Cell(
+                [
+                  for (final (i, desc) in descs.indexed)
+                    CellConfig(
+                      desc.identity,
+                      highlight: _initialFetchCompleted &&
+                          !descs.same(i, prevDescs, (v) => v?.identity),
+                    ),
+                ],
+                rowNumber: vicinity.row,
+                specialTextType: SpecialTextType.genericType,
+              ),
             ),
-          6 => Cell.center(
-              [
-                for (final (i, desc) in descs.indexed)
-                  CellConfig(
-                    desc.hasObject,
-                    highlight: _initialFetchCompleted &&
-                        (isNew ||
-                            !descs.same(i, prevDescs, (v) => v?.hasObject)),
-                  ),
-              ],
-              rowNumber: vicinity.row,
+          4 => TableViewCell(
+              child: Cell.center(
+                [
+                  for (final (i, desc) in descs.indexed)
+                    CellConfig(
+                      desc.isPending,
+                      highlight: _initialFetchCompleted &&
+                          !descs.same(i, prevDescs, (v) => v?.isPending),
+                    ),
+                ],
+                rowNumber: vicinity.row,
+              ),
             ),
-          7 => Cell(
-              [
-                for (final (i, desc) in descs.indexed)
-                  CellConfig(
-                    desc.object,
-                    highlight: _initialFetchCompleted &&
-                        !descs.same(i, prevDescs, (v) => v?.object),
-                    onTap: () => widget.selectionNotifier.value =
-                        (id: id, potDescription: desc),
-                  ),
-              ],
-              rowNumber: vicinity.row,
+          5 => TableViewCell(
+              child: Cell.center(
+                [
+                  for (final (i, desc) in descs.indexed)
+                    CellConfig(
+                      desc.isDisposed,
+                      highlight: _initialFetchCompleted &&
+                          !descs.same(i, prevDescs, (v) => v?.isDisposed),
+                    ),
+                ],
+                rowNumber: vicinity.row,
+              ),
             ),
-          _ => const SizedBox.shrink(),
+          6 => TableViewCell(
+              child: Cell.center(
+                [
+                  for (final (i, desc) in descs.indexed)
+                    CellConfig(
+                      desc.hasObject,
+                      highlight: _initialFetchCompleted &&
+                          (isNew ||
+                              !descs.same(i, prevDescs, (v) => v?.hasObject)),
+                    ),
+                ],
+                rowNumber: vicinity.row,
+              ),
+            ),
+          7 => TableViewCell(
+              child: Cell(
+                [
+                  for (final (i, desc) in descs.indexed)
+                    CellConfig(
+                      desc.object,
+                      highlight: _initialFetchCompleted &&
+                          !descs.same(i, prevDescs, (v) => v?.object),
+                      onTap: () => widget.selectionNotifier.value =
+                          (id: id, potDescription: desc),
+                    ),
+                ],
+                rowNumber: vicinity.row,
+              ),
+            ),
+          _ => const TableViewCell(child: SizedBox.shrink()),
         };
       },
     );
