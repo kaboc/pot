@@ -12,9 +12,6 @@ class ScopeState {
   static int currentScope = 0;
 }
 
-// Temporary alias for use in pottery
-typedef StaticPot = PotManager;
-
 // ignore: avoid_classes_with_only_static_members
 class PotManager {
   static final eventHandler = PotEventHandler();
