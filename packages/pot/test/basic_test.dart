@@ -173,6 +173,36 @@ void main() {
       expect(pot.hasObject, isTrue);
       expect(foo.value, 1);
     });
+
+    test(
+      'Calling reset() on a pot removes static data for the pot only partially',
+      () {
+        final pot1 = Pot(() => Foo(1));
+        final pot2 = Pot(() => Foo(1));
+        final pot3 = Pot(() => Foo(1));
+
+        pot1.create();
+        Pot.pushScope();
+        pot2.create();
+        pot3.create();
+        expect(ScopeState.currentScope, 1);
+        expect(ScopeState.scopes, [
+          [pot1],
+          [pot2, pot3],
+        ]);
+        expect(PotManager.allInstances.keys, [pot1, pot2, pot3]);
+
+        pot2.reset();
+        expect(ScopeState.currentScope, 1);
+        // The reset pot is removed from scopes list.
+        expect(ScopeState.scopes, [
+          [pot1],
+          [pot3],
+        ]);
+        // The reset pot remains in allInstances Map.
+        expect(PotManager.allInstances.keys, [pot1, pot2, pot3]);
+      },
+    );
   });
 
   group('replace()', () {
@@ -467,6 +497,31 @@ void main() {
       expect(Pot.uninitialize, isNot(throwsA(anything)));
     });
 
+    test('Calling dispose() on a pot removes static data for the pot', () {
+      final pot1 = Pot(() => Foo(1));
+      final pot2 = Pot(() => Foo(2));
+      final pot3 = Pot(() => Foo(3));
+
+      pot1.create();
+      Pot.pushScope();
+      pot2.create();
+      pot3.create();
+      expect(ScopeState.currentScope, 1);
+      expect(ScopeState.scopes, [
+        [pot1],
+        [pot2, pot3],
+      ]);
+      expect(PotManager.allInstances.keys, [pot1, pot2, pot3]);
+
+      pot2.dispose();
+      expect(ScopeState.currentScope, 1);
+      expect(ScopeState.scopes, [
+        [pot1],
+        [pot3],
+      ]);
+      expect(PotManager.allInstances.keys, [pot1, pot3]);
+    });
+
     test('uninitialize() clears static data', () {
       final pot1 = Pot(() => Foo(1));
       final pot2 = Pot(() => Foo(2));
@@ -490,16 +545,50 @@ void main() {
     });
 
     test(
-      'Globally stored data for local pot is not discarded automatically',
+      'Static data for local pot remains until cleaned up by dispose()',
       () {
-        void declarePotLocally() {
+        void declarePotLocally({required bool callDispose}) {
           final pot = Pot(() => Foo(1));
           pot.create();
+          if (callDispose) {
+            pot.dispose();
+          }
         }
 
         expect(ScopeState.scopes[0], isEmpty);
-        declarePotLocally();
+        expect(
+          PotManager.allInstances.keys.map(
+            (pot) => PotDescription.fromPot(pot).object,
+          ),
+          isEmpty,
+        );
+
+        declarePotLocally(callDispose: false);
         expect(ScopeState.scopes[0], hasLength(1));
+        expect(
+          PotManager.allInstances.keys.map(
+            (pot) => PotDescription.fromPot(pot).object,
+          ),
+          ['Foo(1)'],
+        );
+
+        Pot.uninitialize();
+        expect(ScopeState.scopes[0], isEmpty);
+        expect(
+          PotManager.allInstances.keys.map(
+            (pot) => PotDescription.fromPot(pot).object,
+          ),
+          isEmpty,
+        );
+
+        declarePotLocally(callDispose: true);
+        expect(ScopeState.scopes[0], isEmpty);
+        expect(
+          PotManager.allInstances.keys.map(
+            (pot) => PotDescription.fromPot(pot).object,
+          ),
+          isEmpty,
+        );
       },
     );
   });
