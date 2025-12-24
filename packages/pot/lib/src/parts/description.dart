@@ -4,7 +4,7 @@ part of '../pot.dart';
 @immutable
 class PotDescription {
   /// Creates a [PotDescription] that describes the details of a [Pot].
-  const PotDescription({
+  const PotDescription._({
     required this.identity,
     required this.isPending,
     required this.isDisposed,
@@ -16,7 +16,7 @@ class PotDescription {
   /// Creates a [PotDescription] from a Map.
   // Used also by pottery and pottery_devtools_extension.
   factory PotDescription.fromMap(Map<String, Object?> map) {
-    return PotDescription(
+    return PotDescription._(
       identity: map['identity'] as String? ?? '',
       isPending: map['isPending'] as bool?,
       isDisposed: map['isDisposed'] as bool? ?? false,
@@ -29,7 +29,7 @@ class PotDescription {
   /// Creates a [PotDescription] from a Pot.
   // Used also by pottery and pottery_devtools_extension.
   factory PotDescription.fromPot(Pot<Object?> pot) {
-    return PotDescription(
+    return PotDescription._(
       identity: pot.identity(),
       isPending: pot is ReplaceablePot ? pot.isPending : null,
       isDisposed: pot._isDisposed,

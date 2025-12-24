@@ -62,14 +62,14 @@ void main() {
     });
 
     test('PotDescription.toMap', () {
-      final map = const PotDescription(
-        identity: 'aaa',
-        isPending: false,
-        isDisposed: false,
-        hasObject: true,
-        object: 'null',
-        scope: 10,
-      ).toMap();
+      final map = PotDescription.fromMap(const {
+        'identity': 'aaa',
+        'isPending': false,
+        'isDisposed': false,
+        'hasObject': true,
+        'object': 'null',
+        'scope': 10,
+      }).toMap();
 
       expect(map['identity'], 'aaa');
       expect(map['isPending'], isFalse);
@@ -115,15 +115,15 @@ void main() {
         kind: PotEventKind.created,
         time: now,
         currentScope: 20,
-        potDescriptions: const [
-          PotDescription(
-            identity: 'aaa',
-            isPending: false,
-            isDisposed: false,
-            hasObject: true,
-            object: 'bbb',
-            scope: 30,
-          ),
+        potDescriptions: [
+          PotDescription.fromMap(const {
+            'identity': 'aaa',
+            'isPending': false,
+            'isDisposed': false,
+            'hasObject': true,
+            'object': 'bbb',
+            'scope': 30,
+          }),
         ],
       ).toMap();
 
@@ -141,14 +141,14 @@ void main() {
 
   group('toString()', () {
     test('PotDescription.toString()', () {
-      const desc = PotDescription(
-        identity: 'aaa',
-        isPending: false,
-        isDisposed: false,
-        hasObject: true,
-        object: 'null',
-        scope: 10,
-      );
+      final desc = PotDescription.fromMap(const {
+        'identity': 'aaa',
+        'isPending': false,
+        'isDisposed': false,
+        'hasObject': true,
+        'object': 'null',
+        'scope': 10,
+      });
 
       expect(
         desc.toString(),
@@ -159,21 +159,21 @@ void main() {
 
     test('PotEvent.toString()', () {
       final now = DateTime.now();
-      const desc = PotDescription(
-        identity: 'aaa',
-        isPending: true,
-        isDisposed: false,
-        hasObject: false,
-        object: 'bbb',
-        scope: 30,
-      );
+      final desc = PotDescription.fromMap(const {
+        'identity': 'aaa',
+        'isPending': true,
+        'isDisposed': false,
+        'hasObject': false,
+        'object': 'bbb',
+        'scope': 30,
+      });
 
       final event = PotEvent(
         number: 10,
         kind: PotEventKind.markedAsPending,
         time: now,
         currentScope: 20,
-        potDescriptions: const [desc],
+        potDescriptions: [desc],
       );
 
       expect(
