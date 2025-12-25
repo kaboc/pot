@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart' show ValueNotifier;
 // ignore: depend_on_referenced_packages
 import 'package:pot/pot.dart' show PotDescription, PotEvent;
 
-typedef LocalObject = ({String potIdentity, String object});
+typedef LocalObject = ({String potIdentity, Object? object});
 
 typedef Pots = Map<String, ({DateTime time, PotDescription description})>;
 typedef Potteries

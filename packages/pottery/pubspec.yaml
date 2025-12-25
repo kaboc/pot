@@ -14,7 +14,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  pot: ^0.8.0
+  pot: ^0.9.0
 
 dev_dependencies:
   flutter_test:

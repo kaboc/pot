@@ -6,7 +6,8 @@ import 'package:flutter/widgets.dart' show State;
 
 import 'package:pot/pot.dart';
 import 'package:pot/src/private/static.dart' show PotManager;
-import 'package:pot/src/private/utils.dart' show ObjectIdentity;
+import 'package:pot/src/private/utils.dart'
+    show ObjectIdentity, convertForDescription;
 
 import '../local_pottery.dart';
 import '../pottery.dart';
@@ -114,7 +115,7 @@ class PotteryExtensionManager {
                   for (final v in data.list)
                     {
                       'potIdentity': v.pot.identity(),
-                      'object': '${v.localObject}',
+                      'object': convertForDescription(v.localObject),
                     },
                 ],
               },

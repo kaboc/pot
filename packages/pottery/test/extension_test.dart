@@ -21,6 +21,25 @@ class Foo {
   String toString() => 'Foo($value)';
 }
 
+({Object? raw, Object? inDescription}) testObject() {
+  return (
+    raw: {
+      'a': [Foo(1), true, null],
+      'b': const {
+        'c': 2.0,
+        'd': ['e', false, (e: false, f: 'g')],
+      },
+    },
+    inDescription: {
+      'a': ['Foo(1)', true, null],
+      'b': const {
+        'c': 2.0,
+        'd': ['e', false, '(e: false, f: g)'],
+      },
+    },
+  );
+}
+
 void main() {
   late PotteryExtensionManager extensionManager;
   late SpyExtensionCommunicator communicator;
@@ -141,26 +160,29 @@ void main() {
       '"ext.pottery.getPotteries" responses with correct data',
       (tester) async {
         pot1 = Pot.pending<int>();
-        pot2 = Pot.pending<int>();
+        final pot2 = Pot.pending<Object?>();
+        addTearDown(pot2.dispose);
+
+        final object = testObject();
 
         await tester.pumpWidget(
           Pottery(
             pots: {
               pot1!: () => 10,
-              pot2!: () => 20,
+              pot2: () => object.raw,
             },
             builder: (context) {
               pot1!.create();
-              pot2!.create();
+              pot2.create();
               return const SizedBox.shrink();
             },
           ),
         );
 
         final desc1 = PotDescription.fromPot(pot1!);
-        final desc2 = PotDescription.fromPot(pot2!);
-        expect(desc1.object, '10');
-        expect(desc2.object, '20');
+        final desc2 = PotDescription.fromPot(pot2);
+        expect(desc1.object, 10);
+        expect(desc2.object, object.inDescription);
 
         expect(communicator.log, hasLength(8));
         expect(communicator.log[0], ('pottery:initialize', '{}'));
@@ -198,13 +220,16 @@ void main() {
       '"ext.pottery.getLocalPotteries" responses with correct data',
       (tester) async {
         pot1 = Pot.pending<int>();
-        pot2 = Pot.pending<int>();
+        final pot2 = Pot.pending<Object?>();
+        addTearDown(pot2.dispose);
+
+        final object = testObject();
 
         await tester.pumpWidget(
           LocalPottery(
             pots: {
               pot1!: () => 10,
-              pot2!: () => 20,
+              pot2: () => object.raw,
             },
             builder: (context) => const SizedBox.shrink(),
           ),
@@ -231,11 +256,11 @@ void main() {
                   'objects': [
                     {
                       'potIdentity': pot1!.identity(),
-                      'object': '10',
+                      'object': 10,
                     },
                     {
-                      'potIdentity': pot2!.identity(),
-                      'object': '20',
+                      'potIdentity': pot2.identity(),
+                      'object': object.inDescription,
                     },
                   ],
                 },

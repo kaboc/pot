@@ -172,7 +172,7 @@ extension on Map<String, Object?>? {
                   if (object
                       case {
                         'potIdentity': final String? potIdentity,
-                        'object': final String? object,
+                        'object': final Object? object,
                       })
                     (potIdentity: potIdentity ?? '', object: object ?? ''),
             ],

@@ -13,6 +13,25 @@ import 'fake.dart';
 
 const _kFetchingDebounceDuration = Duration(milliseconds: 50);
 
+({Object? raw, Object? inDescription}) testObject() {
+  return (
+    raw: {
+      'a': [true, null],
+      'b': const {
+        'c': 2.0,
+        'd': ['e', false, (e: false, f: 'g')],
+      },
+    },
+    inDescription: {
+      'a': [true, null],
+      'b': const {
+        'c': 2.0,
+        'd': ['e', false, '(e: false, f: g)'],
+      },
+    },
+  );
+}
+
 void main() {
   late PotteryExtensionManager extensionManager;
   late FakeExtensionCommunicator communicator;
@@ -291,7 +310,10 @@ void main() {
     testWidgets('getLocalPotteries()', (tester) async {
       pot1 = Pot.pending();
       pot2 = Pot.pending();
-      pot3 = Pot.pending();
+      final pot3 = Pot.pending<Object?>();
+      addTearDown(pot3.dispose);
+
+      final obj = testObject();
 
       await tester.pumpWidget(
         Column(
@@ -305,7 +327,7 @@ void main() {
             ),
             LocalPottery(
               pots: {
-                pot3!: () => 30,
+                pot3: () => obj.raw,
               },
               builder: (context) => const SizedBox.shrink(),
             ),
@@ -333,9 +355,9 @@ void main() {
             for (final v in entry.value.objects) v.potIdentity: v.object,
         },
         {
-          pot1!.identity(): '10',
-          pot2!.identity(): '20',
-          pot3!.identity(): '30',
+          pot1!.identity(): 10,
+          pot2!.identity(): 20,
+          pot3.identity(): obj.inDescription,
         },
       );
     });
