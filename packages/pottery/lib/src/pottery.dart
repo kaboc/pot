@@ -83,8 +83,10 @@ class Pottery extends StatefulWidget {
   /// The extension starts automatically in debug mode without this
   /// method, but only when [Pottery] or [LocalPottery] is first used.
   /// This method allows to start it earlier.
+  ///
+  /// This method does nothing in non-debug mode.
   static void startExtension() {
-    PotteryExtensionManager.createSingle();
+    runIfDebug(PotteryExtensionManager.createSingle);
   }
 }
 
