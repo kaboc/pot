@@ -8,13 +8,6 @@ import 'extension/extension_manager.dart';
 import 'pottery.dart';
 import 'utils.dart';
 
-/// An alias of [LocalPottery].
-@Deprecated(
-  'Use LocalPottery instead. '
-  'This was deprecated as of pottery 0.2.0.',
-)
-typedef ScopedPottery = LocalPottery;
-
 /// The signature of a map consisting of pots and factories.
 typedef PotOverrides = Map<Pot<Object?>, PotObjectFactory<Object?>>;
 
