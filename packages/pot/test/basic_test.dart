@@ -428,6 +428,26 @@ void main() {
       expect(pot.dispose, isNot(throwsA(anything)));
     });
 
+    test('dispose() resets state in pot', () {
+      final pot = Pot(() => Foo(1));
+      final replaceablePot = Pot.replaceable(() => Foo(1));
+
+      pot.create();
+      replaceablePot.create();
+      expect(pot.hasObject, isTrue);
+
+      pot.dispose();
+      expect(pot.hasObject, isFalse);
+      expect(pot.scope, isNull);
+
+      replaceablePot.dispose();
+      expect(replaceablePot.hasObject, isFalse);
+      expect(replaceablePot.scope, isNull);
+      // Not reset as pending. It's unnecessary to replace factory
+      // to throw since the pot itself is unusable now.
+      expect(replaceablePot.isPending, isFalse);
+    });
+
     test('Calling dispose() again after dispose() does not throw', () {
       final pot = Pot(() => Foo(1));
       pot.dispose();
@@ -467,6 +487,12 @@ void main() {
         () => pot2.replaceForTesting(() => Foo(2)),
         throwsA(isA<StateError>()),
       );
+    });
+
+    test('Calling notifyObjectUpdate() after dispose() throws', () {
+      final pot = Pot(() => Foo(1));
+      pot.dispose();
+      expect(pot.notifyObjectUpdate, throwsA(isA<StateError>()));
     });
 
     test('pushScope() after one of pots is disposed does not throw', () {

@@ -121,6 +121,45 @@ void main() {
       expect(map['scope'], 10);
     });
 
+    test('PotDescription.fromPot', () {
+      final object = testObject();
+
+      final pot1 = Pot(() => Foo(1));
+      final pot2 = Pot.replaceable(() => object.raw);
+      addTearDown(pot1.dispose);
+      addTearDown(pot2.dispose);
+
+      pot1.create();
+      Pot.pushScope();
+      pot2.create();
+
+      final desc1 = PotDescription.fromPot(pot1);
+      expect(desc1.identity, pot1.identity());
+      expect(desc1.isPending, isNull);
+      expect(desc1.isDisposed, isFalse);
+      expect(desc1.hasObject, isTrue);
+      expect(desc1.object, 'Foo(1)');
+      expect(desc1.scope, 0);
+
+      final desc2 = PotDescription.fromPot(pot2);
+      expect(desc2.identity, pot2.identity());
+      expect(desc2.isPending, isFalse);
+      expect(desc2.isDisposed, isFalse);
+      expect(desc2.hasObject, isTrue);
+      expect(desc2.object, object.converted.normal);
+      expect(desc2.scope, 1);
+
+      pot2.dispose();
+
+      final desc3 = PotDescription.fromPot(pot2);
+      expect(desc3.identity, pot2.identity());
+      expect(desc3.isPending, isFalse);
+      expect(desc3.isDisposed, isTrue);
+      expect(desc3.hasObject, isFalse);
+      expect(desc3.object, isNull);
+      expect(desc3.scope, isNull);
+    });
+
     test('PotEvent.fromMap', () {
       final now = DateTime.now();
       final object = testObject();
