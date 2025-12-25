@@ -214,7 +214,7 @@ class _PotBody<T> {
   /// of [Pot], if an object exists.
   ///
   /// This does not dispose of the pot itself, so a new object is created
-  /// again when it is need. Use this when the object is not used any more
+  /// again when it is needed. Use this when the object is no longer used
   /// for now, and get a new object when it is necessary again.
   ///
   /// ```dart
@@ -248,7 +248,7 @@ class _PotBody<T> {
   /// >   // The disposer is not triggered because there is no object yet.
   /// >   counterPot.reset();
   /// > }
-  /// ```
+  /// > ```
   void reset() {
     if (_isDisposed) {
       throwStateError();

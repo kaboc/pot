@@ -1,3 +1,16 @@
+## 0.9.0
+
+- Update minimum Dart SDK version to 3.6.2.
+- Fix missing state cleanup in `uninitialize()`.
+- Perform internal refactoring.
+- **Breaking**:
+    - Remove deprecated `resetAll()`.
+        - Use `uninitialize()` instead.
+    - Remove public default constructor from `PotDescription`.
+        - This class is primarily for internal use. This change should not affect most users.
+    - Change `PotDescription.object` from `String` to `Object?`.
+        - This may only affect those who process events received via `listen()`.
+
 ## 0.8.0
 
 - Add `Pot.uninitialize()`.

@@ -2,7 +2,8 @@
 [![pot CI](https://github.com/kaboc/pot/actions/workflows/pot.yml/badge.svg)](https://github.com/kaboc/pot/actions/workflows/pot.yml)
 [![codecov](https://codecov.io/gh/kaboc/pot/branch/main/graph/badge.svg?token=YZMCN6WZKM)](https://codecov.io/gh/kaboc/pot)
 
-An easy and safe DI (Dependency Injection) solution for Dart.
+A simple and type-safe dependency injection (DI) package, designed for easy
+scoping and testing.
 
 ## What is a pot?
 
@@ -12,9 +13,6 @@ Each pot has a Singleton factory function triggered to create an object as
 needed. It is possible to replace the factory or remove the object in a pot at
 your preferred timing, which is useful for testing as well as for implementing
 app features.
-
-> [!NOTE]
-> A pot is usually assigned to a global variable.
 
 ### Advantages
 
@@ -38,13 +36,13 @@ app features.
 ## Related package
 
 - [Pottery]
-    - A package that helps you use pots in Flutter by allowing to limit the scope
-      of pots in the widget tree.
+    - A Flutter package with utility widgets for `Pot`, automatically managing
+      the lifecycle of pots and the objects they hold based on the widget lifecycle.
     - Whether to use this is up to you. It is just an additional utility.
 
 ## Usage
 
-Create a pot with a so-called Singleton factory that instantiates an object.
+Assign a pot created with a singleton factory to a global variable.
 
 ```dart
 final counterPot = Pot(() => Counter(0));
@@ -52,9 +50,10 @@ final counterPot = Pot(() => Counter(0));
 
 Now you can use the pot in whatever file importing the above declaration.
 
-> [!NOTE]
-> The created pot should be assigned to a global variable unless there is a
-> special reason against it.
+> [!WARNING]
+> Avoid assigning a pot to a local variable because its state will persist
+> even after the local variable's reference is lost. Otherwise, you must
+> always ensure that you call dispose() manually when it is no longer needed.
 
 ### Getting the object
 
@@ -109,12 +108,20 @@ final counterPot = Pot(
 
 ```dart
 void main() {
-  final counter = counterPot();
-  counter.increment();
-  ...
+  final counterA = counterPot(); // 0
+  counter.increment(); // 1
 
-  // Removes the Counter object from the pot and triggers the disposer function.
+  // Removes the Counter object from the pot
+  // and triggers the disposer.
   counterPot.reset();
+
+  final counterB = counterPot(); // 0
+
+  // Disposes the pot to release resources.
+  // This also triggers the disposer.
+  counterPot.dispose();
+
+  final counterC = counterPot(); // Error
 }
 ```
 
@@ -212,7 +219,7 @@ removeListener();
 
 > [!NOTE]
 > - Events of changes in the objects held in pots are not emitted automatically.
->     - Call `notifyObjectUpdate()` to manually emit those events if necessary.
+>   Call `notifyObjectUpdate()` to manually emit those events if necessary.
 > - There is no guarantee that the event data format remains unchanged in the
 >   future. Use the method and the data passed to the callback function only
 >   for debugging purposes.
@@ -311,46 +318,6 @@ The behaviour of each reset caused by this method is the same as when you call
 [Pot.uninitialize()][uninitialize] removes all scopes and resets all pots.
 This is useful to reset all pots and scopes to the initial state for testing.
 It may also be used to make the app behave as if it has restarted.
-
-## Caveats
-
-### DON'T declare a pot locally
-
-All pots should usually be declared globally, although it is possible to declare
-them locally. It is because the data related to scoping is stored statically,
-and forgetting to manually remove scopes causes some resources to remain until
-the end of the program. Make sure to call [reset()][reset] or one of the other
-methods that have the same effect if you declare pots locally.
-
-<details>
-<summary>Example code (Click to open)</summary>
-
-```dart
-void main() {
-  final myClass = MyClass();
-  ...
-  myClass.dispose();
-}
-```
-
-```dart
-class MyClass {
-  // Locally declared pot
-  final servicePot = Pot(() => MyService());
-
-  // Use reset() in a disposing method like this
-  // and make sure to call it at some point.
-  void dispose() {
-    servicePot.reset();
-  }
-
-  void someMethod() {
-    final service = servicePot();
-    ...
-  }
-}
-```
-</details>
 
 [Pot]: https://pub.dev/documentation/pot/latest/pot/Pot-class.html
 [Pottery]: https://pub.dev/packages/pottery
