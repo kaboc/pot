@@ -41,3 +41,24 @@ extension ObjectIdentity<T> on Pot<T> {
     return '$typeName#${shortHash()}';
   }
 }
+
+// Used also by pottery and pottery_devtools_extension.
+Object? convertForDescription(Object? object, {bool quoteString = false}) {
+  return switch (object) {
+    null || num() || bool() => object,
+    String() => quoteString ? '"$object"' : object,
+    final List<Object?> list => [
+        for (final v in list)
+          convertForDescription(v, quoteString: quoteString),
+      ],
+    final Map<Object?, Object?> map => {
+        for (final MapEntry(:key, :value) in map.entries)
+          quoteString ? '"$key"' : key:
+              convertForDescription(value, quoteString: quoteString),
+      },
+    // Converts the object to a String because including a non-primitive
+    // object in event data carries the risk that receivers of the event
+    // might keep a reference to it or modify its content by mistake.
+    _ => quoteString ? '"$object"' : '$object',
+  };
+}

@@ -8,6 +8,36 @@ import 'package:pot/pot.dart';
 import 'package:pot/src/private/static.dart';
 import 'package:pot/src/private/utils.dart';
 
+import 'utils.dart';
+
+({Object? raw, ({Object? normal, Object? quoted}) converted}) testObject() {
+  return (
+    raw: {
+      'a': [Foo(1), true, null],
+      'b': const {
+        'c': 2.0,
+        'd': (e: false, f: 'g'),
+      },
+    },
+    converted: (
+      normal: {
+        'a': ['Foo(1)', true, null],
+        'b': const {
+          'c': 2.0,
+          'd': '(e: false, f: g)',
+        },
+      },
+      quoted: {
+        '"a"': ['"Foo(1)"', true, null],
+        '"b"': const {
+          '"c"': 2.0,
+          '"d"': '"(e: false, f: g)"',
+        },
+      },
+    ),
+  );
+}
+
 void main() {
   StreamController<PotEvent>? controller;
   final events = <PotEvent>[];
@@ -43,13 +73,24 @@ void main() {
   });
 
   group('Converters', () {
+    test('convertForDescription()', () {
+      final object = testObject();
+      final converted = convertForDescription(object.raw);
+      final convertedWithQuotes =
+          convertForDescription(object.raw, quoteString: true);
+
+      expect(converted, object.converted.normal);
+      expect(convertedWithQuotes, object.converted.quoted);
+    });
+
     test('PotDescription.fromMap', () {
-      final desc = PotDescription.fromMap(const {
+      final object = testObject();
+      final desc = PotDescription.fromMap({
         'identity': 'aaa',
         'isPending': false,
         'isDisposed': false,
         'hasObject': true,
-        'object': null,
+        'object': object.raw,
         'scope': 10,
       });
 
@@ -57,17 +98,18 @@ void main() {
       expect(desc.isPending, isFalse);
       expect(desc.isDisposed, isFalse);
       expect(desc.hasObject, isTrue);
-      expect(desc.object, 'null');
+      expect(desc.object, object.converted.normal);
       expect(desc.scope, 10);
     });
 
     test('PotDescription.toMap', () {
-      final map = PotDescription.fromMap(const {
+      final object = testObject();
+      final map = PotDescription.fromMap({
         'identity': 'aaa',
         'isPending': false,
         'isDisposed': false,
         'hasObject': true,
-        'object': 'null',
+        'object': object.raw,
         'scope': 10,
       }).toMap();
 
@@ -75,13 +117,13 @@ void main() {
       expect(map['isPending'], isFalse);
       expect(map['isDisposed'], isFalse);
       expect(map['hasObject'], isTrue);
-      expect(map['object'], 'null');
+      expect(map['object'], object.converted.normal);
       expect(map['scope'], 10);
     });
 
     test('PotEvent.fromMap', () {
       final now = DateTime.now();
-
+      final object = testObject();
       final event = PotEvent.fromMap({
         'number': 10,
         'kind': 'reset',
@@ -93,7 +135,7 @@ void main() {
             'isPending': true,
             'isDisposed': true,
             'hasObject': false,
-            'object': 'bbb',
+            'object': object.raw,
             'scope': 30,
           },
         ],
@@ -104,24 +146,24 @@ void main() {
       expect(event.time, now);
       expect(event.currentScope, 20);
       expect(event.potDescriptions.first.identity, 'aaa');
-      expect(event.potDescriptions.first.object, 'bbb');
+      expect(event.potDescriptions.first.object, object.converted.normal);
     });
 
     test('PotEvent.toMap', () {
       final now = DateTime.now();
-
+      final object = testObject();
       final map = PotEvent(
         number: 10,
         kind: PotEventKind.created,
         time: now,
         currentScope: 20,
         potDescriptions: [
-          PotDescription.fromMap(const {
+          PotDescription.fromMap({
             'identity': 'aaa',
             'isPending': false,
             'isDisposed': false,
             'hasObject': true,
-            'object': 'bbb',
+            'object': object.raw,
             'scope': 30,
           }),
         ],
@@ -135,7 +177,7 @@ void main() {
       final descs = map['potDescriptions'] as List?;
       final desc = descs?.first as Map<String, Object?>?;
       expect(desc?['identity'], 'aaa');
-      expect(desc?['object'], 'bbb');
+      expect(desc?['object'], object.converted.normal);
     });
   });
 
@@ -158,30 +200,32 @@ void main() {
 
   group('toString()', () {
     test('PotDescription.toString()', () {
-      final desc = PotDescription.fromMap(const {
+      final object = testObject();
+      final desc = PotDescription.fromMap({
         'identity': 'aaa',
         'isPending': false,
         'isDisposed': false,
         'hasObject': true,
-        'object': 'null',
+        'object': object.raw,
         'scope': 10,
       });
 
       expect(
         desc.toString(),
         'PotDescription(identity: aaa, isPending: false, isDisposed: false, '
-        'hasObject: true, object: null, scope: 10)',
+        'hasObject: true, object: ${object.converted.normal}, scope: 10)',
       );
     });
 
     test('PotEvent.toString()', () {
       final now = DateTime.now();
-      final desc = PotDescription.fromMap(const {
+      final object = testObject();
+      final desc = PotDescription.fromMap({
         'identity': 'aaa',
         'isPending': true,
         'isDisposed': false,
         'hasObject': false,
-        'object': 'bbb',
+        'object': object.raw,
         'scope': 30,
       });
 
@@ -362,15 +406,15 @@ void main() {
 
         expect(events, hasLength(5));
         expect(events[0].potDescriptions[0].hasObject, isFalse);
-        expect(events[0].potDescriptions[0].object, 'null');
+        expect(events[0].potDescriptions[0].object, isNull);
         expect(events[1].potDescriptions[0].hasObject, isFalse);
-        expect(events[1].potDescriptions[0].object, 'null');
+        expect(events[1].potDescriptions[0].object, isNull);
         expect(events[2].potDescriptions[0].hasObject, isTrue);
-        expect(events[2].potDescriptions[0].object, '1');
+        expect(events[2].potDescriptions[0].object, 1);
         expect(events[3].potDescriptions[0].hasObject, isFalse);
-        expect(events[3].potDescriptions[0].object, 'null');
+        expect(events[3].potDescriptions[0].object, isNull);
         expect(events[4].potDescriptions[0].hasObject, isFalse);
-        expect(events[4].potDescriptions[0].object, 'null');
+        expect(events[4].potDescriptions[0].object, isNull);
       });
 
       test('allPotDescriptions returns descriptions of all pots', () {

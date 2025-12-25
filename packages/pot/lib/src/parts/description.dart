@@ -21,7 +21,7 @@ class PotDescription {
       isPending: map['isPending'] as bool?,
       isDisposed: map['isDisposed'] as bool? ?? false,
       hasObject: map['hasObject'] as bool? ?? false,
-      object: map['object'] as String? ?? 'null',
+      object: convertForDescription(map['object']),
       scope: map['scope'] as int?,
     );
   }
@@ -34,7 +34,7 @@ class PotDescription {
       isPending: pot is ReplaceablePot ? pot.isPending : null,
       isDisposed: pot._isDisposed,
       hasObject: pot._hasObject,
-      object: '${pot._object}',
+      object: convertForDescription(pot._object),
       scope: pot._scope,
     );
   }
@@ -52,7 +52,10 @@ class PotDescription {
   final bool hasObject;
 
   /// The object held in the pot.
-  final String object;
+  ///
+  /// This is not always the original object; some types are converted
+  /// to [String] for representation and for safety.
+  final Object? object;
 
   /// The number of the scope the pot is bound to.
   final int? scope;
