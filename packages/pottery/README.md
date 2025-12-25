@@ -209,7 +209,7 @@ It is also possible to start it earlier by calling `Pottery.startExtension()`.
 
 [Pottery]: https://pub.dev/documentation/pottery/latest/pottery/Pottery-class.html
 [LocalPottery]: https://pub.dev/documentation/pottery/latest/pottery/LocalPottery-class.html
-[of]: https://pub.dev/documentation/pottery/latest/pottery/NearestPotOf/of.html
+[of]: https://pub.dev/documentation/pottery/latest/pottery/NearestLocalPotObjectOf/of.html
 [Pot]: https://pub.dev/packages/pot
 [PotNotReadyException]: https://pub.dev/documentation/pot/latest/pot/PotNotReadyException-class.html
 [notifyObjectUpdate]: https://pub.dev/documentation/pottery/latest/pottery/Pot/notifyObjectUpdate.html

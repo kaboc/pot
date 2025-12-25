@@ -227,7 +227,7 @@ class _LocalPotteryState extends State<LocalPottery> {
 }
 
 /// An extension on [Pot] to integrate with [LocalPottery].
-extension NearestPotOf<T> on Pot<T> {
+extension NearestLocalPotObjectOf<T> on Pot<T> {
   ({Object? object, bool found}) _findObject(BuildContext context) {
     // Apparently, this lookup returns the current element
     // if no matching ancestor is found.
