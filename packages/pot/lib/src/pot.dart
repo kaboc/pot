@@ -248,27 +248,6 @@ class Pot<T> extends _PotBody<T> {
     ScopeState.scopes.clearScope(ScopeState.currentScope, keepScope: true);
   }
 
-  /// Resets all pots of all scopes.
-  ///
-  /// This removes all objects in the pots bound to any scopes, and
-  /// triggers the disposer of each pot.
-  ///
-  /// If `keepScopes` is `true` or not specified, calling this method
-  /// does not affect the scopes themselves; the index number of the
-  /// current scope stays the same. Otherwise, the index is reset to 0.
-  ///
-  /// See [reset] for details on a reset of an object.
-  @Deprecated(
-    'Use uninitialize instead. '
-    'This feature was deprecated after v0.8.0.',
-  )
-  static void resetAll({bool keepScopes = true}) {
-    final count = ScopeState.currentScope;
-    for (var i = count; i >= 0; i--) {
-      ScopeState.scopes.clearScope(i, keepScope: keepScopes);
-    }
-  }
-
   /// Resets the state of all pots and scopes to their initial state.
   ///
   /// This removes all existing scopes and resets the scope index back to 0.
