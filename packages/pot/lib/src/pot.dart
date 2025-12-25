@@ -9,6 +9,7 @@ import 'private/utils.dart';
 part 'parts/description.dart';
 part 'parts/error_utils.dart';
 part 'parts/pot_body.dart';
+part 'parts/replaceable_pot.dart';
 
 /// The signature of a Singleton factory that creates and returns
 /// an object of type [T].
