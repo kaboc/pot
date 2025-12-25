@@ -139,6 +139,23 @@ void main() {
     });
   });
 
+  group('Pot identity', () {
+    test(
+      'Internal flag determines whether generic type is included in identity',
+      () {
+        final pot = Pot(() => 1);
+
+        isDetailedPotIdentityEnabled = DetailedPotIdentity.notSet;
+        expect(pot.identity(), startsWith('Pot<int>#${pot.shortHash()}'));
+        expect(isDetailedPotIdentityEnabled, DetailedPotIdentity.enabled);
+
+        isDetailedPotIdentityEnabled = DetailedPotIdentity.disabled;
+        expect(pot.identity(), startsWith('Pot#${pot.shortHash()}'));
+        expect(isDetailedPotIdentityEnabled, DetailedPotIdentity.disabled);
+      },
+    );
+  });
+
   group('toString()', () {
     test('PotDescription.toString()', () {
       final desc = PotDescription.fromMap(const {
