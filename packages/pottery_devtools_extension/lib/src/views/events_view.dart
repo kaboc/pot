@@ -130,9 +130,9 @@ class _TableState extends State<_Table> {
       columnBuilder: (index) {
         return TableSpan(
           extent: switch (index) {
-            0 => const FixedTableSpanExtent(160),
-            1 => const FixedTableSpanExtent(190),
-            2 => const FixedTableSpanExtent(170),
+            0 => const FixedTableSpanExtent(170),
+            1 => const FixedTableSpanExtent(160),
+            2 => const FixedTableSpanExtent(190),
             3 => const FixedTableSpanExtent(200),
             4 => const FixedTableSpanExtent(100),
             5 => const FixedTableSpanExtent(100),
@@ -157,10 +157,10 @@ class _TableState extends State<_Table> {
       cellBuilder: (context, vicinity) {
         if (vicinity.row == 0) {
           return switch (vicinity.column) {
-            0 => const TableViewCell(child: HeadingCell('Event')),
-            1 => const TableViewCell(child: HeadingCell('Occurred at')),
-            2 => const TableViewCell(child: HeadingCell('Pot type')),
-            3 => const TableViewCell(child: HeadingCell('Generic type')),
+            0 => const TableViewCell(child: HeadingCell('Pot type')),
+            1 => const TableViewCell(child: HeadingCell('Event')),
+            2 => const TableViewCell(child: HeadingCell('Occurred at')),
+            3 => const TableViewCell(child: HeadingCell('Object type')),
             4 => const TableViewCell(child: HeadingCell('isPending')),
             5 => const TableViewCell(child: HeadingCell('isDisposed')),
             6 => const TableViewCell(child: HeadingCell('hasObject')),
@@ -180,6 +180,19 @@ class _TableState extends State<_Table> {
           0 => TableViewCell(
               child: BoldCell(
                 [
+                  for (final desc in descs)
+                    CellConfig(
+                      desc.identity,
+                      highlight: isNew,
+                    ),
+                ],
+                rowNumber: vicinity.row,
+                specialTextType: SpecialTextType.identity,
+              ),
+            ),
+          1 => TableViewCell(
+              child: BoldCell(
+                [
                   CellConfig(
                     event.kind.name,
                     highlight: isNew,
@@ -189,7 +202,7 @@ class _TableState extends State<_Table> {
                 lineSpan: descs.length,
               ),
             ),
-          1 => TableViewCell(
+          2 => TableViewCell(
               child: Cell.center(
                 [
                   CellConfig(
@@ -199,19 +212,6 @@ class _TableState extends State<_Table> {
                 ],
                 rowNumber: vicinity.row,
                 lineSpan: descs.length,
-              ),
-            ),
-          2 => TableViewCell(
-              child: Cell(
-                [
-                  for (final desc in descs)
-                    CellConfig(
-                      desc.identity,
-                      highlight: isNew,
-                    ),
-                ],
-                rowNumber: vicinity.row,
-                specialTextType: SpecialTextType.identity,
               ),
             ),
           3 => TableViewCell(

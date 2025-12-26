@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart' show ValueNotifier;
 enum ViewType {
   pots(
     'Pots',
-    'Pot instances (in order of creation)',
+    'Pot instances by creation order',
   ),
   potteries(
     'Pottery',

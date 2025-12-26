@@ -132,7 +132,7 @@ class _TableState extends State<_Table> {
       primary: true,
       columnCount: 5,
       rowCount: potteries.length + 1,
-      pinnedColumnCount: 1,
+      pinnedColumnCount: 2,
       pinnedRowCount: 1,
       horizontalDetails: ScrollableDetails.horizontal(
         controller: widget.horizontalController,
@@ -141,8 +141,8 @@ class _TableState extends State<_Table> {
         return TableSpan(
           extent: switch (index) {
             0 => const FixedTableSpanExtent(155),
-            1 => const FixedTableSpanExtent(190),
-            2 => const FixedTableSpanExtent(170),
+            1 => const FixedTableSpanExtent(170),
+            2 => const FixedTableSpanExtent(190),
             3 => const FixedTableSpanExtent(200),
             4 => const MaxTableSpanExtent(
                 FixedTableSpanExtent(280),
@@ -167,9 +167,9 @@ class _TableState extends State<_Table> {
         if (vicinity.row == 0) {
           return switch (vicinity.column) {
             0 => const TableViewCell(child: HeadingCell('Identity')),
-            1 => const TableViewCell(child: HeadingCell('Created at')),
-            2 => const TableViewCell(child: HeadingCell('Pot type')),
-            3 => const TableViewCell(child: HeadingCell('Generic type')),
+            1 => const TableViewCell(child: HeadingCell('Pot type')),
+            2 => const TableViewCell(child: HeadingCell('Created at')),
+            3 => const TableViewCell(child: HeadingCell('Object type')),
             4 => const TableViewCell(child: HeadingCell('object')),
             _ => const TableViewCell(child: SizedBox.shrink()),
           };
@@ -196,19 +196,7 @@ class _TableState extends State<_Table> {
               ),
             ),
           1 => TableViewCell(
-              child: Cell.center(
-                [
-                  CellConfig(
-                    time,
-                    highlight: _initialFetchCompleted && isNew,
-                  ),
-                ],
-                rowNumber: vicinity.row,
-                lineSpan: objects.length,
-              ),
-            ),
-          2 => TableViewCell(
-              child: Cell(
+              child: BoldCell(
                 [
                   for (final (i, object) in objects.indexed)
                     CellConfig(
@@ -219,6 +207,18 @@ class _TableState extends State<_Table> {
                 ],
                 rowNumber: vicinity.row,
                 specialTextType: SpecialTextType.identity,
+              ),
+            ),
+          2 => TableViewCell(
+              child: Cell.center(
+                [
+                  CellConfig(
+                    time,
+                    highlight: _initialFetchCompleted && isNew,
+                  ),
+                ],
+                rowNumber: vicinity.row,
+                lineSpan: objects.length,
               ),
             ),
           3 => TableViewCell(

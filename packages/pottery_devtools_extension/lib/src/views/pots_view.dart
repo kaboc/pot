@@ -161,7 +161,7 @@ class _TableState extends State<_Table> {
           return switch (vicinity.column) {
             0 => const TableViewCell(child: HeadingCell('Pot type')),
             1 => const TableViewCell(child: HeadingCell('Created at')),
-            2 => const TableViewCell(child: HeadingCell('Generic type')),
+            2 => const TableViewCell(child: HeadingCell('Object type')),
             3 => const TableViewCell(child: HeadingCell('isPending')),
             4 => const TableViewCell(child: HeadingCell('isDisposed')),
             5 => const TableViewCell(child: HeadingCell('hasObject')),
