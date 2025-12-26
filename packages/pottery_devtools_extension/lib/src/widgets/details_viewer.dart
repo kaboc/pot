@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 
+// ignore: depend_on_referenced_packages, implementation_imports
+import 'package:pot/src/private/utils.dart' show convertForDescription;
+
 import 'package:pottery_devtools_extension/src/utils.dart';
-import 'package:pottery_devtools_extension/src/widgets/highlighted_json.dart';
 
 class DetailsViewer extends StatelessWidget {
   const DetailsViewer({
     required this.title,
     required this.time,
-    required this.json,
+    required this.data,
   });
 
   final String? title;
   final DateTime? time;
-  final String? json;
+  final Map<String, Object?>? data;
 
   @override
   Widget build(BuildContext context) {
-    return json == null
+    return data == null
         ? const SizedBox.shrink()
         : LayoutBuilder(
             builder: (context, constraints) {
@@ -38,12 +40,78 @@ class DetailsViewer extends StatelessWidget {
                         Text('$time'),
                       ],
                       const SizedBox(height: 16.0),
-                      HighlightedJson(json!),
+                      _BulletedDataList(data!),
                     ],
                   ),
                 ),
               );
             },
           );
+  }
+}
+
+class _BulletedDataList extends StatelessWidget {
+  const _BulletedDataList(this.data);
+
+  final Map<String, Object?> data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Table(
+      columnWidths: const <int, TableColumnWidth>{
+        0: IntrinsicColumnWidth(),
+        1: FlexColumnWidth(),
+      },
+      children: [
+        for (final MapEntry(:key, :value) in data.entries)
+          if (key != 'scope')
+            TableRow(
+              children: [
+                Padding(
+                  padding: const EdgeInsetsDirectional.only(end: 8.0),
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        WidgetSpan(
+                          alignment: PlaceholderAlignment.middle,
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.only(
+                              start: 4.0,
+                              end: 6.0,
+                            ),
+                            child: Container(
+                              width: 4.0,
+                              height: 4.0,
+                              decoration: ShapeDecoration(
+                                shape: const CircleBorder(),
+                                color: context.colorScheme.secondary,
+                              ),
+                            ),
+                          ),
+                        ),
+                        TextSpan(
+                          text: '$key:',
+                          style: TextStyle(
+                            color: context.colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 1.0),
+                  child: Text(
+                    '${convertForDescription(value, quoteString: true)}',
+                    style: TextStyle(
+                      color: context.colorScheme.tertiary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+      ],
+    );
   }
 }

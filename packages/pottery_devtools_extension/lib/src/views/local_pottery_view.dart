@@ -277,14 +277,19 @@ class _Details extends StatelessWidget {
       (s) => s.entries.firstWhereOrNull((v) => v.key == selection?.id),
     );
 
+    final data = entry?.value.objects.firstWhereOrNull(
+      (v) => v.potIdentity == selection?.object?.potIdentity,
+    );
+
     return DetailsViewer(
       title: entry?.key,
       time: entry?.value.time,
-      json: entry?.value.objects
-          .firstWhereOrNull(
-            (v) => v.potIdentity == selection?.object?.potIdentity,
-          )
-          ?.toFormattedJson(),
+      data: data == null
+          ? null
+          : {
+              'potIdentity': data.potIdentity,
+              'object': data.object,
+            },
     );
   }
 }

@@ -6,7 +6,6 @@ import 'package:pottery/pottery.dart';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 
 import 'package:pottery_devtools_extension/src/event_handler.dart';
-import 'package:pottery_devtools_extension/src/utils.dart';
 import 'package:pottery_devtools_extension/src/widgets/_widgets.dart';
 
 typedef _Selection = ({PotEvent event, PotDescription potDescription});
@@ -298,7 +297,7 @@ class _Details extends StatelessWidget {
     return DetailsViewer(
       title: selection?.event.kind.name,
       time: selection?.event.time,
-      json: selection?.potDescription.toFormattedJson(),
+      data: selection?.potDescription.toMap(),
     );
   }
 }

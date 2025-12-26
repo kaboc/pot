@@ -7,7 +7,6 @@ import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 
 import 'package:pottery_devtools_extension/src/event_handler.dart';
 import 'package:pottery_devtools_extension/src/types.dart';
-import 'package:pottery_devtools_extension/src/utils.dart';
 import 'package:pottery_devtools_extension/src/widgets/_widgets.dart';
 
 class PotsView extends StatefulWidget {
@@ -286,9 +285,7 @@ class _Details extends StatelessWidget {
     return DetailsViewer(
       title: pots?.description.identity,
       time: pots?.time,
-      json: pots?.description == null
-          ? null
-          : pots!.description.toFormattedJson(),
+      data: pots?.description == null ? null : pots!.description.toMap(),
     );
   }
 }

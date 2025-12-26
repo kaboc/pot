@@ -323,11 +323,11 @@ class _Details extends StatelessWidget {
     return DetailsViewer(
       title: entry?.key,
       time: entry?.value.time,
-      json: entry?.value.potDescriptions
+      data: entry?.value.potDescriptions
           .firstWhereOrNull(
             (v) => v.identity == selection?.potDescription.identity,
           )
-          ?.toFormattedJson(),
+          ?.toMap(),
     );
   }
 }
