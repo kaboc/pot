@@ -21,9 +21,9 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Pottery(
-      pots: {
-        counterPot: CounterNotifier.new,
-      },
+      overrides: [
+        counterPot.set(CounterNotifier.new),
+      ],
       builder: (context) {
         return MaterialApp(
           home: Scaffold(
@@ -33,12 +33,12 @@ class App extends StatelessWidget {
                 children: [
                   for (var i = 0; i < 50; i++)
                     LocalPottery(
-                      pots: {
-                        indexPot: () => i,
+                      overrides: [
+                        indexPot.set(() => i),
                         // A different notifier is provided to the subtree
                         // when the index is an odd number.
-                        if (i.isOdd) counterPot: HyperCounterNotifier.new,
-                      },
+                        if (i.isOdd) counterPot.set(HyperCounterNotifier.new),
+                      ],
                       disposer: (pots) {
                         // It is your responsibility to dispose the objects
                         // created by LocalPottery, whereas Pottery does

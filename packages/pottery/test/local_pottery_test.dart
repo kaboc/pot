@@ -25,6 +25,28 @@ void main() {
     fooPot = barPot = nullablePot = null;
   });
 
+  test(
+    'The overrides parameter accepts both PotReplacement and PotOverride',
+    () {
+      // Ensures that PotReplacement extends PotOverride.
+      expect(
+        PotReplacement(pot: Pot.replaceable(() => 10), factory: () => 0),
+        isA<PotOverride<Object?>>(),
+      );
+
+      final localPottery = LocalPottery(
+        overrides: [Pot.pending<int>().set(() => 10)],
+        builder: (context) => const SizedBox(),
+      );
+
+      Type getType<T>(List<T> v) => T;
+      final overridesType = getType(localPottery.overrides);
+
+      // Verifies that the declared type of the parameter is PotOverride.
+      expect(overridesType, PotOverride<Object?>);
+    },
+  );
+
   testWidgets(
     'call() cannot get object from LocalPottery ancestor',
     (tester) async {
@@ -33,9 +55,9 @@ void main() {
       var called = false;
       await tester.pumpWidget(
         TestLocalPottery(
-          pots: {
-            fooPot!: () => const Foo(1),
-          },
+          overrides: [
+            fooPot!.set(() => const Foo(1)),
+          ],
           builder: (context) {
             expect(fooPot!.call, throwsA(isA<PotNotReadyException>()));
             called = true;
@@ -49,7 +71,7 @@ void main() {
 
   testWidgets(
     'of() returns the associated object provided by nearest LocalPottery '
-    'ancestor that contains the pot in pots map.',
+    'ancestor that contains the pot in overrides list.',
     (tester) async {
       fooPot = Pot.pending();
       expect(fooPot!.create, throwsA(isA<PotNotReadyException>()));
@@ -57,9 +79,9 @@ void main() {
       var called = false;
       await tester.pumpWidget(
         TestLocalPottery(
-          pots: {
-            fooPot!: () => const Foo(1),
-          },
+          overrides: [
+            fooPot!.set(() => const Foo(1)),
+          ],
           builder: (context) {
             expect(fooPot!.of(context), const Foo(1));
             called = true;
@@ -73,7 +95,7 @@ void main() {
 
   testWidgets(
     'of() returns object held in pot if no LocalPottery ancestors have '
-    'the pot in pots map',
+    'the pot in overrides list',
     (tester) async {
       fooPot = Pot.replaceable(() => const Foo(1));
       barPot = Pot.pending();
@@ -82,9 +104,9 @@ void main() {
       var called = false;
       await tester.pumpWidget(
         TestLocalPottery(
-          pots: {
-            barPot!: Bar.new,
-          },
+          overrides: [
+            barPot!.set(Bar.new),
+          ],
           builder: (context) {
             expect(fooPot!.of(context), const Foo(1));
             called = true;
@@ -106,9 +128,9 @@ void main() {
       Foo? foo2;
       await tester.pumpWidget(
         TestLocalPottery(
-          pots: {
-            fooPot!: () => const Foo(20),
-          },
+          overrides: [
+            fooPot!.set(() => const Foo(20)),
+          ],
           builder: (context) {
             foo1 ??= fooPot!();
             foo2 ??= fooPot!.of(context);
@@ -128,9 +150,9 @@ void main() {
     var isNullObtained = false;
     await tester.pumpWidget(
       TestLocalPottery(
-        pots: {
-          nullablePot!: () => null,
-        },
+        overrides: [
+          nullablePot!.set(() => null),
+        ],
         builder: (context) {
           isNullObtained = nullablePot!.of(context) == null;
           return const SizedBox.shrink();
@@ -156,10 +178,10 @@ void main() {
       LocalPotteryObjects? map;
       await tester.pumpWidget(
         TestLocalPottery(
-          pots: {
-            fooPot!: () => const Foo(20),
-            barPot!: () => const Bar(),
-          },
+          overrides: [
+            fooPot!.set(() => const Foo(20)),
+            barPot!.set(() => const Bar()),
+          ],
           disposer: (pots) => map = pots,
         ),
       );
@@ -191,9 +213,9 @@ void main() {
         Column(
           children: [
             TestLocalPottery(
-              pots: {
-                fooPot!: () => const Foo(10),
-              },
+              overrides: [
+                fooPot!.set(() => const Foo(10)),
+              ],
               builder: (context1) {
                 foo1 = fooPot!.of(context1);
                 return Builder(
@@ -205,9 +227,9 @@ void main() {
               },
             ),
             TestLocalPottery(
-              pots: {
-                fooPot!: () => const Foo(20),
-              },
+              overrides: [
+                fooPot!.set(() => const Foo(20)),
+              ],
               builder: (context3) {
                 foo3 = fooPot!.of(context3);
                 return Builder(
@@ -231,7 +253,7 @@ void main() {
 
   testWidgets(
     'When LocalPotteries are nested, of() returns the object from the '
-    'nearest ancestor that has the pot in pots map',
+    'nearest ancestor that has the pot in overrides list',
     (tester) async {
       fooPot = Pot.pending();
       barPot = Pot.pending();
@@ -243,21 +265,21 @@ void main() {
 
       await tester.pumpWidget(
         TestLocalPottery(
-          pots: {
-            fooPot!: () => const Foo(10),
-          },
+          overrides: [
+            fooPot!.set(() => const Foo(10)),
+          ],
           builder: (context1) {
             foo1 = fooPot!.of(context1);
             return TestLocalPottery(
-              pots: {
-                fooPot!: () => const Foo(20),
-              },
+              overrides: [
+                fooPot!.set(() => const Foo(20)),
+              ],
               builder: (context2) {
                 foo2 = fooPot!.of(context2);
                 return TestLocalPottery(
-                  pots: {
-                    barPot!: () => const Bar(),
-                  },
+                  overrides: [
+                    barPot!.set(() => const Bar()),
+                  ],
                   builder: (context3) {
                     foo3 = fooPot!.of(context3);
                     bar = barPot!.of(context3);
@@ -288,10 +310,10 @@ void main() {
     await tester.pumpWidget(
       TestLocalPottery(
         localPotteryKey: key,
-        pots: {
-          fooPot!: () => foo,
-          barPot!: () => bar,
-        },
+        overrides: [
+          fooPot!.set(() => foo),
+          barPot!.set(() => bar),
+        ],
       ),
     );
 

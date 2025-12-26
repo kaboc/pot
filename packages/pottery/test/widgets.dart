@@ -7,12 +7,12 @@ import 'package:pottery/pottery.dart';
 class TestPottery extends StatefulWidget {
   const TestPottery({
     this.potteryKey,
-    required this.pots,
+    required this.overrides,
     this.builder,
   });
 
   final GlobalKey<Object?>? potteryKey;
-  final PotReplacements pots;
+  final List<PotReplacement<Object?>> overrides;
   final WidgetBuilder? builder;
 
   @override
@@ -31,7 +31,7 @@ class _TestPotteryState extends State<TestPottery> {
           if (!_pressed)
             Pottery(
               key: widget.potteryKey,
-              pots: widget.pots,
+              overrides: widget.overrides,
               builder: widget.builder ?? (_) => const SizedBox.shrink(),
             ),
           RemovePotteryButton(
@@ -46,13 +46,13 @@ class _TestPotteryState extends State<TestPottery> {
 class TestLocalPottery extends StatefulWidget {
   const TestLocalPottery({
     this.localPotteryKey,
-    required this.pots,
+    required this.overrides,
     this.disposer,
     this.builder,
   });
 
   final GlobalKey<Object?>? localPotteryKey;
-  final PotReplacements pots;
+  final List<PotOverride<Object?>> overrides;
   final WidgetBuilder? builder;
   final void Function(LocalPotteryObjects)? disposer;
 
@@ -72,7 +72,7 @@ class _TestLocalPotteryState extends State<TestLocalPottery> {
           if (!_pressed)
             LocalPottery(
               key: widget.localPotteryKey,
-              pots: widget.pots,
+              overrides: widget.overrides,
               disposer: widget.disposer,
               builder: widget.builder ?? (_) => const SizedBox.shrink(),
             ),

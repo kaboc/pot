@@ -1,23 +1,20 @@
 import 'package:flutter/foundation.dart'
-    show DiagnosticPropertiesBuilder, DiagnosticsProperty;
+    show DiagnosticPropertiesBuilder, IterableProperty;
 import 'package:flutter/widgets.dart';
 
 import 'package:pot/pot.dart';
 
+import 'common_types.dart';
 import 'extension/extension_manager.dart';
 import 'local_pottery.dart';
 import 'utils.dart';
-
-/// The signature of a map consisting of replaceable pots and factories.
-typedef PotReplacements
-    = Map<ReplaceablePot<Object?>, PotObjectFactory<Object?>>;
 
 /// A widget that controls the availability of particular [Pot]s
 /// according to the widget lifecycle.
 ///
 /// {@template pottery.class}
 /// This widget replaces the factories of [ReplaceablePot]s with new
-/// factories as specified in [pots]. For any pot that already holds
+/// factories as specified in [overrides]. For any pot that already holds
 /// an object, the object is immediately replaced with a new one created
 /// by the new factory. If a pot has no object, a new one is not created
 /// until the pot is accessed for the first time.
@@ -38,10 +35,10 @@ typedef PotReplacements
 /// ...
 ///
 /// child: Pottery(
-///   pots: {
-///     notesNotifierPot: NotesNotifier.new,
-///     notesRepositoryPot: NotesRepository.new,
-///   },
+///   overrides: [
+///     notesNotifierPot.set(NotesNotifier.new),
+///     notesRepositoryPot.set(NotesRepository.new),
+///   ],
 ///   builder: (context) {
 ///     return ChildWidget();
 ///   },
@@ -52,10 +49,6 @@ typedef PotReplacements
 /// It only uses the lifecycle of itself in the tree to control
 /// the lifetime of pots' content, which is an important difference
 /// from [LocalPottery].
-///
-/// Also note that an error arises only at runtime if the map
-/// contains wrong pairs of pot and factory. Make sure to specify
-/// a correct factory creating an object of the right type.
 /// {@endtemplate}
 class Pottery extends StatefulWidget {
   /// Creates a [Pottery] widget that limits the lifespan of the
@@ -65,12 +58,12 @@ class Pottery extends StatefulWidget {
   /// {@macro pottery.class}
   const Pottery({
     super.key,
-    required this.pots,
+    required this.overrides,
     required this.builder,
   });
 
   /// Pairs of a replaceable [Pot] and its new factory.
-  final PotReplacements pots;
+  final List<PotReplacement<Object?>> overrides;
 
   /// A function called to obtain the child widget.
   final WidgetBuilder builder;
@@ -99,19 +92,24 @@ class _PotteryState extends State<Pottery> {
 
     runIfDebug(() {
       _extensionManager = PotteryExtensionManager.createSingle()
-        ..onPotteryCreated(this, widget.pots.keys);
+        ..onPotteryCreated(this, widget.overrides.map((repl) => repl.pot));
     });
-    widget.pots.forEach((pot, factory) => pot.replace(factory));
+
+    for (final repl in widget.overrides) {
+      repl.pot.replace(repl.factory);
+    }
   }
 
   @override
   void dispose() {
+    final pots = widget.overrides.map((repl) => repl.pot);
+
     // Some pots may depend on other pots located earlier in
     // the collection, so they must be reset in reverse order.
-    widget.pots.keys.toList().reversed.forEach((pot) {
-      pot.resetAsPending();
-    });
-    _extensionManager?.onPotteryRemoved(this, widget.pots.keys);
+    for (var i = pots.length - 1; i >= 0; i--) {
+      pots.elementAt(i).resetAsPending();
+    }
+    _extensionManager?.onPotteryRemoved(this, pots);
 
     super.dispose();
   }
@@ -124,6 +122,8 @@ class _PotteryState extends State<Pottery> {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<PotReplacements>('pots', widget.pots));
+    properties.add(
+      IterableProperty<PotReplacement<Object?>>('overrides', widget.overrides),
+    );
   }
 }

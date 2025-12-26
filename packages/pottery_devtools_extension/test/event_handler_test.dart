@@ -193,7 +193,7 @@ void main() {
 
         await tester.pumpWidget(
           Pottery(
-            pots: {pot1!: () => 10},
+            overrides: [pot1!.set(() => 10)],
             builder: (context) => const SizedBox.shrink(),
           ),
         );
@@ -228,16 +228,16 @@ void main() {
         Column(
           children: [
             Pottery(
-              pots: {
-                pot1!: () => 10,
-                pot2!: () => 20,
-              },
+              overrides: [
+                pot1!.set(() => 10),
+                pot2!.set(() => 20),
+              ],
               builder: (context) => const SizedBox.shrink(),
             ),
             Pottery(
-              pots: {
-                pot3!: () => 30,
-              },
+              overrides: [
+                pot3!.set(() => 30),
+              ],
               builder: (context) => const SizedBox.shrink(),
             ),
           ],
@@ -281,7 +281,7 @@ void main() {
 
         await tester.pumpWidget(
           LocalPottery(
-            pots: {pot1!: () => 10},
+            overrides: [pot1!.set(() => 10)],
             builder: (context) => const SizedBox.shrink(),
           ),
         );
@@ -319,16 +319,16 @@ void main() {
         Column(
           children: [
             LocalPottery(
-              pots: {
-                pot1!: () => 10,
-                pot2!: () => 20,
-              },
+              overrides: [
+                pot1!.set(() => 10),
+                pot2!.set(() => 20),
+              ],
               builder: (context) => const SizedBox.shrink(),
             ),
             LocalPottery(
-              pots: {
-                pot3: () => obj.raw,
-              },
+              overrides: [
+                pot3.set(() => obj.raw),
+              ],
               builder: (context) => const SizedBox.shrink(),
             ),
           ],

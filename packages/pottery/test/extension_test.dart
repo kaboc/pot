@@ -167,10 +167,10 @@ void main() {
 
         await tester.pumpWidget(
           Pottery(
-            pots: {
-              pot1!: () => 10,
-              pot2: () => object.raw,
-            },
+            overrides: [
+              pot1!.set(() => 10),
+              pot2.set(() => object.raw),
+            ],
             builder: (context) {
               pot1!.create();
               pot2.create();
@@ -227,10 +227,10 @@ void main() {
 
         await tester.pumpWidget(
           LocalPottery(
-            pots: {
-              pot1!: () => 10,
-              pot2: () => object.raw,
-            },
+            overrides: [
+              pot1!.set(() => 10),
+              pot2.set(() => object.raw),
+            ],
             builder: (context) => const SizedBox.shrink(),
           ),
         );
@@ -277,9 +277,9 @@ void main() {
 
         await tester.pumpWidget(
           Pottery(
-            pots: {
-              fooPot!: () => Foo(20),
-            },
+            overrides: [
+              fooPot!.set(() => Foo(20)),
+            ],
             builder: (context) {
               fooPot!().value = 30;
               return const SizedBox.shrink();
@@ -323,9 +323,9 @@ void main() {
 
         await tester.pumpWidget(
           LocalPottery(
-            pots: {
-              fooPot!: () => Foo(20),
-            },
+            overrides: [
+              fooPot!.set(() => Foo(20)),
+            ],
             builder: (context) {
               fooPot!.of(context).value = 30;
               return const SizedBox.shrink();
