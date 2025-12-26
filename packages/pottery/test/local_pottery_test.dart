@@ -93,30 +93,48 @@ void main() {
     },
   );
 
-  testWidgets(
-    'of() returns object held in pot if no LocalPottery ancestors have '
-    'the pot in overrides list',
-    (tester) async {
-      fooPot = Pot.replaceable(() => const Foo(1));
-      barPot = Pot.pending();
-      expect(fooPot!().value, 1);
+  {
+    final variants = ValueVariant({
+      (pot: Pot(() => 1), object: 1, typeName: 'Pot'),
+      (pot: Pot.replaceable(() => 1), object: 1, typeName: 'ReplaceablePot'),
+    });
 
-      var called = false;
-      await tester.pumpWidget(
-        TestLocalPottery(
-          overrides: [
-            barPot!.set(Bar.new),
-          ],
-          builder: (context) {
-            expect(fooPot!.of(context), const Foo(1));
-            called = true;
-            return const SizedBox.shrink();
-          },
-        ),
-      );
-      expect(called, isTrue);
-    },
-  );
+    testWidgets(
+      'Calling of() on a pot throws if no LocalPottery ancestors have the pot '
+      'in overrides list',
+      (tester) async {
+        fooPot = Pot.replaceable(() => const Foo(1));
+        barPot = Pot.pending();
+        expect(fooPot!().value, 1);
+
+        final variant = variants.currentValue!;
+        var called = false;
+        await tester.pumpWidget(
+          TestLocalPottery(
+            overrides: [
+              barPot!.set(Bar.new),
+            ],
+            builder: (context) {
+              expect(
+                () => variant.pot.of(context),
+                throwsA(
+                  predicate(
+                    (e) =>
+                        e is LocalPotteryNotFoundException &&
+                        e.potTypeName == variant.typeName,
+                  ),
+                ),
+              );
+              called = true;
+              return const SizedBox.shrink();
+            },
+          ),
+        );
+        expect(called, isTrue);
+      },
+      variant: variants,
+    );
+  }
 
   testWidgets(
     'Calling maybeOf() on a pot returns null regardless of whether the pot is '

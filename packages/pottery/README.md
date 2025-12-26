@@ -99,7 +99,21 @@ available only in the subtree.
 An important fact is that the existing pots remain unchanged. The factories and
 objects are associated with those pots and stored in [LocalPottery] for local
 use. Therefore, calling `yourPot()` still returns the globally accessible object
-stored in the pot itself. Use [of()][of] instead to obtain the local object.
+stored in the pot itself.
+
+To obtain the local object, use [of()][of] or [maybeOf()][maybeOf] instead.
+These methods look up the widget tree for the nearest `LocalPottery` ancestor
+that has the pot in its `overrides` list.
+
+When no relevant `LocalPottery` ancestor is found:
+- `of()`: Throws [LocalPotteryNotFoundException].
+- `maybeOf()`: Returns `null`.
+
+> [!WARNING]
+> When the object type is nullable, `maybeOf()` cannot distinguish between
+> "the relevant `LocalPottery` was not found" and "it was found but the
+> provided object is null." Use `of()` if the pot is expected to be provided
+> by a `LocalPottery` ancestor.
 
 ```dart
 final fooPot = Pot(() => Foo(111));
@@ -133,14 +147,15 @@ class ChildWidget extends StatelessWidget {
 }
 ```
 
-For usage in more practical use cases, see the examples in [main2.dart] and in
-the document of `LocalPottery`.
+For more practical use cases, see the example in [main2.dart] and the
+documentation for [LocalPottery], [of], and [maybeOf].
 
 #### Important differences in [LocalPottery] compared to [Pottery]:
 
 - Objects are created immediately when `LocalPottery` is created, not when objects
   in pots are accessed for the first time.
-- Objects created with `LocalPottery` are only accessible with [of()][of].
+- Objects created with `LocalPottery` are only accessible with [of()][of] or
+  [maybeOf()][maybeOf] in the subtree.
 - Objects created within `LocalPottery` are not automatically disposed when
   the `LocalPottery` is removed from the tree. Use the `disposer` argument
   of `LocalPottery` (instead of the disposer in each pot) to define a custom
@@ -189,6 +204,8 @@ It is also possible to start it earlier by calling `Pottery.startExtension()`.
 [Pottery]: https://pub.dev/documentation/pottery/latest/pottery/Pottery-class.html
 [LocalPottery]: https://pub.dev/documentation/pottery/latest/pottery/LocalPottery-class.html
 [of]: https://pub.dev/documentation/pottery/latest/pottery/NearestLocalPotObjectOf/of.html
+[maybeOf]: https://pub.dev/documentation/pottery/latest/pottery/NearestLocalPotObjectOf/maybeOf.html
+[LocalPotteryNotFoundException]: https://pub.dev/documentation/pot/latest/pot/LocalPotteryNotFoundException-class.html
 [Pot]: https://pub.dev/packages/pot
 [PotNotReadyException]: https://pub.dev/documentation/pot/latest/pot/PotNotReadyException-class.html
 [notifyObjectUpdate]: https://pub.dev/documentation/pottery/latest/pottery/Pot/notifyObjectUpdate.html

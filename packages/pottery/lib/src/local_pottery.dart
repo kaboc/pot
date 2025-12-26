@@ -285,20 +285,50 @@ extension NearestLocalPotObjectOf<T> on Pot<T> {
   /// Returns the object provided by the nearest [LocalPottery] ancestor
   /// that has this [Pot] in its 'overrides' list.
   ///
-  /// If no such `LocalPottery` is found, the object held in the global
-  /// pot is returned, in which case, the return value is the same as
-  /// that of the [Pot.call] method.
+  /// Unlike [maybeOf], this method throws if no such `LocalPottery` ancestor
+  /// is found.
   ///
   /// This method efficiently looks up the widget tree to find a localized
   /// instance of the object associated with this pot.
   ///
   /// See also:
-  /// * [maybeOf], which returns null if no relevant `LocalPottery`
-  ///   ancestor is found.
+  /// * [maybeOf], which doesn't throw if no relevant `LocalPottery`
+  ///   ancestor is found. It returns null instead.
   /// * [LocalPottery], which provides the object that the `of()` and
-  ///   `maybeOf()` methods obtain.
+  ///   `maybeOf` methods obtain.
   T of(BuildContext context) {
     final (:object, :found) = _recursivelyFindObject(context);
-    return found ? object as T : this();
+    if (found) {
+      return object as T;
+    }
+
+    throw LocalPotteryNotFoundException(
+      this is ReplaceablePot ? 'ReplaceablePot' : 'Pot',
+    );
   }
+}
+
+/// The error that is thrown when `of` is called but no surrounding
+/// [LocalPottery] ancestor provides a localized value for the pot.
+///
+/// This usually happens when the [BuildContext] passed to `of()` is
+/// not a descendant of a `LocalPottery` that contains an entry for
+/// the requested pot in its `overrides` list.
+class LocalPotteryNotFoundException implements Exception {
+  /// Creates a [LocalPotteryNotFoundException] with the type of the pot
+  /// for which a localized value was not found.
+  const LocalPotteryNotFoundException(this.potTypeName);
+
+  /// The type of the pot used as a key to find the localized object.
+  final String potTypeName;
+
+  @override
+  // coverage:ignore-line
+  String toString() => '''
+Error: No localized value found for $potTypeName.
+
+To fix this, please ensure that:
+  * The widget tree contains a LocalPottery widget above the one calling of().
+  * The LocalPottery includes an entry for $potTypeName in its `overrides` list to provide a localized value.
+''';
 }
