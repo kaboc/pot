@@ -26,14 +26,9 @@ void main() {
   });
 
   testWidgets(
-    'of() returns the associated object provided by nearest LocalPottery '
-    'ancestor that contains the pot in pots map.',
+    'call() cannot get object from LocalPottery ancestor',
     (tester) async {
       fooPot = Pot.pending();
-      barPot = Pot.pending();
-
-      expect(fooPot!.create, throwsA(isA<PotNotReadyException>()));
-      expect(barPot!.create, throwsA(isA<PotNotReadyException>()));
 
       var called = false;
       await tester.pumpWidget(
@@ -42,12 +37,56 @@ void main() {
             fooPot!: () => const Foo(1),
           },
           builder: (context) {
-            expect(fooPot!.create, throwsA(isA<PotNotReadyException>()));
+            expect(fooPot!.call, throwsA(isA<PotNotReadyException>()));
+            called = true;
+            return const SizedBox.shrink();
+          },
+        ),
+      );
+      expect(called, isTrue);
+    },
+  );
+
+  testWidgets(
+    'of() returns the associated object provided by nearest LocalPottery '
+    'ancestor that contains the pot in pots map.',
+    (tester) async {
+      fooPot = Pot.pending();
+      expect(fooPot!.create, throwsA(isA<PotNotReadyException>()));
+
+      var called = false;
+      await tester.pumpWidget(
+        TestLocalPottery(
+          pots: {
+            fooPot!: () => const Foo(1),
+          },
+          builder: (context) {
             expect(fooPot!.of(context), const Foo(1));
-            expect(
-              () => barPot!.of(context),
-              throwsA(isA<PotNotReadyException>()),
-            );
+            called = true;
+            return const SizedBox.shrink();
+          },
+        ),
+      );
+      expect(called, isTrue);
+    },
+  );
+
+  testWidgets(
+    'of() returns object held in pot if no LocalPottery ancestors have '
+    'the pot in pots map',
+    (tester) async {
+      fooPot = Pot.replaceable(() => const Foo(1));
+      barPot = Pot.pending();
+      expect(fooPot!().value, 1);
+
+      var called = false;
+      await tester.pumpWidget(
+        TestLocalPottery(
+          pots: {
+            barPot!: Bar.new,
+          },
+          builder: (context) {
+            expect(fooPot!.of(context), const Foo(1));
             called = true;
             return const SizedBox.shrink();
           },
