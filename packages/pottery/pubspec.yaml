@@ -1,6 +1,6 @@
 name: pottery
-description: "Utility widgets for Pot in Flutter, automatically managing the lifetime of objects based on the widget lifecycle."
-version: 0.4.3
+description: "Utility widgets for Pot in Flutter, automatically managing the lifecycle of pots and the objects they hold based on the widget lifecycle."
+version: 0.5.0
 repository: https://github.com/kaboc/pot
 
 topics:

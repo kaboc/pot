@@ -1,3 +1,21 @@
+## 0.5.0
+
+- Update minimum Dart SDK version to 3.6.2.
+- Improve `Pottery.startExtension()` to do nothing in debug mode.
+- Improve tables and detail view in DevTools extension.
+- Add `maybeOf()`.
+    - Returns `null` if no relevant `LocalPottery` is found.
+    - Note that it also returns `null` if the target object is nullable and its value is `null`.
+- **Breaking**:
+    - Change `of()` to throw if no relevant `LocalPottery` is found.
+        - Use `maybeOf()` to get `null` instead.
+    - Replace `pots` parameter (Map) with type-safe `overrides` (List) via `set()`. (#14)
+        - Before: `pots: {myPot: () => object)}`
+        - After: `overrides: [myPot.set(() => object)]`
+    - Trivial changes:
+        - Remove deprecated `LocalPottery` alias.
+        - Rename `NearestPotOf` extension to `NearestLocalPotObjectOf`.
+
 ## 0.4.3
 
 - Improve performance of `of()` by reducing lookup costs.
@@ -66,3 +84,4 @@
 
 [#4]: https://github.com/kaboc/pot/pull/4
 [#7]: https://github.com/kaboc/pot/pull/7
+[#14]: https://github.com/kaboc/pot/pull/14

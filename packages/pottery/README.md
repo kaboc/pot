@@ -2,29 +2,9 @@
 [![pottery CI](https://github.com/kaboc/pot/actions/workflows/pottery.yml/badge.svg)](https://github.com/kaboc/pot/actions/workflows/pottery.yml)
 [![codecov](https://codecov.io/gh/kaboc/pot/branch/main/graph/badge.svg?token=YZMCN6WZKM)](https://codecov.io/gh/kaboc/pot)
 
-## Overview
-
-This package provides two widgets, [Pottery] and [LocalPottery], which manage
-the lifetime of [Pot]s (single-type DI containers) according to the lifecycle
-of widgets in Flutter.
-
-
-### Why is this better than the scoping feature of Pot?
-
-[Pot] itself from package:pot has the feature of scoping, but it is a package
-for Dart, not specific to Flutter.
-
-`Pottery` is a utility that makes up for it. It makes use of the widget lifecycle
-to limit the scope of pots. It is more natural in Flutter and less error-prone.
-
-### How will this make things better?
-
-While it is convenient that you can access a pot stored in a global variable
-from anywhere, it gives you too much freedom, making you wonder how pots should
-be managed in a Flutter app. For example, you may easily lose track of from
-where in your app code a particular pot is used.
-
-`Pottery` makes it possible to manage pots in a similar manner to using package:provider.
+Utility widgets for [Pot] (a simple and type-safe DI package) in Flutter.
+[Pottery] and [LocalPottery] automatically manage the lifecycle of pots and the
+objects they hold based on the widget lifecycle.
 
 ## Examples
 
@@ -35,12 +15,20 @@ where in your app code a particular pot is used.
 
 ### Pottery
 
-Create a [Pot] as "pending" first if it is not necessary yet at the start of
-your app. The pot should usually be assigned to a global variable.
+Use [Pottery] to set or replace the factories of pots for the duration that the
+widget exists in the tree. It is useful when a pot is not immediately necessary
+at app startup.
+
+Create [Pot]s as "pending" first in such cases. The pots should usually be
+assigned to global variables.
 
 ```dart
 final counterNotifierPot = Pot.pending<CounterNotifier>();
 ```
+
+> [!NOTE]
+> If a target pot is not pending and an object already exists in it when `Pottery`
+> is created, `Pottery` immediately replaces the object as well as the factory.
 
 Use the `overrides` parameter of `Pottery` to specify pots and their factories
 using `set()`. Each of the factories becomes available thereafter for the pot
@@ -70,34 +58,29 @@ Widget build(BuildContext context) {
 );
 ```
 
-> [!NOTE]
-> It is easier to understand how to use `Pottery` by imagining it as something
-> similar to `MultiProvider` of the provider package, although they internally
-> work quite differently:
->
-> - MultiProvider
->     - Creates objects and provides them so that they are available in the subtree.
-> - Pottery
->     - Replaces factories to make pots ready so that they are available after
->       that point. The widget tree is only used to manage the lifetime of
->       factories and objects in pots, so pots are still available outside the
->       tree.
-
 Removing `Pottery` from the tree (e.g. navigating back from the page where
 `Pottery` is used) resets all pots in the `overrides` list and replaces their
 factories to throw an [PotNotReadyException].
 
 > [!NOTE]
-> If a target pot is not pending and an object already exists in it when `Pottery`
-> is created, `Pottery` immediately replaces the object as well as the factory.
+> It is easier to understand how to use `Pottery` by imagining it as something
+> similar to `MultiProvider` of the provider package, although they internally
+> work quite differently:
+>
+> - **MultiProvider**: Creates objects and provides them so that they are
+>   available in the subtree.
+> - **Pottery**: Replaces factories to make pots ready so that they are
+>   available after that point. The widget tree is only used to manage the
+>   lifetime of factories and objects in pots, so pots are still available
+>   outside the tree.
 
 ### LocalPottery
 
-This widget defines new factories for existing pots to create objects that are
-available only in the subtree.
+[LocalPottery] defines new factories for existing pots to create objects that
+are available only in the subtree.
 
 An important fact is that the existing pots remain unchanged. The factories and
-objects are associated with those pots and stored in [LocalPottery] for local
+objects are associated with those pots and stored in `LocalPottery` for local
 use. Therefore, calling `yourPot()` still returns the globally accessible object
 stored in the pot itself.
 
@@ -177,6 +160,25 @@ LocalPottery(
 )
 ```
 
+## FAQ
+
+### Why is this better than the scoping feature of Pot?
+
+[Pot] itself has the feature of scoping, but it is a package for Dart, not
+specific to Flutter.
+
+`Pottery` is a utility that makes up for it. It makes use of the widget lifecycle
+to limit the scope of pots. It is more natural in Flutter and less error-prone.
+
+### How will this make things better?
+
+While it is convenient that you can access a pot stored in a global variable
+from anywhere, it gives you too much freedom, making you wonder how pots should
+be managed in a Flutter app. For example, you may easily lose track of from
+where in your app code a particular pot is used.
+
+`Pottery` makes it possible to manage pots in a similar manner to using package:provider.
+
 ## DevTools extension
 
 This package includes the DevTools extension.
@@ -191,9 +193,12 @@ It is also possible to start it earlier by calling `Pottery.startExtension()`.
 
 > [!NOTE]
 > Updates of the object in a pot caused by external factors (e.g. the object is
-> a `ValueNotifier` and its value is reassigned) are not automatically reflected
-> in the table view until an event of either `Pot`, `Pottery` or `LocalPottery`
-> happens. Press the refresh icon button if you want to see the changes quickly,
+> a `ValueNotifier` and its value is reassigned) are not automatically detected
+> by the DevTools Extension. However, because the Extension refreshes the entire
+> view whenever any event from `Pot`, `Pottery`, or `LocalPottery` occurs, such
+> changes may be reflected "coincidentally" as a result of an unrelated event.
+>
+> To ensure the changes are reflected immediately, press the refresh icon button,
 > or use [notifyObjectUpdate()][notifyObjectUpdate] on a pot to emit an event
 > to cause a refresh.
 

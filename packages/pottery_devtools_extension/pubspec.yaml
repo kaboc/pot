@@ -1,7 +1,7 @@
 name: pottery_devtools_extension
-description: "A Flutter web app for the package:pottery DevTools extension."
+description: "Pottery DevTools Extension"
 publish_to: 'none'
-version: 0.0.2
+version: 0.1.0
 
 environment:
   sdk: ^3.6.2
