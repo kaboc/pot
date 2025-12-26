@@ -42,7 +42,9 @@ your app. The pot should usually be assigned to a global variable.
 final counterNotifierPot = Pot.pending<CounterNotifier>();
 ```
 
-Use [Pottery] and specify a factory when you are about to start using the pot.
+Use the `overrides` parameter of `Pottery` to specify pots and their factories
+using `set()`. Each of the factories becomes available thereafter for the pot
+it is called on.
 
 ```dart
 Widget build(BuildContext context) {
@@ -53,10 +55,10 @@ Widget build(BuildContext context) {
 
   return Scaffold(
     body: Pottery(
-      pots: {
-        counterNotifierPot: CounterNotifier.new,
-      },
-      // The new factory specified in the pots argument above is ready
+      overrides: [
+        counterNotifierPot.set(CounterNotifier.new),
+      ],
+      // The new factory specified in `overrides` above is ready
       // before this builder is called for the first time.
       builder: (context) {
         // Methods and getters of counterNotifierPot are now available.
@@ -67,9 +69,6 @@ Widget build(BuildContext context) {
   ),
 );
 ```
-
-`pots` is a Map with key-value pairs of a Pot and a factory. Each of the factories
-becomes available for a corresponding Pot thereafter.
 
 > [!NOTE]
 > It is easier to understand how to use `Pottery` by imagining it as something
@@ -85,7 +84,7 @@ becomes available for a corresponding Pot thereafter.
 >       tree.
 
 Removing `Pottery` from the tree (e.g. navigating back from the page where
-`Pottery` is used) resets all pots in the `pots` map and replaces their
+`Pottery` is used) resets all pots in the `overrides` list and replaces their
 factories to throw an [PotNotReadyException].
 
 > [!NOTE]
@@ -111,9 +110,9 @@ class ParentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LocalPottery(
-      pots: {
-        fooPot: () => Foo(222),
-      },
+      overrides: [
+        fooPot.set(() => Foo(222)),
+      ],
       builder: (context) {
         print(fooPot()); // 111
         print(fooPot.of(context)); // 222
@@ -152,35 +151,15 @@ and subtypes:
 
 ```dart
 LocalPottery(
-  pots: {
-    myChangeNotifier: () => MyChangeNotifier(),
-    intValueNotifier: () => ValueNotifier(111),
-  },
+  overrides: [
+    myChangeNotifier.set(() => MyChangeNotifier()),
+    intValueNotifier.set(() => ValueNotifier(111)),
+  ],
   disposer: (pots) {
     pots.values.whereType<ChangeNotifier>().forEach((v) => v.dispose());
   },
   builder: (context) { ... },
 )
-```
-
-## Caveats
-
-### Make sure to specify a factory that returns a correct type.
-
-Key-value pairs passed to `pots` are not type-safe.
-
-In the following example, a function returning an `int` value is specified as
-a new factory of a Pot for `String`. Although it is obviously wrong, the static
-analysis does not tell you about the mistake. The error only occurs at runtime.
-
-```dart
-final stringPot = Pot.pending<String>();
-```
-
-```dart
-pots: {
-  stringPot: () => 123,
-}
 ```
 
 ## DevTools extension

@@ -25,6 +25,31 @@ void main() {
     fooPot = barPot = nullablePot = null;
   });
 
+  test('The overrides parameter strictly requires PotReplacement type', () {
+    Type getType<T>(List<T> v) => T;
+
+    final List<num> list = <int>[10];
+    final type = getType(list);
+
+    // Ensures that the type obtained by getType() is the static type
+    // argument (T) of the list, not the runtime type of its elements.
+    expect(type, num);
+    expect(type, isNot(int));
+
+    final pottery = Pottery(
+      overrides: [Pot.pending<int>().set(() => 10)],
+      builder: (context) => const SizedBox(),
+    );
+
+    // Ensures that getType() captures the static type argument
+    // defined in the property, rather than the actual runtime type
+    // of the assigned instance.
+    final overridesType = getType(pottery.overrides);
+
+    expect(overridesType, PotReplacement<Object?>);
+    expect(overridesType, isNot(PotOverride<Object?>));
+  });
+
   testWidgets(
     'Using Pottery makes pots available and removing it makes pots '
     'unavailable again',
@@ -39,10 +64,10 @@ void main() {
 
       await tester.pumpWidget(
         TestPottery(
-          pots: {
-            fooPot!: Foo.new,
-            barPot!: Bar.new,
-          },
+          overrides: [
+            fooPot!.set(Foo.new),
+            barPot!.set(Bar.new),
+          ],
         ),
       );
 
@@ -73,9 +98,9 @@ void main() {
       Foo? foo;
       await tester.pumpWidget(
         TestPottery(
-          pots: {
-            fooPot!: () => const Foo(20),
-          },
+          overrides: [
+            fooPot!.set(() => const Foo(20)),
+          ],
           builder: (_) {
             foo ??= fooPot!();
             return const SizedBox.shrink();
@@ -92,9 +117,9 @@ void main() {
 
     await tester.pumpWidget(
       TestPottery(
-        pots: {
-          nullablePot!: () => null,
-        },
+        overrides: [
+          nullablePot!.set(() => null),
+        ],
       ),
     );
     expect(nullablePot!(), isNull);
@@ -102,7 +127,7 @@ void main() {
 
   testWidgets(
     'PotNotReadyException is thrown when Pottery calls reset() '
-    'of a pot that depends on a pot located later in the pots map',
+    'of a pot that depends on a pot located later in overrides list',
     (tester) async {
       fooPot = Pot.pending(disposer: (_) => barPot!());
       barPot = Pot.pending();
@@ -115,10 +140,10 @@ void main() {
 
       await tester.pumpWidget(
         TestPottery(
-          pots: {
-            fooPot!: Foo.new,
-            barPot!: Bar.new,
-          },
+          overrides: [
+            fooPot!.set(Foo.new),
+            barPot!.set(Bar.new),
+          ],
         ),
       );
 
@@ -134,18 +159,18 @@ void main() {
   );
 
   testWidgets(
-    'PotNotReadyException is thrown when Pottery calls reset() '
-    'of a pot that depends on a pot located earlier in the map',
+    'PotNotReadyException is thrown when Pottery calls reset() of '
+    'a pot that depends on a pot located earlier in overrides list',
     (tester) async {
       fooPot = Pot.pending();
       barPot = Pot.pending(disposer: (_) => fooPot!());
 
       await tester.pumpWidget(
         TestPottery(
-          pots: {
-            fooPot!: Foo.new,
-            barPot!: Bar.new,
-          },
+          overrides: [
+            fooPot!.set(Foo.new),
+            barPot!.set(Bar.new),
+          ],
         ),
       );
 
@@ -176,19 +201,25 @@ void main() {
     await tester.pumpWidget(
       TestPottery(
         potteryKey: key,
-        pots: {
-          fooPot!: fooFactory,
-          barPot!: barFactory,
-        },
+        overrides: [
+          fooPot!.set(fooFactory),
+          barPot!.set(barFactory),
+        ],
       ),
     );
 
     final builder = DiagnosticPropertiesBuilder();
     key.currentState!.debugFillProperties(builder);
 
+    final prop = builder.properties.firstWhere((v) => v.name == 'overrides');
+    final potReplacements = [
+      if (prop.value case final List<PotReplacement<Object?>> repls)
+        for (final repl in repls) (repl.pot, repl.factory),
+    ];
+
     expect(
-      builder.properties.firstWhere((v) => v.name == 'pots').value,
-      {fooPot: fooFactory, barPot: barFactory},
+      potReplacements,
+      [(fooPot, fooFactory), (barPot, barFactory)],
     );
   });
 }

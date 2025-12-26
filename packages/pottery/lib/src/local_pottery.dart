@@ -4,12 +4,10 @@ import 'package:flutter/widgets.dart';
 
 import 'package:pot/pot.dart';
 
+import 'common_types.dart';
 import 'extension/extension_manager.dart';
 import 'pottery.dart';
 import 'utils.dart';
-
-/// The signature of a map consisting of pots and factories.
-typedef PotOverrides = Map<Pot<Object?>, PotObjectFactory<Object?>>;
 
 /// The signature of a map consisting of pots and the objects they hold.
 typedef LocalPotteryObjects = Map<Pot<Object?>, Object?>;
@@ -52,9 +50,9 @@ class _InheritedLocalPottery extends InheritedWidget {
 ///   @override
 ///   Widget build(BuildContext context) {
 ///     return LocalPottery(
-///       pots: {
-///         fooPot: () => Foo(222),
-///       },
+///       overrides: [
+///         fooPot.set(() => Foo(222)),
+///       ],
 ///       builder: (context) {
 ///         print(fooPot()); // 111
 ///         print(fooPot.of(context)); // 222
@@ -96,9 +94,9 @@ class _InheritedLocalPottery extends InheritedWidget {
 ///   static Route<void> route({required Category category}) {
 ///     return MaterialPageRoute(
 ///       builder: (context) => LocalPottery(
-///         pots: {
-///           todosNotifierPot: () => TodosNotifierPot(category: category),
-///         },
+///         overrides: [
+///           todosNotifierPot.set(() => TodosNotifierPot(category: category)),
+///         ],
 ///         builder: (context) => const TodoListPage(),
 ///       ),
 ///     );
@@ -149,7 +147,7 @@ class LocalPottery extends StatefulWidget {
   /// {@macro localPottery.class}
   const LocalPottery({
     super.key,
-    required this.pots,
+    required this.overrides,
     required this.builder,
     this.disposer,
   });
@@ -159,7 +157,7 @@ class LocalPottery extends StatefulWidget {
   /// The factories are called immediately to create objects when the
   /// [LocalPottery] is created. The object is accessible by calling
   /// `of()` (not [Pot.call]) on a pot from the widget subtree.
-  final PotOverrides pots;
+  final List<PotOverride<Object?>> overrides;
 
   /// A function called to obtain the child widget.
   final WidgetBuilder builder;
@@ -189,8 +187,8 @@ class _LocalPotteryState extends State<LocalPottery> {
     super.initState();
 
     _objects = {
-      for (final (pot, objectFactory) in widget.pots.records)
-        pot: objectFactory(),
+      for (final PotOverride(:pot, :factory) in widget.overrides)
+        pot: factory(),
     };
 
     runIfDebug(() {
