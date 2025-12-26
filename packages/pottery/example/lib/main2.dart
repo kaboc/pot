@@ -74,7 +74,7 @@ class _Item extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final index = indexPot.of(context);
-    final notifier = counterPot.of(context);
+    final notifier = counterPot.maybeOf(context) ?? counterPot();
     final count = notifier.grab(context);
 
     return ListTile(

@@ -119,6 +119,34 @@ void main() {
   );
 
   testWidgets(
+    'Calling maybeOf() on a pot returns null regardless of whether the pot is '
+    'nullable if no LocalPottery ancestors have the pot in overrides list',
+    (tester) async {
+      barPot = Pot.pending();
+      final nullablePot = Pot.replaceable<int?>(() => 10);
+      final nonNullablePot = Pot.replaceable<int>(() => 10);
+      expect(nullablePot(), 10);
+      expect(nonNullablePot(), 10);
+
+      var called = false;
+      await tester.pumpWidget(
+        TestLocalPottery(
+          overrides: [
+            barPot!.set(Bar.new),
+          ],
+          builder: (context) {
+            expect(nullablePot.maybeOf(context), isNull);
+            expect(nonNullablePot.maybeOf(context), isNull);
+            called = true;
+            return const SizedBox.shrink();
+          },
+        ),
+      );
+      expect(called, isTrue);
+    },
+  );
+
+  testWidgets(
     'Pots are immediately available in the builder function',
     (tester) async {
       fooPot = Pot.replaceable(() => const Foo(10));

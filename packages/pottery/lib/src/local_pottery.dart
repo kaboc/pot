@@ -248,20 +248,7 @@ extension NearestLocalPotObjectOf<T> on Pot<T> {
     return _findObject(element);
   }
 
-  /// Returns the object provided by the nearest [LocalPottery] ancestor
-  /// that has this [Pot] in its 'pots' map.
-  ///
-  /// If no such `LocalPottery` is found, the object held in the global
-  /// pot is returned, in which case, the return value is the same as
-  /// that of the [Pot.call] method.
-  ///
-  /// This method efficiently looks up the widget tree to find a localized
-  /// instance of the object associated with this pot.
-  ///
-  /// See also:
-  /// * [LocalPottery], which provides the object that the `of()`
-  ///   method obtains.
-  T of(BuildContext context) {
+  ({Object? object, bool found}) _recursivelyFindObject(BuildContext context) {
     // Targets the current BuildContext too so that the local objects
     // become available from within the builder callback.
     var (:object, :found) = _findObject(context);
@@ -273,6 +260,45 @@ extension NearestLocalPotObjectOf<T> on Pot<T> {
       });
     }
 
+    return (object: object, found: found);
+  }
+
+  /// Returns the object provided by the nearest [LocalPottery] ancestor
+  /// that has this [Pot] in its `overrides` list, if any.
+  ///
+  /// Unlike [of], this method returns `null` if no such `LocalPottery`
+  /// ancestor is found.
+  ///
+  /// This method efficiently looks up the widget tree to find a localized
+  /// instance of the object associated with this pot.
+  ///
+  /// See also:
+  /// * [of], which throws instead of returning `null` if no relevant
+  ///   `LocalPottery` ancestor is found.
+  /// * [LocalPottery], which provides the object that the `of()` and
+  ///   `maybeOf` methods obtain.
+  T? maybeOf(BuildContext context) {
+    final (:object, :found) = _recursivelyFindObject(context);
+    return found ? object as T : null;
+  }
+
+  /// Returns the object provided by the nearest [LocalPottery] ancestor
+  /// that has this [Pot] in its 'overrides' list.
+  ///
+  /// If no such `LocalPottery` is found, the object held in the global
+  /// pot is returned, in which case, the return value is the same as
+  /// that of the [Pot.call] method.
+  ///
+  /// This method efficiently looks up the widget tree to find a localized
+  /// instance of the object associated with this pot.
+  ///
+  /// See also:
+  /// * [maybeOf], which returns null if no relevant `LocalPottery`
+  ///   ancestor is found.
+  /// * [LocalPottery], which provides the object that the `of()` and
+  ///   `maybeOf()` methods obtain.
+  T of(BuildContext context) {
+    final (:object, :found) = _recursivelyFindObject(context);
     return found ? object as T : this();
   }
 }
