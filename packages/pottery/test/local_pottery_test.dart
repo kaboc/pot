@@ -47,6 +47,22 @@ void main() {
     },
   );
 
+  test(
+    'set() resolves to the appropriate override type based on the pot type',
+    () {
+      final nonReplaceablePot = Pot(() => 1);
+      expect(nonReplaceablePot.set(() => 2), isA<PotOverride<int>>());
+      expect(nonReplaceablePot.set(() => 3), isNot(isA<PotReplacement<int>>()));
+
+      final replaceablePot = Pot.replaceable(() => 1);
+      expect(replaceablePot.set(() => 2), isA<PotReplacement<int>>());
+      // This confirms that PotReplacement extends PotOverride.
+      // It ensures that LocalPottery can accept both types of overrides in
+      // its `overrides` list, which is defined as List<PotOverride>.
+      expect(replaceablePot.set(() => 3), isA<PotOverride<int>>());
+    },
+  );
+
   testWidgets(
     'call() cannot get object from LocalPottery ancestor',
     (tester) async {
