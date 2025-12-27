@@ -1,0 +1,12 @@
+name: _
+publish_to: none
+
+environment:
+  sdk: ^3.6.2
+
+workspace:
+  - packages/pot
+  - packages/pot/example
+  - packages/pottery
+  - packages/pottery/example
+  - packages/pottery_devtools_extension

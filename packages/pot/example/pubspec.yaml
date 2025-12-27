@@ -4,6 +4,8 @@ description: An example of Pot.
 environment:
   sdk: ^3.6.2
 
+resolution: workspace
+
 dependencies:
   pot:
     path: ../
