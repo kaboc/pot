@@ -322,8 +322,8 @@ class LocalPotteryNotFoundException implements Exception {
   /// The type of the pot used as a key to find the localized object.
   final String potTypeName;
 
+  // coverage:ignore-start
   @override
-  // coverage:ignore-line
   String toString() => '''
 Error: No localized value found for $potTypeName.
 
@@ -331,4 +331,5 @@ To fix this, please ensure that:
   * The widget tree contains a LocalPottery widget above the one calling of().
   * The LocalPottery includes an entry for $potTypeName in its `overrides` list to provide a localized value.
 ''';
+  // coverage:ignore-end
 }
