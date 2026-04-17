@@ -49,6 +49,12 @@ import 'utils.dart';
 /// > [Pottery] does not bind pots to the widget tree. It only uses the
 /// > lifecycle of itself in the tree to control the lifetime of pots'
 /// > content, which is an important difference from [LocalPottery].
+///
+/// > [!WARNING]
+/// > Do not manually reset or replace a pot used by a `Pottery`. Also,
+/// > do not let a `Pottery` take over pots already managed by another
+/// > `Pottery`. Doing so skips the reset that should happen when the
+/// > original `Pottery` is disposed.
 /// {@endtemplate}
 class Pottery extends StatefulWidget {
   /// Creates a [Pottery] widget that limits the lifespan of the
@@ -84,6 +90,8 @@ class Pottery extends StatefulWidget {
 }
 
 class _PotteryState extends State<Pottery> {
+  final Map<ReplaceablePot<Object?>, int> _factoryHashCodes = {};
+
   PotteryExtensionManager? _extensionManager;
 
   @override
@@ -97,19 +105,37 @@ class _PotteryState extends State<Pottery> {
 
     for (final repl in widget.overrides) {
       repl.pot.replace(repl.factory);
+      _factoryHashCodes[repl.pot] = repl.factory.hashCode;
     }
   }
 
   @override
   void dispose() {
-    final pots = widget.overrides.map((repl) => repl.pot);
+    final pots = widget.overrides.map((v) => v.pot).toList();
+    final removedPots = <ReplaceablePot<Object?>>[];
 
     // Some pots may depend on other pots located earlier in
     // the collection, so they must be reset in reverse order.
     for (var i = pots.length - 1; i >= 0; i--) {
-      pots.elementAt(i).resetAsPending();
+      final pot = pots[i];
+
+      // If the factory's hash code has changed, another Pottery has
+      // probably replaced the factory. In that case, the pot has already
+      // been reset by the replacement. Resetting it here would make the
+      // pot unusable for the new screen, so it must be skipped.
+      //
+      // This can happen when a new instance of the same Pottery is
+      // created before the previous screen finishes its closing animation.
+      // Then dispose() of the old instance may run after initState() of
+      // the new one.
+      //
+      // ignore: invalid_use_of_internal_member
+      if (pot.factoryHashCode == _factoryHashCodes[pot]) {
+        pot.resetAsPending();
+        removedPots.add(pot);
+      }
     }
-    _extensionManager?.onPotteryRemoved(this, pots);
+    _extensionManager?.onPotteryRemoved(this, removedPots);
 
     super.dispose();
   }

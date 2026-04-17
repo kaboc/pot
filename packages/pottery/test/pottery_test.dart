@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart' show DiagnosticPropertiesBuilder;
+import 'package:flutter/material.dart' show ElevatedButton;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -124,6 +125,72 @@ void main() {
     );
     expect(nullablePot!(), isNull);
   });
+
+  testWidgets(
+    'Pot reset is skipped when Pottery is disposed if another Pottery has '
+    "replaced the pot's factory",
+    (tester) async {
+      final disposedObjects = <String>[];
+      fooPot = Pot.pending(
+        disposer: (v) => disposedObjects.add('Foo(${v.value})'),
+      );
+      barPot = Pot.pending(
+        disposer: (v) => disposedObjects.add('Bar()'),
+      );
+
+      var count = 0;
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              return Column(
+                children: [
+                  if (count <= 1)
+                    Pottery(
+                      overrides: [
+                        fooPot!.set(() => const Foo(1)),
+                        barPot!.set(Bar.new),
+                      ],
+                      builder: (context) => const SizedBox.shrink(),
+                    ),
+                  if (count == 1)
+                    Pottery(
+                      overrides: [
+                        fooPot!.set(() => const Foo(2)),
+                      ],
+                      builder: (context) => const SizedBox.shrink(),
+                    ),
+                  ElevatedButton(
+                    onPressed: () => setState(() => count += 1),
+                    child: const Text(''),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      );
+
+      fooPot!.create();
+      barPot!.create();
+      expect(disposedObjects, isEmpty);
+
+      final buttonFinder = find.byType(ElevatedButton);
+      await tester.tap(buttonFinder);
+      await tester.pump();
+
+      fooPot!.create();
+      barPot!.create();
+      expect(disposedObjects, ['Foo(1)']);
+
+      await tester.tap(buttonFinder);
+      await tester.pump();
+
+      expect(disposedObjects, unorderedEquals(['Foo(1)', 'Bar()', 'Foo(2)']));
+    },
+  );
 
   testWidgets(
     'PotNotReadyException is thrown when Pottery calls reset() '
