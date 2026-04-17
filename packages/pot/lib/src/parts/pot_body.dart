@@ -36,6 +36,11 @@ class _PotBody<T> {
   /// a pot is associated with a certain scope as expected.
   int? get scope => _scope;
 
+  /// Internal API for Pot and related packages.
+  /// Intentionally undocumented for external use.
+  @internal
+  int? get factoryHashCode => _factory.hashCode;
+
   Pot<T> get _pot => this as Pot<T>;
 
   @override

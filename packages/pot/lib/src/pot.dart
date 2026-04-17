@@ -1,4 +1,5 @@
-import 'package:meta/meta.dart' show immutable, sealed, visibleForTesting;
+import 'package:meta/meta.dart'
+    show immutable, internal, sealed, visibleForTesting;
 
 import 'errors.dart';
 import 'event.dart';
