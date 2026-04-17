@@ -49,6 +49,12 @@ import 'utils.dart';
 /// > [Pottery] does not bind pots to the widget tree. It only uses the
 /// > lifecycle of itself in the tree to control the lifetime of pots'
 /// > content, which is an important difference from [LocalPottery].
+///
+/// > [!WARNING]
+/// > Do not manually reset or replace a pot used by a `Pottery`. Also,
+/// > do not let a `Pottery` take over pots already managed by another
+/// > `Pottery`. Doing so skips the reset that should happen when the
+/// > original `Pottery` is disposed.
 /// {@endtemplate}
 class Pottery extends StatefulWidget {
   /// Creates a [Pottery] widget that limits the lifespan of the
