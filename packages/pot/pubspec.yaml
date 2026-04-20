@@ -1,6 +1,6 @@
 name: pot
 description: A simple and type-safe dependency injection (DI) package, designed for easy scoping and testing.
-version: 0.9.0
+version: 0.9.1
 repository: https://github.com/kaboc/pot
 
 topics:

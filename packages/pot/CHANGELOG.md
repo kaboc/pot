@@ -1,3 +1,7 @@
+## 0.9.1
+
+- Add an internal getter for the factory hash code.
+
 ## 0.9.0
 
 - Update minimum Dart SDK version to 3.6.2.
