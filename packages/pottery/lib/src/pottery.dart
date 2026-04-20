@@ -137,6 +137,9 @@ class _PotteryState extends State<Pottery> {
     }
     _extensionManager?.onPotteryRemoved(this, removedPots);
 
+    _factoryHashCodes.clear();
+    _extensionManager = null;
+
     super.dispose();
   }
 
