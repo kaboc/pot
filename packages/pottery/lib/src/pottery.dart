@@ -114,8 +114,8 @@ class _PotteryState extends State<Pottery> {
     final pots = widget.overrides.map((v) => v.pot).toList();
     final removedPots = <ReplaceablePot<Object?>>[];
 
-    // Some pots may depend on other pots located earlier in
-    // the collection, so they must be reset in reverse order.
+    // Some pots may depend on other pots located earlier in the collection,
+    // so they must be reset in reverse order.
     for (var i = pots.length - 1; i >= 0; i--) {
       final pot = pots[i];
 

@@ -1,3 +1,8 @@
+## 0.5.1
+
+- Avoid resetting active pot in stale `Pottery.dispose()` when pot factory has changed. ([#16])
+- Clear `Pottery` resources on dispose.
+
 ## 0.5.0
 
 - Update minimum Dart SDK version to 3.6.2.
@@ -9,7 +14,7 @@
 - **Breaking**:
     - Change `of()` to throw if no relevant `LocalPottery` is found.
         - Use `maybeOf()` to get `null` instead.
-    - Replace `pots` parameter (Map) with type-safe `overrides` (List) via `set()`. (#14)
+    - Replace `pots` parameter (Map) with type-safe `overrides` (List) via `set()`. ([#14])
         - Before: `pots: {myPot: () => object)}`
         - After: `overrides: [myPot.set(() => object)]`
     - Trivial changes:
@@ -44,10 +49,10 @@
 ## 0.2.0
 
 - **Breaking**
-    - Rename `ScopedPottery` to `LocalPottery`. (#7)
+    - Rename `ScopedPottery` to `LocalPottery`. ([#7])
         - This is to avoid it being confused with the scoping feature of package:pot.
         - `ScopedPottery` now exists as an alias, but will be removed.
-    - Rename `ScopedPots` to `LocalPotteryObjects`. (#7)
+    - Rename `ScopedPots` to `LocalPotteryObjects`. ([#7])
         - This is the type name of the `builder` parameter of `LocalPottery`.
 - Raise the minimum Flutter SDK version to 3.10.0.
 
@@ -85,3 +90,4 @@
 [#4]: https://github.com/kaboc/pot/pull/4
 [#7]: https://github.com/kaboc/pot/pull/7
 [#14]: https://github.com/kaboc/pot/pull/14
+[#16]: https://github.com/kaboc/pot/pull/16
